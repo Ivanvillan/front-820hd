@@ -1,0 +1,26 @@
+<section id="weekoffers">
+    <div class="weekoffers-container">
+        <div class="weekoffers-header">
+            <h3 class="title-container">Ofertas semanales</h3>
+            <div class="weekoffers-manage" *ngIf="isAdmin">
+                <button [routerLink]="['/manage/', 1]">Administrar</button>
+            </div>
+        </div>
+        <div class="weekoffers-body">
+            <swiper class="img-container-weekoffers mySwiper" [slidesPerView]="3" [slidesPerGroup]="3" [loop]="true"
+                [loopFillGroupWithBlank]="true" [pagination]="{
+            clickable: true
+        }">
+                <ng-template class="weekoffer-element" swiperSlide *ngFor="let weekoffer of weekoffers">
+                    <img (click)="openDialog(weekoffer)" src="http://localhost:3002/images/{{weekoffer.additional}}" alt="">
+                    <mat-chip-list (click)="openDialog(weekoffer)">
+                        <mat-chip>{{weekoffer.discount}}% OFF</mat-chip>
+                    </mat-chip-list>
+                    <p (click)="openDialog(weekoffer)">{{weekoffer.description}}</p>
+                    <span (click)="openDialog(weekoffer)" class="price">{{weekoffer.price | currency: '$'}}</span>
+                    <!-- <button>Solicitar</button> -->
+                </ng-template>
+            </swiper>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="title">
+    <span>Detalle de la oferta</span>
+  </div>
+  <div class="center">
+    <div class="image">
+      <div *ngIf="data.additional; else noimg">
+        <img src="http://localhost:3002/images/{{data.additional}}" alt="">
+      </div>
+      <ng-template #noimg>
+        <img src="./../../../../../assets/no-image.png" alt="">
+      </ng-template>
+    </div>
+    <div class="info">
+      <div class="discount">
+        <span>{{data.discount}}% OFF</span>
+      </div>
+      <div class="name">
+        <span>{{data.title}}</span>
+      </div>
+      <div class="description">
+        <span>{{data.description}}</span>
+      </div>
+      <div class="price">
+        <span>{{data.price | currency: '$'}}</span>
+      </div>
+      <div class="send">
+        <button (click)="send()">Solicitar</button>
+      </div>
+    </div>
+  </div>
+</div>

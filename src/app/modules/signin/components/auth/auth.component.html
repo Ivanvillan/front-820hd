@@ -1,0 +1,13 @@
+<form>
+  <div class="form-inputs">
+    <input type="email" placeholder="Email" name="email" [(ngModel)]="login.email" autofocus>
+    <input type="password" placeholder="Contraseña" name="password" [(ngModel)]="login.password">
+  </div>
+  <div class="form-buttons">
+    <a (click)="openSnackbar()">Olvidé mi contraseña</a>
+    <button (click)="auth()">Ingresar</button>
+  </div>
+  <div class="service">
+    <p>¿Todavía no usas 820hd? <a (click)="openSnackbar()">Contratá el servicio</a></p>
+  </div>
+</form>

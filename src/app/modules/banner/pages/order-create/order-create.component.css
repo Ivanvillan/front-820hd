@@ -1,0 +1,18 @@
+@media screen and (max-width: 39.9em){
+}
+
+/* tablets */
+@media screen and (min-width: 40em) and (max-width: 63.9em) {
+
+}
+
+/* web */
+@media screen and (min-width: 64em) {
+    #center {
+        display: grid;
+        grid-template-columns: 25% 45% 25%;
+        margin-top: 15px;
+        justify-content: space-evenly;
+        /* grid-auto-rows: minmax(100px, auto); */
+    }
+}

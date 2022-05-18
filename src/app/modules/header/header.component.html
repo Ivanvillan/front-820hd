@@ -1,0 +1,86 @@
+<nav class="isHome" *ngIf="setHeader && isHome">
+    <section id="profile">
+        <div class="profile-info" (click)="toggleLogout()">
+            <span class="username">{{ username }}</span>
+            <span class="usertype">{{ userType }}</span>
+        </div>
+        <div class="profile-image" (click)="toggleLogout()"><img src="./../../../assets/user.jpg" alt=""></div>
+        <div class="logout" [class.active]="showLogout">
+            <a (click)="logout()">Salir</a>
+        </div>
+    </section>
+    <section id="logo">
+        <img src="./../../../assets/logo820hd-w.png" alt="Logo 820hd">
+    </section>
+    <section id="title">
+        <h1>Hacé tu pedido en 820HD</h1>
+    </section>
+    <section id="services">
+        <div class="services-button">
+            <div class="supplies" routerLink="/supplies">
+                <img src="./../../../assets/insumos-icon.png" alt="Icon insumo">
+                <span>Insumos</span>
+            </div>
+            <div class="assistance" routerLink="/assistance">
+                <img src="./../../../assets/service-icon.png" alt="Icon asistencia">
+                <span>Servicios</span>
+            </div>
+        </div>
+    </section>
+</nav>
+
+<nav class="isAdmin" *ngIf="setHeader && isAdmin">
+    <section id="profile">
+        <div class="profile-info" (click)="toggleLogout()">
+            <span class="username">{{ username }}</span>
+            <span class="usertype">{{ userType }}</span>
+        </div>
+        <div class="profile-image" (click)="toggleLogout()"><img src="./../../../assets/user.jpg" alt=""></div>
+        <div class="logout" [class.active]="showLogout">
+            <a (click)="logout()">Salir</a>
+        </div>
+    </section>
+    <section id="logo-admin">
+        <img src="./../../../assets/logo820hd-w.png" alt="Logo 820hd">
+    </section>
+    <section id="title-admin">
+        <h1>Administración</h1>
+        <p>Estás administrando 820HD como <strong>{{ username }}</strong></p>
+    </section>
+</nav>
+
+<nav class="isUser" *ngIf="setHeader && isUser">
+    <section id="profile">
+        <div class="profile-info" (click)="toggleLogout()">
+            <span class="username">{{ username }}</span>
+            <span class="usertype">{{ userType }}</span>
+        </div>
+        <div class="profile-image" (click)="toggleLogout()"><img src="./../../../assets/user.jpg" alt=""></div>
+        <div class="logout" [class.active]="showLogout">
+            <a (click)="logout()">Salir</a>
+        </div>
+    </section>
+    <section id="logo">
+        <img src="./../../../assets/logo820hd-w.png" alt="Logo 820hd">
+    </section>
+    <section id="title-user">
+        <h1>Sección servicios</h1>
+        <p>Le rogamos que complete con la mayor cantidad de detalles el formulario, </p>
+        <p> de manera que podamos darle seguimiento en el menor tiempo posible</p>
+    </section>
+    <section id="services">
+        <div class="services-button-user">
+            <div class="supplies-user" [ngClass]="{'active': isSupplies}" routerLink="/supplies">
+                <div class="supplies-span">
+                    <span>Insumos</span>
+                </div>
+            </div>
+            <div class="assistance-user" [ngClass]="{'active': isAssistance}" routerLink="/assistance">
+                <span>Servicios</span>
+            </div>
+        </div>
+    </section>
+</nav>
+
+<ng-template #elseSection></ng-template>
+

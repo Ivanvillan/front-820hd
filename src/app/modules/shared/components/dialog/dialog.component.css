@@ -1,0 +1,193 @@
+@media screen and (max-width: 39.9em){
+    .title {
+        font-size: 18px;
+        font-weight: 700;
+    }
+    
+    .center {
+        display: flex;
+        align-items: center;
+    }
+    
+    .image {
+        margin-top: 10px;
+        margin-right: 20px;
+    }
+    img {
+        width: 80px;
+    }
+    .info {
+        margin-top: 10px;
+        width: 100%;
+    }
+    
+    .discount {
+        width: 60px;
+        background-color: #65BB12;
+        border: 1px solid #65BB12;
+        color: #f9f9f9;
+        margin-top: 8px;
+        padding: 3px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+    }
+    
+    .name {
+        margin-top: 10px;
+        text-transform: capitalize;
+        font-weight: 600;
+    }
+    
+    .description {
+        margin-top: 20px;
+        margin-right: 10px;
+        font-weight: 300;
+    }
+    
+    .price {
+        margin-top: 20px;
+        color: #65BB12;
+        font-weight: 400;
+    }
+    .send button{
+        float: right;
+        background-color: #0078bd;
+        color: #f9f9f9;
+        border: none;
+        border-radius: 3px;
+        width: 80px;
+        height: 30px;
+        cursor: pointer;
+    }
+}
+
+@media screen and (min-width: 40em) and (max-width: 63.9em) {
+    .title {
+        font-size: 18px;
+        font-weight: 700;
+    }
+    
+    .center {
+        display: flex;
+        align-items: center;
+    }
+    
+    .image {
+        margin-top: 10px;
+        margin-right: 20px;
+    }
+    img {
+        width: 100px;
+    }
+    .info {
+        margin-top: 10px;
+        width: 100%;
+    }
+    
+    .discount {
+        width: 60px;
+        background-color: #65BB12;
+        border: 1px solid #65BB12;
+        color: #f9f9f9;
+        margin-top: 8px;
+        padding: 3px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+    }
+    
+    .name {
+        margin-top: 10px;
+        text-transform: capitalize;
+        font-weight: 600;
+    }
+    
+    .description {
+        margin-top: 20px;
+        margin-right: 10px;
+        font-weight: 300;
+    }
+    
+    .price {
+        margin-top: 20px;
+        color: #65BB12;
+        font-weight: 400;
+    }
+    .send button{
+        float: right;
+        background-color: #0078bd;
+        color: #f9f9f9;
+        border: none;
+        border-radius: 3px;
+        width: 80px;
+        height: 30px;
+        cursor: pointer;
+    }
+}
+
+@media screen and (min-width: 64em) {
+    .title {
+        font-size: 18px;
+        font-weight: 700;
+    }
+    
+    .center {
+        display: flex;
+    }
+    
+    .image {
+        margin-top: 10px;
+        margin-right: 20px;
+    }
+    img {
+        width: 150px;
+    }
+    .info {
+        margin-top: 10px;
+        width: 100%;
+    }
+    
+    .discount {
+        width: 60px;
+        background-color: #65BB12;
+        border: 1px solid #65BB12;
+        color: #f9f9f9;
+        margin-top: 8px;
+        padding: 3px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+    }
+    
+    .name {
+        margin-top: 10px;
+        text-transform: capitalize;
+        font-weight: 600;
+    }
+    
+    .description {
+        margin-top: 20px;
+        margin-right: 10px;
+        font-weight: 300;
+    }
+    
+    .price {
+        margin-top: 20px;
+        color: #65BB12;
+        font-weight: 400;
+    }
+    .send button{
+        float: right;
+        background-color: #0078bd;
+        color: #f9f9f9;
+        border: none;
+        border-radius: 3px;
+        width: 80px;
+        height: 30px;
+        cursor: pointer;
+    }
+}

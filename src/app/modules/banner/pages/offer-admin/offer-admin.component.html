@@ -1,0 +1,150 @@
+<div class="container">
+  <div class="box-create">
+    <div class="first-section">
+      <div class="title">
+        <span>Crear nueva oferta</span>
+      </div>
+      <div class="img">
+        <img [src]="imgToShow ? imgToShow : 'assets/logo820hd.png'" width="75" alt="">
+      </div>
+      <div class="select-image">
+        <label for="files" class="label-select">Seleccionar imagen</label>
+        <input (change)="readURL($event);" id="files" style="visibility:hidden;" type="file">
+      </div>
+    </div>
+    <form #offerForm="ngForm">
+      <div class="second-section">
+        <div class="one fields">
+          <mat-form-field appearance="legacy">
+            <mat-label>Titulo</mat-label>
+            <input matInput type="text" [(ngModel)]="offer.title" name="title">
+          </mat-form-field>
+          <mat-form-field appearance="legacy">
+            <mat-label>Descripcion</mat-label>
+            <input matInput type="text" [(ngModel)]="offer.description" name="description">
+          </mat-form-field>
+        </div>
+        <div class="two fields">
+          <mat-form-field appearance="legacy">
+            <mat-label>Precio</mat-label>
+            <input matInput type="number" [(ngModel)]="offer.price" name="price">
+          </mat-form-field>
+          <mat-form-field appearance="legacy">
+            <mat-label>Descuento</mat-label>
+            <input matInput type="number" [(ngModel)]="offer.discount" name="discount">
+          </mat-form-field>
+        </div>
+        <div class="three fields">
+          <mat-form-field appearance="legacy">
+            <mat-label>Tipo de Oferta</mat-label>
+            <mat-select [(ngModel)]="offer.type" name="type">
+              <mat-option [value]="1">
+                Insumo
+              </mat-option>
+              <mat-option [value]="2">
+                Servicio
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="legacy">
+            <mat-label>¿Oferta semanal?</mat-label>
+            <mat-select [(ngModel)]="offer.weekly" name="weekly">
+              <mat-option [value]="1">
+                Si
+              </mat-option>
+              <mat-option [value]="0">
+                No
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="create-button">
+            <button (click)="create(); offerForm.resetForm()">Crear</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="center-section">
+    <div class="list-offer">
+      <table class="table mat-elevation-z8" mat-table [dataSource]="dataTable">
+        <ng-container matColumnDef="Titulo">
+          <th mat-header-cell *matHeaderCellDef>Titulo</th>
+          <td mat-cell *matCellDef="let offer">{{offer.title}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Descripcion">
+          <th mat-header-cell *matHeaderCellDef>Descripcion</th>
+          <td mat-cell *matCellDef="let offer">{{offer.description}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Precio">
+          <th mat-header-cell *matHeaderCellDef>Precio</th>
+          <td mat-cell *matCellDef="let offer">{{offer.price | currency: '$'}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Descuento">
+          <th mat-header-cell *matHeaderCellDef>Descuento</th>
+          <td mat-cell *matCellDef="let offer">{{offer.discount}}%</td>
+        </ng-container>
+        <ng-container matColumnDef="Tipo">
+          <th mat-header-cell *matHeaderCellDef>Tipo</th>
+          <td mat-cell *matCellDef="let offer"> {{offer.type == 2 ? 'Servicio' : 'Insumo'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="Semanal">
+          <th mat-header-cell *matHeaderCellDef>Semanal</th>
+          <td mat-cell *matCellDef="let offer"> {{offer.weekly == false ? 'No' : 'Si'}} </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <!-- (click)="clickedRows.has(offerRow) ? clickedRows.delete(offerRow) : clickedRows.add(offerRow)" [class.row-is-clicked]="clickedRows.has(offerRow)"  -->
+        <tr mat-row (click)="describeOffer(offerRow)" *matRowDef="let offerRow; columns: columns;"></tr>
+      </table>
+    </div>
+    <div class="offer-description">
+      <span class="selection">Selección</span>
+      <div class="selected" *ngIf="dataDescribe.idadvertisement; else nodata">
+        <div class="img">
+          <img
+            [src]="dataDescribe.additional ? 'http://localhost:3002/images/' + dataDescribe.additional : 'assets/no-image.png'"
+            alt=" Imagen del producto" width="300">
+        </div>
+        <div class="offer-detail">
+          <div class="offer-title">
+            <span class="label">Título</span>
+            <span class="data">{{dataDescribe.title | uppercase}}</span>
+          </div>
+          <div class="offer-value offer-section">
+            <div class="price detail">
+              <span class="label">Precio</span>
+              <span class="data">{{dataDescribe.price | currency: '$'}}</span>
+            </div>
+            <div class="discount detail">
+              <span class="label">Descuento</span>
+              <span class="data">{{dataDescribe.discount}}% OFF</span>
+            </div>
+          </div>
+          <div class="offer-type offer-section">
+            <div class="weekly detail">
+              <span class="label">Semanal</span>
+              <span [textContent]="dataDescribe.weekly == false ? 'No' : 'Si'" class="data"></span>
+            </div>
+            <div class="type detail">
+              <span class="label">Tipo</span>
+              <span [textContent]="dataDescribe.type == 2 ? 'Servicio' : 'Insumo'" class="data"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template class="selected" #nodata>
+        <div class="img">
+          <img [src]="'assets/no-image.png'" alt="">
+        </div>
+        <div class="offer-title">
+          <span>Seleccione una oferta</span>
+        </div>
+        <div>
+          <span></span>
+          <span></span>
+        </div>
+        <span></span>
+        <span></span>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,217 @@
+@media screen and (max-width: 39.9em){
+    .title-container {
+        margin: 20px 0 0 20px;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    /* WEEKOFFERS STYLE */
+    .weekoffers-container {
+        margin: 10px;
+        background-color: #f9f9f9;
+        border-radius: 3px;
+        transition: all 0.5s cubic-bezier(.25,.8,.25,1);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.25), 0 0 20px rgba(0,0,0,0.22);
+    }
+    .weekoffers-container:hover{
+        box-shadow: 0 8px 28px rgba(0,0,0,0.30), 5px 0px 20px rgba(0,0,0,0.22);
+    }
+    .swiper {
+        padding-bottom: 50px;
+    }
+    .weekoffers-body {
+        padding: 40px
+    }
+    .mat-chip {
+        margin-top: 10px !important;
+        background-color: #65BB12 !important;
+        color: #F9F9F9 !important;
+    }
+    .img-container-weekoffers img {
+        width: 90%;
+        object-fit: cover;
+    }
+    .img-container-weekoffers p {
+        margin: 10px 0 10px 0px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .img-container-weekoffers span {
+        font-weight: 700;
+        color: #65BB12;
+    }
+    .weekoffers-header {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .weekoffers-manage {
+        margin: 20px 0 0 10px;
+    }
+    .weekoffers-manage button {
+        height: 25px;
+        width: 100px;
+        background-color: #0078BD;
+        color: #F9F9F9;
+        border: 1px solid #F9F9F9;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    /*  */
+}
+
+/* tablets */
+@media screen and (min-width: 40em) and (max-width: 63.9em) {
+    .title-container {
+        position: relative;
+        top: 20px;
+        left: 20px;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    /* WEEKOFFERS STYLE */
+    .weekoffers-container {
+        margin: 10px;
+        background-color: #f9f9f9;
+        border-radius: 3px;
+        transition: all 0.5s cubic-bezier(.25,.8,.25,1);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.25), 0 0 20px rgba(0,0,0,0.22);
+    }
+    .weekoffers-container:hover{
+        box-shadow: 0 8px 28px rgba(0,0,0,0.30), 5px 0px 20px rgba(0,0,0,0.22);
+    }
+    .swiper {
+        padding-bottom: 50px;
+    }
+    .weekoffers-body {
+        padding: 40px
+    }
+    .mat-chip {
+        margin-top: 10px !important;
+        background-color: #65BB12 !important;
+        color: #F9F9F9 !important;
+    }
+    .img-container-weekoffers img {
+        width: 90%;
+        object-fit: cover;
+    }
+    .img-container-weekoffers p {
+        margin: 10px 0 10px 0px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .img-container-weekoffers span {
+        font-weight: 700;
+        color: #65BB12;
+    }
+    .weekoffers-header {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .weekoffers-manage {
+        position: relative;
+        top: 21px;
+        left: 30px;
+    }
+    .weekoffers-manage button {
+        height: 25px;
+        width: 120px;
+        background-color: #0078BD;
+        color: #F9F9F9;
+        border: 1px solid #F9F9F9;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    /*  */
+}
+
+/* web */
+@media screen and (min-width: 64em) {
+
+    .title-container {
+        padding-top: 20px;
+        padding-left: 20px;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    /* WEEKOFFERS STYLE */
+    .weekoffers-header {
+        display: flex;
+        align-items: center;
+    }
+    .weekoffers-manage {
+        margin-top: 20px;
+        margin-left: 10px;
+    }
+    .weekoffers-manage button {
+        height: 25px;
+        width: 120px;
+        background-color: #0078BD;
+        color: #F9F9F9;
+        border: 1px solid #F9F9F9;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .weekoffers-container {
+        height: 450px;
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+        border-radius: 3px;
+        transition: all 0.5s cubic-bezier(.25,.8,.25,1);
+        box-shadow: 0 4px 18px rgba(0,0,0,0.25), 0 0 20px rgba(0,0,0,0.22);
+    }
+    .weekoffers-container:hover{
+        box-shadow: 0 8px 28px rgba(0,0,0,0.30), 5px 0px 20px rgba(0,0,0,0.22);
+    }
+    .weekoffers-body {
+        padding: 25px;
+    }
+    .swiper {
+        margin-top: 20px;
+        padding-bottom: 50px;
+    }
+    .weekoffer-element {
+        padding: 6px 0;
+    }
+    .weekoffer-element:hover {
+        border-radius: 3px;
+        cursor: pointer;
+        background-color: #e5e5e5;
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+    .mat-chip {
+        margin-top: 15px !important;
+        margin-left: 10px !important;
+        background-color: #65BB12 !important;
+        color: #F9F9F9 !important;
+    }
+    .img-container-weekoffers img {
+        width: 95%;
+        margin-left: 5px;
+        object-fit: cover;
+    }
+    .img-container-weekoffers p {
+        margin: 10px 0 10px 10px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .img-container-weekoffers span {
+        margin-left: 10px;
+        font-weight: 700;
+        color: #65BB12;
+    }
+    /*  */
+}
+
+
+/* @media screen and (max-width: 39.9em){
+}
+
+@media screen and (min-width: 40em) and (max-width: 63.9em) {
+}
+
+@media screen and (min-width: 64em) {
+} */

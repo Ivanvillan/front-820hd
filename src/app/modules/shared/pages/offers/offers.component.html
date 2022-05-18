@@ -1,0 +1,25 @@
+<section id="offers">
+    <div class="offers-container">
+        <div class="offers-header">
+            <h2 class="title-container">Ofertas</h2>
+            <div class="offers-manage" *ngIf="isAdmin">
+                <button [routerLink]="['/manage/', 1]">Administrar</button>
+            </div>
+        </div>
+        <div class="offers-body">
+            <div class="offer-element" *ngFor="let offer of offers" (click)="openDialog(offer)">
+                <div class="title">
+                    <span>{{offer.title}}</span>
+                </div>
+                <div class="second-section">
+                    <div class="description">
+                        <p>{{offer.description}}</p>
+                    </div>
+                    <div class="price">
+                        <span>{{offer.price | currency: '$'}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
