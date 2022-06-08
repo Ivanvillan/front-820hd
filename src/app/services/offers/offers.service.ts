@@ -26,4 +26,7 @@ export class OffersService {
   create(data: CreateOfferDTO) {
     return this.http.post<Offer[]>(`${this.API_URI}`, data)
   }
+  delete(id: number) {
+    return this.http.delete(`${this.API_URI}/${id}`)
+  }
 }

@@ -101,4 +101,24 @@ export class OfferAdminComponent implements OnInit {
   create() {
     this.handleFileSelect();
   }
+
+  offerDelete(id: number) {
+    this.offersService.delete(id).subscribe({
+      next: (res) => {
+        this.readOffers();
+        this._snackBar.open('La oferta se eliminó correctamente', 'Cerrar', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom'
+        });
+      },
+      error: (err) => {
+        this._snackBar.open('Error al eliminar oferta', 'Cerrar', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom'
+        });
+      }
+    })
+  }
 }

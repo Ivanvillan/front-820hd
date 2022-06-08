@@ -4,6 +4,8 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 
 import { faArrowCircleDown } from '@fortawesome/free-solid-svg-icons';
+import { OffersService } from 'src/app/services/offers/offers.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
@@ -28,6 +30,8 @@ export class HeaderComponent implements OnInit {
     private credentialsService: CredentialsService,
     private authService: AuthService,
     private router: Router,
+    private offersService: OffersService,
+    private _snackBar: MatSnackBar
   ) {
     if(window.location.href.includes('/home') || window.location.href.includes('/')) {
       this.isHome = true;
@@ -73,6 +77,22 @@ export class HeaderComponent implements OnInit {
   }  
 
   ngOnInit(): void {  
+    if(!(window.location.href.includes('/signin'))) {
+      this.offersService.readWeekly().subscribe({
+        error: (err) => {
+          this._snackBar.open('Tu sesión ha expirado, necesitamos que ingreses tus credenciales nuevamente', 'Cerrar', {
+            duration: 5000,
+            horizontalPosition: 'end',
+            verticalPosition: 'bottom',
+          });
+          this.setHeader = false;
+          this.showLogout = false;
+          this.credentialsService.revokeCredentials();
+          this.authService.logout();
+          this.router.navigate(['/signin']);
+        }
+      })
+    }
   }
 
   toggleLogout() {

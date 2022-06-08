@@ -46,6 +46,10 @@
     cursor: pointer;
 }
 
+.form-buttons button:hover {
+    background-color: #0078bd;
+}
+
 .service {
     max-height: 100%;
     margin-top: 4rem;

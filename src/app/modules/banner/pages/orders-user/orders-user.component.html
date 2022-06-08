@@ -1,6 +1,20 @@
 <div class="center-section">
   <div class="list-order">
-    <table class="table mat-elevation-z8" mat-table [dataSource]="dataTable">
+    <div class="search mat-elevation-z2">
+      <div class="title-search">
+        <span>Filtrar por fecha</span>
+      </div>
+      <div class="first-date date">
+        <input class="first-date" type="date" [(ngModel)]="firstDate">
+      </div>
+      <div class="second-search date">
+        <input type="date" [(ngModel)]="secondDate">
+      </div>
+      <div class="btn-search">
+        <button (click)="search()" type="button">Buscar</button>
+      </div>
+    </div>
+    <table class="table mat-elevation-z2" mat-table [dataSource]="dataTable">
       <ng-container matColumnDef="Contacto">
         <th mat-header-cell *matHeaderCellDef>Contacto</th>
         <td mat-cell *matCellDef="let order">{{order.contacto}}</td>
@@ -27,48 +41,31 @@
     </table>
   </div>
   <div class="order-description">
-    <span class="selection">Selección</span>
-    <div class="selected" *ngIf="dataDescribe.contacto; else nodata">
-      <div class="order-detail">
-        <div class="order-title">
-          <span class="label">Contacto</span>
-          <span class="data">{{dataDescribe.contacto}}</span>
-        </div>
-        <div class="order-value order-section">
-          <div class="price detail">
-            <span class="label">Descripción</span>
-            <span class="data">{{dataDescribe.descripcion}}</span>
-          </div>
-          <div class="type detail">
-            <span class="label">Tipo</span>
-            <span class="data">{{dataDescribe.observaciones}}</span>
-          </div>
-          <div class="discount detail">
-            <span class="label">Descuento</span>
-            <span class="data">{{dataDescribe.fecha}}</span>
-          </div>
-        </div>
-        <div class="order-type order-section">
-          <div class="weekly detail">
-            <span class="label">Semanal</span>
-            <span [textContent]="dataDescribe.insu == false ? 'Servicio' : 'Insumo'" class="data"></span>
-          </div>
-        </div>
+    <div class="order-header">
+      <div class="header-title">
+        <fa-icon [icon]="faDisplay"></fa-icon>
+        <span>TICKETS</span>
+      </div>
+      <div class="header-contact">
+        <span class="contact-label">Enviados por</span>
+        <span class="contact-name">{{dataDescribe.contacto}}</span>
       </div>
     </div>
-    <ng-template class="selected" #nodata>
-      <div class="img">
-        <img [src]="'assets/no-image.png'" alt="">
+    <div class="order-detail" *ngIf="dataDescribe.fecha; else nodata">
+      <span class="selection">Selección</span>
+      <div class="order-date">
+        <span class="label">Fecha</span>
+        <span class="data data-date">{{dataDescribe.fecha | date}}</span>
       </div>
-      <div class="order-title">
-        <span>Seleccione una oferta</span>
+      <div class="detail">
+        <span class="label">Detalle</span>
+        <span class="data">{{dataDescribe.descripcion}}</span>
       </div>
-      <div>
-        <span></span>
-        <span></span>
+      <div class="detail">
+        <span class="label">Observación</span>
+        <span class="data">{{dataDescribe.observaciones}}</span>
       </div>
-      <span></span>
-      <span></span>
-    </ng-template>
+    </div>
+    <ng-template #nodata></ng-template>
   </div>
 </div>

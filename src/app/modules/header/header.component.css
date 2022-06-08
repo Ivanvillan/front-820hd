@@ -90,6 +90,7 @@
         text-transform: capitalize;
     }
     #logo {
+        cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -245,6 +246,7 @@
 
     /* ADMIN SECTION */
     #logo-admin {
+        cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -345,6 +347,7 @@
         text-transform: capitalize;
     }
     #logo {
+        cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -499,6 +502,7 @@
 
     /* ADMIN SECTION */
     #logo-admin {
+        cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -668,6 +672,7 @@
     }
     
     #logo {
+        cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -755,6 +760,7 @@
     }
     /* ADMIN SECTION */
     #logo-admin {
+        cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
