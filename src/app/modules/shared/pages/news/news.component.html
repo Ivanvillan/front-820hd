@@ -1,10 +1,22 @@
 <section id="news">
-  <div class="news-container">
-      <div class="news-header">
-          <h4 class="title-container">Últimas noticias</h4>
-      </div>
-      <div class="news-body">
-          <span>ok</span>
-      </div>
-  </div>
+    <div class="news-container">
+        <div class="news-header">
+            <h4 class="title-container">Últimas noticias</h4>
+        </div>
+        <div class="news-body">
+            <div class="element" *ngFor="let twitt of twitts">
+                <div class="img">
+                    <img src="./../../../../../assets/logo820hd.png" alt="">
+                </div>
+                <div class="info">
+                    <div class="title">
+                       <span class="name">820 Helpdesk <span class="user">@helpdesk820</span></span>
+                    </div>
+                    <div class="text">
+                        <span>{{twitt.text}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

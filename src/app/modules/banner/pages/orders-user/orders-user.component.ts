@@ -42,8 +42,18 @@ export class OrdersUserComponent implements OnInit {
     this.dataDescribe.contacto = data.contact;
     this.ordersService.readAll(data.idClient).subscribe({
       next: (res) => {
-        this.dataTable = [];
-        this.dataTable = this.dataTable.concat(res)
+        if (window.location.href.includes('/supplies')) {
+          this.dataTable = [];
+          this.dataTable = this.dataTable.concat(res);
+          this.dataTable = this.dataTable.filter(
+            (el: { insu: any; sopo: any }) => el.insu == true || (el.insu == false && el.sopo == false) )
+        }
+        if (window.location.href.includes('/assistance')) {
+          this.dataTable = [];
+          this.dataTable = this.dataTable.concat(res);
+          this.dataTable = this.dataTable.filter(
+            (el: { insu: any; sopo: any }) => el.sopo == true || (el.insu == false && el.sopo == false))
+        }
       },
       error: (err) => {
         console.log(err);

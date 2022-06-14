@@ -6,7 +6,7 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-banner',
   templateUrl: './banner.component.html',
-  styleUrls: ['./banner.component.css']
+  styleUrls: ['./banner.component.css'],
 })
 export class BannerComponent {
 
@@ -14,6 +14,7 @@ export class BannerComponent {
   isHome: boolean = false;
   isAdmin: boolean = false;
   isUser: boolean = false;
+  isSupplies: boolean = false;
   offerButton: number = 0;
 
   constructor(private activatedRoute: ActivatedRoute) {
@@ -31,10 +32,17 @@ export class BannerComponent {
         this.offerButton = params['selectedIndex'];
       }
     }
-    if (window.location.href.includes('/assistance') || window.location.href.includes('/supplies')) {
+    if (window.location.href.includes('/supplies')) {
       this.isUser = true;
       this.isAdmin = false;
       this.isHome = false;
+      this.isSupplies = true;
+    }
+    if (window.location.href.includes('/assistance')) {
+      this.isUser = true;
+      this.isAdmin = false;
+      this.isHome = false;
+      this.isSupplies = false;
     }
   }
 

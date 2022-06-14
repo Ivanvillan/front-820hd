@@ -1,9 +1,28 @@
 @media screen and (max-width: 39.9em){
+    #center {
+        margin: 15px;
+        /* grid-auto-rows: minmax(100px, auto); */
+    }
+    app-offers {
+        display: none;
+    }
+    app-news {
+        display: none;
+    }
 }
 
 /* tablets */
 @media screen and (min-width: 40em) and (max-width: 63.9em) {
-
+    #center {
+        margin: 15px;
+        /* grid-auto-rows: minmax(100px, auto); */
+    }
+    app-offers {
+        display: none;
+    }
+    app-news {
+        display: none;
+    }
 }
 
 /* web */

@@ -17,7 +17,16 @@
   </mat-tab>
 </mat-tab-group>
 
-<mat-tab-group *ngIf="isUser" [selectedIndex]="1">
+<mat-tab-group class="supplies" *ngIf="isUser && isSupplies">
+  <mat-tab class="tabs" label="Nuevo pedido">
+    <app-order-create></app-order-create>
+  </mat-tab>
+  <mat-tab class="tabs" label="Historial">
+    <app-orders-user> </app-orders-user>
+  </mat-tab>
+</mat-tab-group>
+
+<mat-tab-group class="assistance" *ngIf="isUser && !isSupplies">
   <mat-tab class="tabs" label="Nuevo pedido">
     <app-order-create></app-order-create>
   </mat-tab>

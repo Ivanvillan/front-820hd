@@ -34,7 +34,7 @@ export class OrderCreateBoxComponent implements OnInit {
 
     if (window.location.href.includes('/supplies'))
       this.order.insu = 1;
-    else this.order.sopo = 2;
+    else this.order.sopo = 1;
 
     this.ordersService.create(this.order).subscribe({
       next: (res) => {

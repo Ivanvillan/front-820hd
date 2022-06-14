@@ -10,7 +10,7 @@ import { Auth } from '../../../../models/auth.model';
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css']
 })
-export class AuthComponent{
+export class AuthComponent {
 
   login: Auth = {
     email: '',
@@ -18,21 +18,25 @@ export class AuthComponent{
   }
 
   constructor(
-    private loginService: AuthService, 
+    private loginService: AuthService,
     private router: Router,
     private _snackBar: MatSnackBar
   ) { }
 
   auth(): void {
     this.loginService.login(this.login)
-    .subscribe({
-      next: (res) => {
-        this.router.navigate(['/home']);
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    })
+      .subscribe({
+        next: (res) => {
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          this._snackBar.open('Hubo un error al iniciar sesión, por favor revise sus credenciales', 'Cerrar', {
+            duration: 5000,
+            horizontalPosition: 'end',
+            verticalPosition: 'bottom'
+          });
+        }
+      })
   }
 
   openSnackbar() {

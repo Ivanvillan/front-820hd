@@ -1,9 +1,11 @@
-<div class="container">
-  <mat-form-field class="full-width" appearance="fill">
-    <mat-label>Describe tu pedido</mat-label>
-    <textarea matInput rows="11" [(ngModel)]="order.descripcion"></textarea>
-  </mat-form-field>
-  <div class="btn">
-    <button class="btn-order" (click)="create()">Enviar</button>
+<form #orderForm="ngForm">
+  <div class="container">
+    <mat-form-field class="full-width" appearance="fill">
+      <mat-label>Describe tu pedido</mat-label>
+      <textarea matInput rows="11" name="description" [(ngModel)]="order.descripcion"></textarea>
+    </mat-form-field>
+    <div class="btn">
+      <button class="btn-order" (click)="create(); orderForm.resetForm()">Enviar</button>
+    </div>
   </div>
-</div>
+</form>
