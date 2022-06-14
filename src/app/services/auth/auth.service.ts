@@ -7,6 +7,7 @@ import { CredentialsService } from '../credentials/credentials.service';
 import { checkMethod } from 'src/app/interceptors/token.interceptor';
 import { Credentials } from 'src/app/models/credentials.models';
 import { Auth } from 'src/app/models/auth.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class AuthService {
 
   showHeader$ = this.showHeader.asObservable();
 
-  API_URI: string = 'http://localhost:3002/api';
+  API_URI = `${environment.API_URL}/api`;
 
   constructor(private http: HttpClient, private credentialsService: CredentialsService) { }
 
