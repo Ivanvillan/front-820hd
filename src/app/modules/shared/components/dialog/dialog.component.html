@@ -6,7 +6,7 @@
   <div class="center">
     <div class="image">
       <div *ngIf="data.additional; else noimg">
-        <img src="http://localhost:3002/images/{{data.additional}}" alt="">
+        <img src="http://localhost:3001/images/{{data.additional}}" alt="">
       </div>
       <ng-template #noimg>
         <img src="./../../../../../assets/no-image.png" alt="">
