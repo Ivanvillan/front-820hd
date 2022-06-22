@@ -71,3 +71,6 @@
 .service p a:visited {
     color: #0078bd;
 }
+::ng-deep .mat-progress-spinner circle, .mat-spinner circle {
+    stroke: #0078bd;
+}

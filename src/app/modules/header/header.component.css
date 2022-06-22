@@ -1,5 +1,5 @@
 .isHome {
-    background-image: url('./../../../assets/banner2.jpg');
+    background-image: url('http://localhost:3001/images/front/banner2.jpg');
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -9,7 +9,7 @@
 }
 
 .isAdmin {
-    background-image: url('./../../../assets/banner4.jpg');
+    background-image: url('http://localhost:3001/images/front/banner4.jpg');
     background-repeat: no-repeat;
     background-position: center bottom;
     background-size: cover;
@@ -18,8 +18,18 @@
     padding-bottom: 10px;
 }
 
-.isUser {
-    background-image: url('./../../../assets/banner1.jpg');
+.isUser-supplies {
+    background-image: url('http://localhost:3001/images/front/banner1.jpg');
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: cover;
+    max-width: 100%;
+    background-color: #262626;
+    padding-bottom: 10px;
+}
+
+.isUser-assistance {
+    background-image: url('http://localhost:3001/images/front/banner5.jpg');
     background-repeat: no-repeat;
     background-position: center top;
     background-size: cover;

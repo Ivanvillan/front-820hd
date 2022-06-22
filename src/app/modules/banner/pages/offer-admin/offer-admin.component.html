@@ -5,7 +5,7 @@
         <span>Crear nueva oferta</span>
       </div>
       <div class="img">
-        <img [src]="imgToShow ? imgToShow : 'assets/no-image.png'" width="120" alt="">
+        <img [src]="imgToShow ? imgToShow : 'http://localhost:3001/images/front/no-image.png'" width="120" alt="">
       </div>
       <div class="select-image">
         <label for="files" class="label-select">Seleccionar imagen</label>
@@ -101,7 +101,7 @@
       <div class="selected" *ngIf="dataDescribe.idadvertisement; else nodata">
         <div class="img-select">
           <img
-            [src]="dataDescribe.additional ? 'http://localhost:3001/images/' + dataDescribe.additional : 'assets/no-image.png'"
+            [src]="dataDescribe.additional ? 'http://localhost:3001/images/' + dataDescribe.additional : 'http://localhost:3001/images/front/no-image.png'"
             alt=" Imagen del producto">
         </div>
         <div class="offer-detail">
@@ -136,7 +136,7 @@
       </div>
       <ng-template class="selected" #nodata>
         <div class="img-select">
-          <img [src]="'assets/no-image.png'" alt="">
+          <img [src]="'http://localhost:3001/images/front/no-image.png'" alt="">
         </div>
         <div class="offer-title">
           <span>Seleccione una oferta</span>

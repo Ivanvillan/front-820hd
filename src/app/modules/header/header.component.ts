@@ -24,6 +24,7 @@ export class HeaderComponent implements OnInit {
   isUser: boolean = false;
   isSupplies: boolean = false;
   isAssistance: boolean = false;
+  bannerSupplies: boolean = false;
   faArrowCircleDown = faArrowCircleDown;
 
   constructor(
@@ -43,17 +44,19 @@ export class HeaderComponent implements OnInit {
       this.isHome = false;
       this.isUser = false
     }
-    if(window.location.href.includes('/assistance')) {
-      this.isUser = true;
-      this.isHome = false;
-      this.isAdmin = false;
-      this.isAssistance = true;
-    }
     if(window.location.href.includes('/supplies')) {
       this.isUser = true;
       this.isHome = false;
       this.isAdmin = false;
       this.isSupplies = true;
+      this.bannerSupplies = true;
+    }
+    if(window.location.href.includes('/assistance')) {
+      this.isUser = true;
+      this.isHome = false;
+      this.isAdmin = false;
+      this.isAssistance = true;
+      this.bannerSupplies = false;
     }
     this.authService.showHeader$.subscribe({
       next: (res) => {

@@ -12,6 +12,7 @@ import { Auth } from '../../../../models/auth.model';
 })
 export class AuthComponent {
 
+  isLoading = false;
   login: Auth = {
     email: '',
     password: ''
@@ -24,12 +25,15 @@ export class AuthComponent {
   ) { }
 
   auth(): void {
+    this.isLoading = true;
     this.loginService.login(this.login)
       .subscribe({
         next: (res) => {
+          this.isLoading = false;
           this.router.navigate(['/home']);
         },
         error: (err) => {
+          this.isLoading = false;
           this._snackBar.open('Hubo un error al iniciar sesión, por favor revise sus credenciales', 'Cerrar', {
             duration: 5000,
             horizontalPosition: 'end',

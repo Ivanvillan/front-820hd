@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBarModule} from '@angular/material/snack-bar'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 
 import { SigninRoutingModule } from './signin-routing.module';
 import { SigninComponent } from './signin.component';
@@ -21,7 +23,8 @@ import { AuthComponent } from './components/auth/auth.component';
     SigninRoutingModule,
     FormsModule,
     FontAwesomeModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ]
 })
 export class SigninModule { }

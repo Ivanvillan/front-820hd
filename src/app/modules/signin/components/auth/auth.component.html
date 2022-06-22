@@ -5,8 +5,13 @@
   </div>
   <div class="form-buttons">
     <a (click)="openSnackbar()">Olvidé mi contraseña</a>
-    <button (click)="auth()">Ingresar</button>
+    <button (click)="auth()" *ngIf="isLoading == false; else spinner">Ingresar</button>
   </div>
+  <ng-template #spinner>
+    <div class="spinner">
+      <mat-spinner diameter="30"></mat-spinner>
+    </div>
+  </ng-template>
   <div class="service">
     <p>¿Todavía no usas 820hd? <a (click)="openSnackbar()">Contratá el servicio</a></p>
   </div>
