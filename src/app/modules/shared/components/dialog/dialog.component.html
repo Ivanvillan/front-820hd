@@ -6,7 +6,7 @@
   <div class="center">
     <div class="image">
       <div *ngIf="data.additional; else noimg">
-        <img [src]="API_URI + '/{{data.additional}}'" alt="">
+        <img [src]="API_URI + '/' + data.additional" alt="">
       </div>
       <ng-template #noimg>
         <img [src]="API_URI + '/front/no-image.png'" alt="">
