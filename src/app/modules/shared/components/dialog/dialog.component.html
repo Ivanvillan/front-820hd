@@ -6,10 +6,10 @@
   <div class="center">
     <div class="image">
       <div *ngIf="data.additional; else noimg">
-        <img src="http://localhost:3001/images/{{data.additional}}" alt="">
+        <img src="localhost:3001/images/{{data.additional}}" alt="">
       </div>
       <ng-template #noimg>
-        <img src="http://localhost:3001/images/front/no-image.png" alt="">
+        <img src="localhost:3001/images/front/no-image.png" alt="">
       </ng-template>
     </div>
     <div class="info">
