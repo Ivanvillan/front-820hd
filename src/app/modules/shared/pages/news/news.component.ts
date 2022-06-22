@@ -9,8 +9,16 @@ import { TwitterService } from 'src/app/services/repository/twitter.service';
 export class NewsComponent implements OnInit {
 
   twitts: any[] = [];
+  API_URI: string = '';
 
-  constructor(private twitterService: TwitterService) { }
+  constructor(private twitterService: TwitterService) { 
+    if(window.location.hostname.includes('localhost')){   
+      this.API_URI = 'http://localhost:3001/images';
+    }
+    if (!window.location.hostname.includes('localhost')) {
+      this.API_URI = 'https://api.820hd.com.ar/images'
+    }
+  }
 
   ngOnInit(): void {
     this.twitterService.readAll().subscribe({

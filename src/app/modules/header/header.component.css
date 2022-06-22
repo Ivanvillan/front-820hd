@@ -1,5 +1,4 @@
-.isHome {
-    background-image: url('localhost:3001/images/front/banner2.jpg');
+/* .isHome {
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -9,7 +8,7 @@
 }
 
 .isAdmin {
-    background-image: url('localhost:3001/images/front/banner4.jpg');
+    background-image: url('http://localhost:3001/images/front/banner4.jpg');
     background-repeat: no-repeat;
     background-position: center bottom;
     background-size: cover;
@@ -19,7 +18,7 @@
 }
 
 .isUser-supplies {
-    background-image: url('localhost:3001/images/front/banner1.jpg');
+    background-image: url('http://localhost:3001/images/front/banner1.jpg');
     background-repeat: no-repeat;
     background-position: center top;
     background-size: cover;
@@ -29,14 +28,14 @@
 }
 
 .isUser-assistance {
-    background-image: url('localhost:3001/images/front/banner5.jpg');
+    background-image: url('http://localhost:3001/images/front/banner5.jpg');
     background-repeat: no-repeat;
     background-position: center top;
     background-size: cover;
     max-width: 100%;
     background-color: #262626;
     padding-bottom: 10px;
-}
+} */
 
 @media screen and (max-width: 39.9em){
     .profile-image img {

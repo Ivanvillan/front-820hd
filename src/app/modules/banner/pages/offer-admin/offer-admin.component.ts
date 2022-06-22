@@ -36,8 +36,16 @@ export class OfferAdminComponent implements OnInit {
     type: 0,
     weekly: false,
   }
+  API_URI: string = '';
 
-  constructor(private offersService: OffersService, private _snackBar: MatSnackBar) { }
+  constructor(private offersService: OffersService, private _snackBar: MatSnackBar) {
+    if(window.location.hostname.includes('localhost')){   
+      this.API_URI = 'http://localhost:3001/images';
+    }
+    if (!window.location.hostname.includes('localhost')) {
+      this.API_URI = 'https://api.820hd.com.ar/images'
+    }
+   }
 
   ngOnInit() {
     this.readOffers();

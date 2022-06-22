@@ -1,16 +1,16 @@
-<nav class="isHome" *ngIf="setHeader && isHome">
+<nav [ngStyle]="setStyles()" *ngIf="setHeader && isHome">
     <section id="profile">
         <div class="profile-info" (click)="toggleLogout()">
             <span class="username">{{ username }}</span>
             <span class="usertype">{{ userType }}</span>
         </div>
-        <div class="profile-image" (click)="toggleLogout()"><img src="localhost:3001/images/front/user.jpg" alt=""></div>
+        <div class="profile-image" (click)="toggleLogout()"><img [src]="API_URI + '/front/user.jpg'" alt=""></div>
         <div class="logout" [class.active]="showLogout">
             <a (click)="logout()">Salir</a>
         </div>
     </section>
     <section id="logo" routerLink="/home">
-        <img src="localhost:3001/images/front/logo820hd-w.png" alt="Logo 820hd">
+        <img [src]="API_URI + '/front/logo820hd-w.png'" alt="Logo 820hd">
     </section>
     <section id="title">
         <h1>Hacé tu pedido en 820HD</h1>
@@ -18,30 +18,30 @@
     <section id="services">
         <div class="services-button">
             <div class="supplies" routerLink="/supplies">
-                <img src="localhost:3001/images/front/insumos-icon.png" alt="Icon insumo">
+                <img [src]="API_URI + '/front/insumos-icon.png'" alt="Icon insumo">
                 <span>Insumos</span>
             </div>
             <div class="assistance" routerLink="/assistance">
-                <img src="localhost:3001/images/front/service-icon.png" alt="Icon asistencia">
+                <img [src]="API_URI + '/front/service-icon.png'" alt="Icon asistencia">
                 <span>Servicios</span>
             </div>
         </div>
     </section>
 </nav>
 
-<nav class="isAdmin" *ngIf="setHeader && isAdmin">
+<nav [ngStyle]="setStyles()" *ngIf="setHeader && isAdmin">
     <section id="profile">
         <div class="profile-info" (click)="toggleLogout()">
             <span class="username">{{ username }}</span>
             <span class="usertype">{{ userType }}</span>
         </div>
-        <div class="profile-image" (click)="toggleLogout()"><img src="localhost:3001/images/front/user.jpg" alt=""></div>
+        <div class="profile-image" (click)="toggleLogout()"><img [src]="API_URI + '/front/user.jpg'" alt=""></div>
         <div class="logout" [class.active]="showLogout">
             <a (click)="logout()">Salir</a>
         </div>
     </section>
     <section id="logo-admin" routerLink="/home">
-        <img src="localhost:3001/images/front/logo820hd-w.png" alt="Logo 820hd">
+        <img [src]="API_URI + '/front/logo820hd-w.png'" alt="Logo 820hd">
     </section>
     <section id="title-admin">
         <h1>Administración</h1>
@@ -49,19 +49,19 @@
     </section>
 </nav>
 
-<nav class="isUser-supplies" *ngIf="setHeader && isUser && bannerSupplies">
+<nav [ngStyle]="setStyles()" *ngIf="setHeader && isUser && bannerSupplies">
     <section id="profile">
         <div class="profile-info" (click)="toggleLogout()">
             <span class="username">{{ username }}</span>
             <span class="usertype">{{ userType }}</span>
         </div>
-        <div class="profile-image" (click)="toggleLogout()"><img src="localhost:3001/images/front/user.jpg" alt=""></div>
+        <div class="profile-image" (click)="toggleLogout()"><img [src]="API_URI + '/front/user.jpg'" alt=""></div>
         <div class="logout" [class.active]="showLogout">
             <a (click)="logout()">Salir</a>
         </div>
     </section>
     <section id="logo" routerLink="/home">
-        <img src="localhost:3001/images/front/logo820hd-w.png" alt="Logo 820hd">
+        <img [src]="API_URI + '/front/logo820hd-w.png'" alt="Logo 820hd">
     </section>
     <section id="title-user">
         <h1>Sección servicios</h1>
@@ -82,19 +82,19 @@
     </section>
 </nav>
 
-<nav class="isUser-assistance" *ngIf="setHeader && isUser && !bannerSupplies;">
+<nav [ngStyle]="setStyles()" *ngIf="setHeader && isUser && !bannerSupplies;">
     <section id="profile">
         <div class="profile-info" (click)="toggleLogout()">
             <span class="username">{{ username }}</span>
             <span class="usertype">{{ userType }}</span>
         </div>
-        <div class="profile-image" (click)="toggleLogout()"><img src="localhost:3001/images/front/user.jpg" alt=""></div>
+        <div class="profile-image" (click)="toggleLogout()"><img [src]="API_URI + '/front/user.jpg'" alt=""></div>
         <div class="logout" [class.active]="showLogout">
             <a (click)="logout()">Salir</a>
         </div>
     </section>
     <section id="logo" routerLink="/home">
-        <img src="localhost:3001/images/front/logo820hd-w.png" alt="Logo 820hd">
+        <img [src]="API_URI + '/front/logo820hd-w.png'" alt="Logo 820hd">
     </section>
     <section id="title-user">
         <h1>Sección servicios</h1>

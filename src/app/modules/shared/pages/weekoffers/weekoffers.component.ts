@@ -19,6 +19,8 @@ export class WeekoffersComponent implements OnInit {
 
   isAdmin: boolean = false;
   weekoffers: Offer[] = [];
+  API_URI: string = '';
+
 
   constructor(
     private credentialsService: CredentialsService, 
@@ -28,6 +30,12 @@ export class WeekoffersComponent implements OnInit {
     const data = JSON.parse(this.credentialsService.getCredentials()!)
     if(data.type !== 'customer') {
       this.isAdmin = true;
+    }
+    if(window.location.hostname.includes('localhost')){   
+      this.API_URI = 'http://localhost:3001/images';
+    }
+    if (!window.location.hostname.includes('localhost')) {
+      this.API_URI = 'https://api.820hd.com.ar/images'
     }
   }
 

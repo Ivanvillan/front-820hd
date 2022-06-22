@@ -12,7 +12,7 @@
             clickable: true
         }">
                 <ng-template class="weekoffer-element" swiperSlide *ngFor="let weekoffer of weekoffers">
-                    <img (click)="openDialog(weekoffer)" src="localhost:3001/images/{{weekoffer.additional}}" alt="">
+                    <img (click)="openDialog(weekoffer)" [src]="API_URI + '/' + weekoffer.additional" alt="">
                     <mat-chip-list (click)="openDialog(weekoffer)">
                         <mat-chip>{{weekoffer.discount}}% OFF</mat-chip>
                     </mat-chip-list>

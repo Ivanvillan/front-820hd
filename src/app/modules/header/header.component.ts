@@ -25,6 +25,7 @@ export class HeaderComponent implements OnInit {
   isSupplies: boolean = false;
   isAssistance: boolean = false;
   bannerSupplies: boolean = false;
+  API_URI: string = '';
   faArrowCircleDown = faArrowCircleDown;
 
   constructor(
@@ -34,24 +35,32 @@ export class HeaderComponent implements OnInit {
     private offersService: OffersService,
     private _snackBar: MatSnackBar
   ) {
-    if(window.location.href.includes('/home') || window.location.href.includes('/')) {
+    if (window.location.hostname.includes('localhost')) {
+      this.API_URI = 'http://localhost:3001/images';
+      if (this.isHome) {
+      }
+    }
+    if (!window.location.hostname.includes('localhost')) {
+      this.API_URI = 'https://api.820hd.com.ar/images'
+    }
+    if (window.location.href.includes('/home') || window.location.href.includes('/')) {
       this.isHome = true;
       this.isAdmin = false;
       this.isUser = false;
     }
-    if(window.location.href.includes('/manage')) {
+    if (window.location.href.includes('/manage')) {
       this.isAdmin = true;
       this.isHome = false;
       this.isUser = false
     }
-    if(window.location.href.includes('/supplies')) {
+    if (window.location.href.includes('/supplies')) {
       this.isUser = true;
       this.isHome = false;
       this.isAdmin = false;
       this.isSupplies = true;
       this.bannerSupplies = true;
     }
-    if(window.location.href.includes('/assistance')) {
+    if (window.location.href.includes('/assistance')) {
       this.isUser = true;
       this.isHome = false;
       this.isAdmin = false;
@@ -64,7 +73,7 @@ export class HeaderComponent implements OnInit {
         this.setHeader = res;
         if (data) {
           this.username = data.name;
-          this.userType = data.type; 
+          this.userType = data.type;
         }
       },
       error: (err) => {
@@ -75,12 +84,12 @@ export class HeaderComponent implements OnInit {
     if (data) {
       this.setHeader = true;
       this.username = data.name;
-      this.userType = data.type; 
+      this.userType = data.type;
     }
-  }  
+  }
 
-  ngOnInit(): void {  
-    if(!(window.location.href.includes('/signin'))) {
+  ngOnInit(): void {
+    if (!(window.location.href.includes('/signin'))) {
       this.offersService.readWeekly().subscribe({
         error: (err) => {
           this._snackBar.open('Tu sesión ha expirado, necesitamos que ingreses tus credenciales nuevamente', 'Cerrar', {
@@ -101,19 +110,68 @@ export class HeaderComponent implements OnInit {
   toggleLogout() {
     this.showLogout = !this.showLogout;
   }
-  
+
   logout(): void {
     this.authService.logout()
-    .subscribe({
-      next: (res) => {
-        this.setHeader = false;
-        this.showLogout = false;
-        this.router.navigate(['/signin']);
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    })
+      .subscribe({
+        next: (res) => {
+          this.setHeader = false;
+          this.showLogout = false;
+          this.router.navigate(['/signin']);
+        },
+        error: (err) => {
+          console.log(err);
+        }
+      })
+  }
+
+  setStyles() {
+    let styles = {}
+    if (this.isHome) {
+      styles = {
+        'background-image': `url(${this.API_URI}/front/banner2.jpg)`,
+        'background-repeat': 'no-repeat',
+        'background-position': 'center',
+        'background-size': 'cover',
+        'max-width': '100%',
+        'background-color': '#262626',
+        'padding-bottom': '10px'
+      };
+    }
+    if (this.isAdmin){
+      styles = {
+        'background-image': `url(${this.API_URI}/front/banner4.jpg)`,
+        'background-repeat': 'no-repeat',
+        'background-position': 'center',
+        'background-size': 'cover',
+        'max-width': '100%',
+        'background-color': '#262626',
+        'padding-bottom': '10px'
+      };
+    }
+    if (this.isSupplies){
+      styles = {
+        'background-image': `url(${this.API_URI}/front/banner1.jpg)`,
+        'background-repeat': 'no-repeat',
+        'background-position': 'center',
+        'background-size': 'cover',
+        'max-width': '100%',
+        'background-color': '#262626',
+        'padding-bottom': '10px'
+      };
+    }
+    if (this.isAssistance){
+      styles = {
+        'background-image': `url(${this.API_URI}/front/banner5.jpg)`,
+        'background-repeat': 'no-repeat',
+        'background-position': 'center',
+        'background-size': 'cover',
+        'max-width': '100%',
+        'background-color': '#262626',
+        'padding-bottom': '10px'
+      };
+    }
+    return styles
   }
 
 }
