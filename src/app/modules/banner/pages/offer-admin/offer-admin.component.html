@@ -58,7 +58,7 @@
             </mat-select>
           </mat-form-field>
           <div class="create-button">
-            <button (click)="create(); offerForm.resetForm()">Crear</button>
+            <button (click)="create(offerForm);">Crear</button>
           </div>
         </div>
       </div>
@@ -101,7 +101,7 @@
       <div class="selected" *ngIf="dataDescribe.idadvertisement; else nodata">
         <div class="img-select">
           <img
-            [src]="dataDescribe.additional ? API_URI + '/images/' + dataDescribe.additional : API_URI + '/images/front/no-image.png'"
+            [src]="dataDescribe.additional ? API_URI + '/' + dataDescribe.additional : API_URI + '/front/no-image.png'"
             alt=" Imagen del producto">
         </div>
         <div class="offer-detail">
@@ -136,7 +136,7 @@
       </div>
       <ng-template class="selected" #nodata>
         <div class="img-select">
-          <img [src]="API_URI + '/images/front/no-image.png'" alt="">
+          <img [src]="API_URI + '/front/no-image.png'" alt="">
         </div>
         <div class="offer-title">
           <span>Seleccione una oferta</span>

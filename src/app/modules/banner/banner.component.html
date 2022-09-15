@@ -8,10 +8,10 @@
   </section>
 </div>
 
-<mat-tab-group *ngIf="isAdmin" class="tab-group" [selectedIndex]="offerButton">
-  <mat-tab class="tabs" label="Historial">
+<mat-tab-group *ngIf="isAdmin" class="manage" [selectedIndex]="offerButton">
+  <!-- <mat-tab class="tabs" style="color: #040404;" label="Historial">
     <app-orders-admin></app-orders-admin>
-  </mat-tab>
+  </mat-tab> -->
   <mat-tab class="tabs" label="Ofertas">
     <app-offer-admin> </app-offer-admin>
   </mat-tab>

@@ -443,6 +443,10 @@
           font-size: 16px;
           font-weight: 300;
       }
+
+      .btn-delete {
+        margin-top: 10px;
+      }
     
       .btn-delete button{
         float: right;

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CreateOfferDTO, Offer } from 'src/app/models/offers.model';
 import { OffersService } from 'src/app/services/offers/offers.service';
@@ -59,6 +60,7 @@ export class OfferAdminComponent implements OnInit {
       this.imageType = file.type.split('/')[1];
       reader.onload = e => this.imgToShow = reader.result;
       reader.readAsDataURL(file);
+      this.handleFileSelect();
     }
   }
   handleFileSelect() {
@@ -74,24 +76,6 @@ export class OfferAdminComponent implements OnInit {
     var binaryString = readerEvt.target.result;
     this.base64textString = `data:image/${this.imageType};base64,${btoa(binaryString)}`;
     this.offer.additional = this.base64textString;
-
-    this.offersService.create(this.offer).subscribe({
-      next: (res) => {
-        this.readOffers();
-        this._snackBar.open('La oferta se creo correctamente', 'Cerrar', {
-          duration: 5000,
-          horizontalPosition: 'end',
-          verticalPosition: 'bottom'
-        });
-      },
-      error: (err) => {
-        this._snackBar.open('Error al crear oferta', 'Cerrar', {
-          duration: 5000,
-          horizontalPosition: 'end',
-          verticalPosition: 'bottom'
-        });
-      }
-    })
   }
   readOffers() {
     this.offersService.readAll().subscribe({
@@ -106,8 +90,27 @@ export class OfferAdminComponent implements OnInit {
   describeOffer(data: Offer) {
     this.dataDescribe = data;
   }
-  create() {
-    this.handleFileSelect();
+  create(form: NgForm) {
+    this.offersService.create(this.offer).subscribe({
+      next: (res) => {
+        this.readOffers();
+        this._snackBar.open('La oferta se creo correctamente', 'Cerrar', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom'
+        });
+        form.reset();
+        this.offer.additional = '';
+        this.imgToShow = '';
+      },
+      error: (err) => {
+        this._snackBar.open('Error al crear oferta', 'Cerrar', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom'
+        });
+      }
+    })
   }
 
   offerDelete(id: number) {
@@ -119,6 +122,7 @@ export class OfferAdminComponent implements OnInit {
           horizontalPosition: 'end',
           verticalPosition: 'bottom'
         });
+        this.dataDescribe.idadvertisement = 0;
       },
       error: (err) => {
         this._snackBar.open('Error al eliminar oferta', 'Cerrar', {
