@@ -78,6 +78,7 @@ export class OfferAdminComponent implements OnInit {
     this.offer.additional = this.base64textString;
   }
   readOffers() {
+    this.dataTable = [];
     this.offersService.readAll().subscribe({
       next: (res) => {
         this.dataTable = res
@@ -90,10 +91,10 @@ export class OfferAdminComponent implements OnInit {
   describeOffer(data: Offer) {
     this.dataDescribe = data;
   }
+
   create(form: NgForm) {
     this.offersService.create(this.offer).subscribe({
       next: (res) => {
-        this.readOffers();
         this._snackBar.open('La oferta se creo correctamente', 'Cerrar', {
           duration: 5000,
           horizontalPosition: 'end',
@@ -102,6 +103,7 @@ export class OfferAdminComponent implements OnInit {
         form.reset();
         this.offer.additional = '';
         this.imgToShow = '';
+        this.readOffers();
       },
       error: (err) => {
         this._snackBar.open('Error al crear oferta', 'Cerrar', {
