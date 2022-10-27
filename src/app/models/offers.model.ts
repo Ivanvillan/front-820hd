@@ -1,8 +1,8 @@
 export interface Offer {
-    idadvertisement: number;
+    idadvertisement?: number;
     title: string;
     description: string;
-    more_info: string;
+    more_info?: string;
     additional: string;
     price: number;
     discount: number;

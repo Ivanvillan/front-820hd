@@ -107,7 +107,7 @@ export class OfferAdminComponent implements OnInit {
         form.reset();
         this.offer.additional = '';
         this.imgToShow = '';
-        this.readOffers();
+        this.dataTable.unshift(this.offer);
       },
       error: (err) => {
         this._snackBar.open('Error al crear oferta', 'Cerrar', {
