@@ -84,7 +84,11 @@ export class OfferAdminComponent implements OnInit {
         this.dataTable = res
       },
       error: (err) => {
-        console.log(err);
+        this._snackBar.open('Error al cargar lista de ofertas', 'Cerrar', {
+          duration: 5000,
+          horizontalPosition: 'end',
+          verticalPosition: 'bottom'
+        });
       }
     })
   }
