@@ -24,7 +24,7 @@ export class OfferAdminComponent implements OnInit {
     price: 0,
     discount: 0,
     type: 0,
-    weekly: false,
+    weekly: 0,
     idadvertisement: 0,
     more_info: '',
   }
@@ -35,7 +35,7 @@ export class OfferAdminComponent implements OnInit {
     price: 0,
     discount: 0,
     type: 0,
-    weekly: false,
+    weekly: 0,
   }
   API_URI: string = '';
 

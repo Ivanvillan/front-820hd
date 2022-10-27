@@ -7,7 +7,7 @@ export interface Offer {
     price: number;
     discount: number;
     type: number;
-    weekly: boolean;
+    weekly: number;
 }
 
 export interface CreateOfferDTO extends Omit<Offer, 'idadvertisement' | 'more_info'> {
