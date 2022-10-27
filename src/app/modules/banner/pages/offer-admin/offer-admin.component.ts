@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CreateOfferDTO, Offer } from 'src/app/models/offers.model';
@@ -39,7 +39,7 @@ export class OfferAdminComponent implements OnInit {
   }
   API_URI: string = '';
 
-  constructor(private offersService: OffersService, private _snackBar: MatSnackBar, private changeDetectorRefs: ChangeDetectorRef) {
+  constructor(private offersService: OffersService, private _snackBar: MatSnackBar) {
     if(window.location.hostname.includes('localhost')){   
       this.API_URI = 'http://localhost:3001/images';
     }
@@ -99,8 +99,6 @@ export class OfferAdminComponent implements OnInit {
   create(form: NgForm) {
     this.offersService.create(this.offer).subscribe({
       next: (res) => {
-        this.dataTable.unshift(this.offer);
-        this.changeDetectorRefs.detectChanges();
         this._snackBar.open('La oferta se creo correctamente', 'Cerrar', {
           duration: 5000,
           horizontalPosition: 'end',
@@ -109,7 +107,7 @@ export class OfferAdminComponent implements OnInit {
         form.reset();
         this.offer.additional = '';
         this.imgToShow = '';
-        console.log(this.dataTable);
+        location.reload();
       },
       error: (err) => {
         this._snackBar.open('Error al crear oferta', 'Cerrar', {
