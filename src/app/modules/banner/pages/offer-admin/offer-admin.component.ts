@@ -99,6 +99,8 @@ export class OfferAdminComponent implements OnInit {
   create(form: NgForm) {
     this.offersService.create(this.offer).subscribe({
       next: (res) => {
+        this.dataTable.unshift(this.offer);
+        this.changeDetectorRefs.detectChanges();
         this._snackBar.open('La oferta se creo correctamente', 'Cerrar', {
           duration: 5000,
           horizontalPosition: 'end',
@@ -107,10 +109,7 @@ export class OfferAdminComponent implements OnInit {
         form.reset();
         this.offer.additional = '';
         this.imgToShow = '';
-        this.dataTable.unshift(this.offer);
-        this.changeDetectorRefs.detectChanges();
         console.log(this.dataTable);
-        
       },
       error: (err) => {
         this._snackBar.open('Error al crear oferta', 'Cerrar', {
