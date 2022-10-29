@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Credentials } from 'src/app/models/credentials.models';
+import * as moment from 'moment-timezone';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class CredentialsService {
       'name': credentials.contacto,
       'email': credentials.email,
       'type': credentials.type,
+      'time': moment().tz('America/Argentina').format()
     }
     localStorage.setItem('credentials', JSON.stringify(data));
     localStorage.setItem('token', token);

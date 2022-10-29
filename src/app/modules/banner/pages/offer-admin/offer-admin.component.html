@@ -58,7 +58,7 @@
             </mat-select>
           </mat-form-field>
           <div class="create-button">
-            <button (click)="create(offerForm);">Crear</button>
+            <button (click)="submit(offerForm);">{{isEditing ? 'Editar' : 'Crear'}}</button>
           </div>
         </div>
       </div>
@@ -129,8 +129,18 @@
               <span [textContent]="dataDescribe.type == 2 ? 'Servicio' : 'Insumo'" class="data"></span>
             </div>
           </div>
-          <div class="btn-delete">
-            <button (click)="offerDelete(dataDescribe.idadvertisement)">Eliminar</button>
+          <div class="actions">
+            <div class="btn-delete">
+              <button (click)="offerDelete(dataDescribe.idadvertisement)">Eliminar</button>
+            </div>
+            <div class="btn-edit" *ngIf="isEditing === false; else edit">
+              <button (click)="setDataForm(dataDescribe)">Editar</button>
+            </div>
+            <ng-template #edit>
+              <div class="btn-cancelEdit">
+                <button (click)="cancelEdit()">Cancelar</button>
+              </div>
+            </ng-template>
           </div>
         </div>
       </div>

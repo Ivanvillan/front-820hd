@@ -24,10 +24,16 @@ export class OffersService {
   readWeekly() {
     return this.http.get<Offer[]>(`${this.API_URI}/9/weekly`)
   }
+
   create(data: CreateOfferDTO) {
     return this.http.post<Offer[]>(`${this.API_URI}`, data)
   }
+
   delete(id: number) {
     return this.http.delete(`${this.API_URI}/${id}`)
+  }
+
+  update(id: number, data: Offer) {
+    return this.http.put<Offer[]>(`${this.API_URI}/${id}`, data)
   }
 }

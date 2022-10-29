@@ -6,6 +6,7 @@ import { CredentialsService } from 'src/app/services/credentials/credentials.ser
 import { faArrowCircleDown } from '@fortawesome/free-solid-svg-icons';
 import { OffersService } from 'src/app/services/offers/offers.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import * as moment from 'moment-timezone';
 
 
 @Component({
@@ -89,9 +90,9 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!(window.location.href.includes('/signin'))) {
-      this.offersService.readWeekly().subscribe({
-        error: (err) => {
+    const data = JSON.parse(this.credentialsService.getCredentials()!);
+    let session = moment().diff(data.time, 'days');    
+    if (!(window.location.href.includes('/signin')) && (session != 0)) {
           this._snackBar.open('Tu sesión ha expirado, necesitamos que ingreses tus credenciales nuevamente', 'Cerrar', {
             duration: 5000,
             horizontalPosition: 'end',
@@ -102,8 +103,6 @@ export class HeaderComponent implements OnInit {
           this.credentialsService.revokeCredentials();
           this.authService.logout();
           this.router.navigate(['/signin']);
-        }
-      })
     }
   }
 
