@@ -13,7 +13,7 @@
                        <span class="name">820 Helpdesk <span class="user">@helpdesk820</span></span>
                     </div>
                     <div class="text">
-                        <span>{{twitt.text}}</span>
+                        <span>{{twitt.text.split('https://')[0]}} <a target="_blank" href="https://{{twitt.text.split('https://')[1]}}">{{twitt.text.split('https://')[1]}}</a></span>
                     </div>
                 </div>
             </div>

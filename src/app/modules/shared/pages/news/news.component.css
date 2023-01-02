@@ -183,6 +183,16 @@
     }
 }
 
+a {
+    color: #0078BD;
+    text-decoration: none;
+}
+
+a:hover {
+    color:#ff0000; 
+    text-decoration:none; 
+    cursor:pointer;  
+}
 
 /* @media screen and (max-width: 39.9em){
 }
