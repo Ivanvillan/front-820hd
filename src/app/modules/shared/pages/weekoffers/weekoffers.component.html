@@ -7,10 +7,9 @@
             </div>
         </div>
         <div class="weekoffers-body">
-            <swiper class="img-container-weekoffers mySwiper" [slidesPerView]="3" [slidesPerGroup]="3" [loop]="true"
-                [loopFillGroupWithBlank]="true" [pagination]="{
-            clickable: true
-        }">
+            <swiper class="img-container-weekoffers mySwiper" [autoplay]="{delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true}" 
+                [slidesPerView]="3" [slidesPerGroup]="3" [loopFillGroupWithBlank]="true" 
+                [pagination]="{clickable: true}">
                 <ng-template class="weekoffer-element" swiperSlide *ngFor="let weekoffer of weekoffers">
                     <img (click)="openDialog(weekoffer)" [src]="API_URI + '/' + weekoffer.additional" alt="">
                     <mat-chip-list (click)="openDialog(weekoffer)">

@@ -3,11 +3,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { Offer } from 'src/app/models/offers.model';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 import { OffersService } from 'src/app/services/offers/offers.service';
-import SwiperCore, { Navigation, Pagination, Swiper } from "swiper";
+import SwiperCore, { Navigation, Pagination, Swiper, Autoplay } from "swiper";
 import { DialogComponent } from '../../components/dialog/dialog.component';
 
 
-SwiperCore.use([Navigation, Pagination]);
+SwiperCore.use([Navigation, Pagination, Autoplay]);
 
 @Component({
   selector: 'app-weekoffers',
