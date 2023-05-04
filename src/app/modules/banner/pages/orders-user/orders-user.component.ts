@@ -39,14 +39,23 @@ export class OrdersUserComponent implements OnInit {
   }
   searchButtonText: string = 'Buscar';
   contactName: string = '';
+  userType: string = '';
+  clients: any[] = [];
+  client: any;
 
   constructor(private ordersService: OrdersService, private credentialsService: CredentialsService) { 
     const data = JSON.parse(this.credentialsService.getCredentials()!);    
     this.contactName = data.contact;
+    this.userType = data.type;
   }
 
   ngOnInit() {
-    this.readAll();
+    if(this.userType === 'admin') {
+      this.readAllClients();
+    }
+    if(this.userType === 'customer') {
+      this.readAll();
+    }
   }
 
   describeOrder(data: any) {
@@ -231,5 +240,23 @@ export class OrdersUserComponent implements OnInit {
       const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const blob = new Blob([buffer], { type: 'application/octet-stream' });
       FileSaver.saveAs(blob, fileName);
+  }
+
+  readAllClients() {
+    this.ordersService.readAllClients().subscribe({
+      next: (res) => {
+        console.log(res);
+        this.clients = [];
+        this.clients.push(res);
+      }, 
+      error: (err) => {
+        console.log(err);
+      }
+    });
+  } 
+
+  customSearchFn(term: string, item: any) {
+    term = term.toLocaleLowerCase();
+    return item.nombre.toLocaleLowerCase().indexOf(term) > -1;
   }
 }

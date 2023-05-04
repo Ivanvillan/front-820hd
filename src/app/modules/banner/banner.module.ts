@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table'
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 import { BannerRoutingModule } from './banner-routing.module';
@@ -43,7 +44,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     FormsModule,
     MatTableModule,
     SharedModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    NgSelectModule
   ],
   exports: [
     BannerComponent

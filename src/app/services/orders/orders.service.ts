@@ -11,6 +11,10 @@ export class OrdersService {
 
   constructor(private http: HttpClient) { }
 
+  readAllClients() {
+    return this.http.get(`${this.API_URI}/clients/all`);
+  }
+
   readAll(id: number) {
     return this.http.get(`${this.API_URI}/${id}`)
   }
