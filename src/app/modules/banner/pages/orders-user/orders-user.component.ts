@@ -59,69 +59,67 @@ export class OrdersUserComponent implements OnInit {
   }
 
   describeOrder(data: any) {
-    this.dataDescribe = data;    
+    this.dataDescribe = data; 
+    this.contactName = this.dataDescribe?.contacto       
   }
   readAll() {
     const data = JSON.parse(this.credentialsService.getCredentials()!);
+    this.searchButtonText = 'Buscando...';
+    this.dataTable = [];
     this.ordersService.readAllByContact(data.idContact).subscribe({
       next: (res) => {        
+        this.searchButtonText = 'Buscar';
         if (window.location.href.includes('/supplies')) {
-          this.dataTable = [];
           this.dataTable = this.dataTable.concat(res);
           this.dataTable = this.dataTable.filter(
             (el: { insu: any; sopo: any }) => el.insu == true || (el.insu == false && el.sopo == false) )
         }
         if (window.location.href.includes('/assistance')) {
-          this.dataTable = [];
           this.dataTable = this.dataTable.concat(res);
           this.dataTable = this.dataTable.filter(
             (el: { insu: any; sopo: any }) => el.sopo == true || (el.insu == false && el.sopo == false))
         }
       },
       error: (err) => {
+        this.searchButtonText = 'Buscar';
         console.log(err);
       }
     })
   }
-  search() {
-    const data = JSON.parse(this.credentialsService.getCredentials()!);
-    if(this.firstDate && this.secondDate) {
-      this.ordersService.readByDate(data.idClient, this.firstDate, this.secondDate).subscribe({
-        next: (res) => {
-          if(res) {
-            this.dataTable = [];
-            this.dataTable = this.dataTable.concat(res)
-          }
-        },
-        error: (err) => {
-          console.log(err);
+  searchByClient() {
+    this.searchButtonText = 'Buscando...';
+    this.dataTable = [];
+    this.ordersService.readByDate(this.client?.id7, this.firstDate, this.secondDate).subscribe({
+      next: (res) => {
+        this.searchButtonText = 'Buscar';
+        if(res) {
+          this.dataTable = this.dataTable.concat(res)
         }
-      })
-    } else {
-      this.readAll();
-    }
+      },
+      error: (err) => {
+        this.searchButtonText = 'Buscar';
+        console.log(err);
+      }
+    })
+    
   }
 
   searchByContact() {
     const data = JSON.parse(this.credentialsService.getCredentials()!);
-    if(this.firstDate && this.secondDate) {
-      this.searchButtonText = 'Buscando...';
-      this.ordersService.readByDateAndContact(data.idClient, this.firstDate, this.secondDate).subscribe({
-        next: (res) => {
-          if(res) {
-            this.dataTable = [];
-            this.dataTable = this.dataTable.concat(res)
-            this.searchButtonText = 'Buscar';
-          }
-        },
-        error: (err) => {
-          console.log(err);
-          this.searchButtonText = 'Buscar';
+    this.searchButtonText = 'Buscando...';
+    this.dataTable = [];
+    this.ordersService.readByDateAndContact(data.idClient, this.firstDate, this.secondDate).subscribe({
+      next: (res) => {
+        this.searchButtonText = 'Buscar';
+        if(res) {
+          this.dataTable = this.dataTable.concat(res)
         }
-      })
-    } else {
-      this.readAll();
-    }
+      },
+      error: (err) => {
+        this.searchButtonText = 'Buscar';
+        console.log(err);
+      }
+    })
   }
 
   formatDate(date: string): string {
@@ -185,7 +183,7 @@ export class OrdersUserComponent implements OnInit {
   
     // Set file name with current date and time
     const date = new Date();
-    const fileName = `Reporte de ordenes PCASSI ${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}.pdf`;
+    const fileName = `Reporte de ordenes ${this.client?.nombre ?? 'PCASSI'} ${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}.pdf`;
   
     // Download the PDF file
     doc.save(fileName)
@@ -193,7 +191,7 @@ export class OrdersUserComponent implements OnInit {
 
   XLSXExport() { 
       const date = new Date();
-      const fileName = `Reporte de ordenes PCASSI ${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}.xlsx`;
+      const fileName = `Reporte de ordenes ${this.client?.nombre ?? 'PCASSI'} ${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}.xlsx`;
       const table = document.getElementById('order-table');
     
       // Create a worksheet from the table
@@ -245,15 +243,49 @@ export class OrdersUserComponent implements OnInit {
   readAllClients() {
     this.ordersService.readAllClients().subscribe({
       next: (res) => {
-        console.log(res);
-        this.clients = [];
-        this.clients.push(res);
+        this.clients = [res].flat();
       }, 
       error: (err) => {
         console.log(err);
       }
     });
   } 
+
+  readCustomClient(): void {
+    this.searchButtonText = 'Buscando...';
+    this.dataTable = [];
+    this.ordersService.readAll(this.client?.id7).subscribe({
+      next: (res) => {    
+        this.searchButtonText = 'Buscar';
+        if (window.location.href.includes('/supplies')) {
+          this.dataTable = this.dataTable.concat(res);
+          this.dataTable = this.dataTable.filter(
+            (el: { insu: any; sopo: any }) => el.insu == true || (el.insu == false && el.sopo == false) )
+          }
+        if (window.location.href.includes('/assistance')) {
+          this.dataTable = this.dataTable.concat(res);
+          this.dataTable = this.dataTable.filter(
+            (el: { insu: any; sopo: any }) => el.sopo == true || (el.insu == false && el.sopo == false))
+        }
+      },
+      error: (err) => {
+        this.searchButtonText = 'Buscar';
+        console.log(err);
+      }
+    })
+  }
+
+
+  onSearch() {
+    if(this.client && this.firstDate && this.secondDate)
+      this.searchByClient();
+    if(!this.client && this.firstDate && this.secondDate)
+      this.searchByContact();
+    if(!this.client && !this.firstDate && !this.secondDate)
+      this.readAll();
+    if(this.client && !this.firstDate && !this.secondDate)
+      this.readCustomClient();
+  }
 
   customSearchFn(term: string, item: any) {
     term = term.toLocaleLowerCase();

@@ -2,7 +2,7 @@
 @import 'swiper/swiper.min.css';
 @import 'swiper/modules/navigation/navigation.min.css';
 @import 'swiper/modules/pagination/pagination.min.css';
-@import "~@ng-select/ng-select/themes/material.theme.css";
+@import "~@ng-select/ng-select/themes/default.theme.css";
 
 
 html, body, div, span, applet, object, iframe,
