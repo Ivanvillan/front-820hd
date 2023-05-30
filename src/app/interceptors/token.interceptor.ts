@@ -33,7 +33,7 @@ export class TokenInterceptor implements HttpInterceptor {
   private addToken(request: HttpRequest<unknown>) {
     const token = this.credentialsService.getToken();
     const data = JSON.parse(this.credentialsService.getCredentials()!);
-    const type = data['type']
+    const type = data['type'];
     if (token) {
       const authReq = request.clone({
         setHeaders: {

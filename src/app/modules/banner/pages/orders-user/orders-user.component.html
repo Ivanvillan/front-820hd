@@ -22,6 +22,14 @@
             </ng-template>
           </ng-select>
         </div>
+        <div class="selection-order-list" *ngIf="userType === 'customer'">
+          <ng-select [items]="selectOrderList" bindLabel="list" bindValue="list"
+          dropdownPosition="bottom" [(ngModel)]="selectedOrderList">
+          <ng-template ng-label-tmp let-item="item">
+              <span>{{ item.list }}</span>
+            </ng-template>
+          </ng-select>
+        </div>
         <div class="btn-search">
           <button (click)="onSearch()" type="button">{{searchButtonText}}</button>
         </div>

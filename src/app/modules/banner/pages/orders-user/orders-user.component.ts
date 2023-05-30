@@ -42,6 +42,11 @@ export class OrdersUserComponent implements OnInit {
   userType: string = '';
   clients: any[] = [];
   client: any;
+  selectOrderList: object[] = [
+    {list: 'personales'},
+    {list: 'general'}
+  ]
+  selectedOrderList: string = 'personales';
 
   constructor(private ordersService: OrdersService, private credentialsService: CredentialsService) { 
     const data = JSON.parse(this.credentialsService.getCredentials()!);    
@@ -55,7 +60,7 @@ export class OrdersUserComponent implements OnInit {
     }
     if(this.userType === 'customer') {
       this.readAll();
-    }
+    }    
   }
 
   describeOrder(data: any) {
@@ -63,10 +68,11 @@ export class OrdersUserComponent implements OnInit {
     this.contactName = this.dataDescribe?.contacto       
   }
   readAll() {
-    const data = JSON.parse(this.credentialsService.getCredentials()!);
+    const data = JSON.parse(this.credentialsService.getCredentials()!);    
+    let contact = data?.idContact;
     this.searchButtonText = 'Buscando...';
     this.dataTable = [];
-    this.ordersService.readAllByContact(data.idContact).subscribe({
+    this.ordersService.readAllByContact(contact).subscribe({
       next: (res) => {        
         this.searchButtonText = 'Buscar';
         if (window.location.href.includes('/supplies')) {
@@ -101,14 +107,14 @@ export class OrdersUserComponent implements OnInit {
         console.log(err);
       }
     })
-    
   }
 
-  searchByContact() {
-    const data = JSON.parse(this.credentialsService.getCredentials()!);
+  searchByDateAndClient() {
     this.searchButtonText = 'Buscando...';
+    const data = JSON.parse(this.credentialsService.getCredentials()!);    
+    let client = data?.idClient;
     this.dataTable = [];
-    this.ordersService.readByDateAndContact(data.idClient, this.firstDate, this.secondDate).subscribe({
+    this.ordersService.readByDate(client, this.firstDate, this.secondDate).subscribe({
       next: (res) => {
         this.searchButtonText = 'Buscar';
         if(res) {
@@ -120,6 +126,98 @@ export class OrdersUserComponent implements OnInit {
         console.log(err);
       }
     })
+  }
+
+  readAllByClient() {
+    this.searchButtonText = 'Buscando...';
+    const data = JSON.parse(this.credentialsService.getCredentials()!);    
+    let client = data?.idClient;
+    this.dataTable = [];
+    this.ordersService.readAll(client).subscribe({
+      next: (res) => {
+        this.searchButtonText = 'Buscar';
+        if(res) {
+          this.dataTable = this.dataTable.concat(res)
+        }
+      },
+      error: (err) => {
+        this.searchButtonText = 'Buscar';
+        console.log(err);
+      }
+    })
+
+  }
+
+  searchByContact() {
+    const data = JSON.parse(this.credentialsService.getCredentials()!);    
+    let contact = data?.idContact;
+    this.searchButtonText = 'Buscando...';
+    this.dataTable = [];
+    this.ordersService.readByDateAndContact(contact, this.firstDate, this.secondDate).subscribe({
+      next: (res) => {
+        this.searchButtonText = 'Buscar';
+        if(res) {
+          this.dataTable = this.dataTable.concat(res)
+        }
+      },
+      error: (err) => {
+        this.searchButtonText = 'Buscar';
+        console.log(err);
+      }
+    })
+  }
+
+
+  readAllClients() {
+    this.ordersService.readAllClients().subscribe({
+      next: (res) => {
+        this.clients = [res].flat();
+      }, 
+      error: (err) => {
+        console.log(err);
+      }
+    });
+  } 
+
+  readCustomClient(): void {
+    this.searchButtonText = 'Buscando...';
+    this.dataTable = [];
+    this.ordersService.readAll(this.client?.id7).subscribe({
+      next: (res) => {    
+        this.searchButtonText = 'Buscar';
+        if (window.location.href.includes('/supplies')) {
+          this.dataTable = this.dataTable.concat(res);
+          this.dataTable = this.dataTable.filter(
+            (el: { insu: any; sopo: any }) => el.insu == true || (el.insu == false && el.sopo == false) )
+          }
+        if (window.location.href.includes('/assistance')) {
+          this.dataTable = this.dataTable.concat(res);
+          this.dataTable = this.dataTable.filter(
+            (el: { insu: any; sopo: any }) => el.sopo == true || (el.insu == false && el.sopo == false))
+        }
+      },
+      error: (err) => {
+        this.searchButtonText = 'Buscar';
+        console.log(err);
+      }
+    })
+  }
+
+
+  onSearch() {
+    console.log(this.selectedOrderList);
+    if(this.client && this.firstDate && this.secondDate)
+      return this.searchByClient();
+    if(this.client && !this.firstDate && !this.secondDate)
+      return this.readCustomClient();
+    if(this.selectedOrderList === 'personales' && !this.client && this.firstDate && this.secondDate)
+      return this.searchByContact();
+    if(this.selectedOrderList === 'personales' && !this.client && !this.firstDate && !this.secondDate)
+      return this.readAll();
+    if(this.selectedOrderList === 'general' && !this.client && this.firstDate && this.secondDate)
+      return this.searchByDateAndClient();
+    if(this.selectedOrderList === 'general' && !this.client && !this.firstDate && !this.secondDate) 
+      return this.readAllByClient();
   }
 
   formatDate(date: string): string {
@@ -238,53 +336,6 @@ export class OrdersUserComponent implements OnInit {
       const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const blob = new Blob([buffer], { type: 'application/octet-stream' });
       FileSaver.saveAs(blob, fileName);
-  }
-
-  readAllClients() {
-    this.ordersService.readAllClients().subscribe({
-      next: (res) => {
-        this.clients = [res].flat();
-      }, 
-      error: (err) => {
-        console.log(err);
-      }
-    });
-  } 
-
-  readCustomClient(): void {
-    this.searchButtonText = 'Buscando...';
-    this.dataTable = [];
-    this.ordersService.readAll(this.client?.id7).subscribe({
-      next: (res) => {    
-        this.searchButtonText = 'Buscar';
-        if (window.location.href.includes('/supplies')) {
-          this.dataTable = this.dataTable.concat(res);
-          this.dataTable = this.dataTable.filter(
-            (el: { insu: any; sopo: any }) => el.insu == true || (el.insu == false && el.sopo == false) )
-          }
-        if (window.location.href.includes('/assistance')) {
-          this.dataTable = this.dataTable.concat(res);
-          this.dataTable = this.dataTable.filter(
-            (el: { insu: any; sopo: any }) => el.sopo == true || (el.insu == false && el.sopo == false))
-        }
-      },
-      error: (err) => {
-        this.searchButtonText = 'Buscar';
-        console.log(err);
-      }
-    })
-  }
-
-
-  onSearch() {
-    if(this.client && this.firstDate && this.secondDate)
-      this.searchByClient();
-    if(!this.client && this.firstDate && this.secondDate)
-      this.searchByContact();
-    if(!this.client && !this.firstDate && !this.secondDate)
-      this.readAll();
-    if(this.client && !this.firstDate && !this.secondDate)
-      this.readCustomClient();
   }
 
   customSearchFn(term: string, item: any) {

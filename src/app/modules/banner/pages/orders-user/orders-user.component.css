@@ -34,6 +34,12 @@
         font-size: 12px !important;
         margin-left: 10px;
     }
+
+    .selection-order-list {
+        width: 150px;
+        font-size: 12px !important;
+        margin-left: 10px;
+    }
     
     .date input {
         border: none;
@@ -233,6 +239,12 @@
         font-size: 12px !important;
         margin-left: 10px;
     }
+
+    .selection-order-list {
+        width: 160px;
+        font-size: 12px !important;
+        margin-left: 10px;
+    }
     
     .date input {
         border: none;
@@ -425,6 +437,12 @@
     }
 
     .clients-search {
+        width: 200px;
+        font-size: 12px !important;
+        margin-left: 20px;
+    }
+
+    .selection-order-list {
         width: 200px;
         font-size: 12px !important;
         margin-left: 20px;
