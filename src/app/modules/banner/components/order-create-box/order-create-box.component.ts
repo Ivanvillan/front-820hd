@@ -15,7 +15,8 @@ export class OrderCreateBoxComponent implements OnInit {
     insu: 0,
     sopo: 0,
     id7: 0,
-    id7c: 0
+    id7c: 0,
+    email: ''
   }
 
   constructor(
@@ -29,9 +30,9 @@ export class OrderCreateBoxComponent implements OnInit {
 
   create() {
     const data = JSON.parse(this.credentialsService.getCredentials()!);
-    this.order.id7 = data.idClient;
-    this.order.id7c = data.idContact;
-
+    this.order.id7 = data?.idClient;
+    this.order.id7c = data?.idContact;
+    this.order.email = data?.email;
     if (window.location.href.includes('/supplies'))
       this.order.insu = 1;
     else this.order.sopo = 1;
