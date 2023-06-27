@@ -24,18 +24,35 @@ export class CredentialsService {
     }
     localStorage.setItem('credentials', JSON.stringify(data));
     localStorage.setItem('token', token);
+    if(!localStorage.getItem('news')) {
+      const timeNews = moment().tz(timeZone).format();
+      localStorage.setItem('news', timeNews)
+    }
   }
 
   getCredentials() {
     const credentials = localStorage.getItem('credentials');
     return credentials;
   }
+
   getToken() {
     const token = localStorage.getItem('token');
     return token;
   }
 
+  getNewsStorage() {
+    const news = localStorage.getItem('news');
+    return news;
+  }
+
+  setNewsStorage() {
+    const timeZone = 'America/Argentina/Buenos_Aires';
+    const timeNews = moment().tz(timeZone).format();
+    localStorage.setItem('news', timeNews)
+  }
+
   revokeCredentials() {
-    return localStorage.clear();
+    localStorage.removeItem('credentials');
+    localStorage.removeItem('token');
   }
 }

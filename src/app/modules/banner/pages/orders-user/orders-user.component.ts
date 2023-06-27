@@ -205,7 +205,6 @@ export class OrdersUserComponent implements OnInit {
 
 
   onSearch() {
-    console.log(this.selectedOrderList);
     if(this.client && this.firstDate && this.secondDate)
       return this.searchByClient();
     if(this.client && !this.firstDate && !this.secondDate)

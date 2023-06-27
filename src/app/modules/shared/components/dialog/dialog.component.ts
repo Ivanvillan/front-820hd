@@ -20,6 +20,8 @@ export class DialogComponent {
     id7c: 0
   }
 
+  randomNumber: number = 0;
+
   API_URI: string = '';
 
   constructor(
@@ -27,14 +29,15 @@ export class DialogComponent {
     private ordersService: OrdersService,
     private _snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<DialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Offer,
+    @Inject(MAT_DIALOG_DATA) public data: any,
   ) { 
     if(window.location.hostname.includes('localhost')){   
       this.API_URI = 'http://localhost:3001/images';
     }
     if (!window.location.hostname.includes('localhost')) {
       this.API_URI = 'https://api.820hd.com.ar/images'
-    }
+    } 
+    this.randomNumber = Math.floor(Math.random() * 3) + 1;   
   }
 
   onNoClick(): void {

@@ -1,33 +1,49 @@
-<div class="container">
-  <div class="title">
-    <span>Detalle de la oferta</span>
-    <button class="close" mat-button (click)="onNoClick();">&times;</button>
-  </div>
-  <div class="center">
-    <div class="image">
-      <div *ngIf="data.additional; else noimg">
-        <img [src]="API_URI + '/' + data.additional" alt="">
-      </div>
-      <ng-template #noimg>
-        <img [src]="API_URI + '/front/no-image.png'" alt="">
-      </ng-template>
+<ng-container *ngIf="data === 'news'; else offer">
+  <div class="container">
+    <div class="title">
+      <span>Novedades 820HD</span>
+      <button class="close" mat-button (click)="onNoClick();">&times;</button>
     </div>
-    <div class="info">
-      <div class="discount">
-        <span>{{data.discount}}% OFF</span>
-      </div>
-      <div class="name">
-        <span>{{data.title}}</span>
-      </div>
-      <div class="description">
-        <span>{{data.description}}</span>
-      </div>
-      <div class="price">
-        <span>{{data.price | currency: '$'}}</span>
-      </div>
-      <div class="send">
-        <button (click)="send()">Solicitar</button>
-      </div>
+    <div class="news-container">
+        <div class="news-image-container">
+          <img class="news-image" [src]="API_URI + '/front/news' + randomNumber + '.png'" alt="">
+        </div>
     </div>
   </div>
-</div>
+</ng-container>
+
+<ng-template #offer>
+  <div class="container">
+    <div class="title">
+      <span>Detalle de la oferta</span>
+      <button class="close" mat-button (click)="onNoClick();">&times;</button>
+    </div>
+    <div class="center">
+      <div class="image-container">
+        <div *ngIf="data.additional; else noimg">
+          <img class="image" [src]="API_URI + '/' + data.additional" alt="">
+        </div>
+        <ng-template #noimg>
+          <img  class="image" [src]="API_URI + '/front/no-image.png'" alt="">
+        </ng-template>
+      </div>
+      <div class="info">
+        <div class="discount">
+          <span>{{data.discount}}% OFF</span>
+        </div>
+        <div class="name">
+          <span>{{data.title}}</span>
+        </div>
+        <div class="description">
+          <span>{{data.description}}</span>
+        </div>
+        <div class="price">
+          <span>{{data.price | currency: '$'}}</span>
+        </div>
+        <div class="send">
+          <button (click)="send()">Solicitar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

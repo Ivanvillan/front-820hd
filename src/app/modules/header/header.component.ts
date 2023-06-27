@@ -7,6 +7,8 @@ import { faArrowCircleDown } from '@fortawesome/free-solid-svg-icons';
 import { OffersService } from 'src/app/services/offers/offers.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as moment from 'moment-timezone';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogComponent } from '../shared/components/dialog/dialog.component';
 
 
 @Component({
@@ -34,7 +36,8 @@ export class HeaderComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private offersService: OffersService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    public dialog: MatDialog
   ) {
     if (window.location.hostname.includes('localhost')) {
       this.API_URI = 'http://localhost:3001/images';
@@ -91,7 +94,12 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     const data = JSON.parse(this.credentialsService.getCredentials()!);
-    let session = moment().diff(data.time, 'days');    
+    const timeNews = this.credentialsService.getNewsStorage();
+    let session = moment().diff(data?.time, 'days');  
+    let newsStorage = moment().diff(timeNews, 'days', true); 
+    if (!(window.location.href.includes('/signin')) && (newsStorage < -1)) {
+      this.openDialog();
+    }
     if (!(window.location.href.includes('/signin')) && (session != 0)) {
           this._snackBar.open('Tu sesión ha expirado, necesitamos que ingreses tus credenciales nuevamente', 'Cerrar', {
             duration: 5000,
@@ -171,6 +179,18 @@ export class HeaderComponent implements OnInit {
       };
     }
     return styles
+  }
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(DialogComponent, {
+      maxWidth: '40vw',
+      maxHeight: '80vh',
+      data: 'news'
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.credentialsService.setNewsStorage();
+    });
   }
 
 }
