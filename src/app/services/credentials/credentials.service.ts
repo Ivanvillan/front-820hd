@@ -24,10 +24,7 @@ export class CredentialsService {
     }
     localStorage.setItem('credentials', JSON.stringify(data));
     localStorage.setItem('token', token);
-    if(!localStorage.getItem('news')) {
-      const timeNews = moment().tz(timeZone).format();
-      localStorage.setItem('news', timeNews)
-    }
+    localStorage.setItem('news', 'true')
   }
 
   getCredentials() {
@@ -45,14 +42,11 @@ export class CredentialsService {
     return news;
   }
 
-  setNewsStorage() {
-    const timeZone = 'America/Argentina/Buenos_Aires';
-    const timeNews = moment().tz(timeZone).format();
-    localStorage.setItem('news', timeNews)
+  revokeNewsStorage() {
+    localStorage.removeItem('news');
   }
 
   revokeCredentials() {
-    localStorage.removeItem('credentials');
-    localStorage.removeItem('token');
+    localStorage.clear();
   }
 }

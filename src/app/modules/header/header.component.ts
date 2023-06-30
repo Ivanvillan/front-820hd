@@ -94,10 +94,9 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     const data = JSON.parse(this.credentialsService.getCredentials()!);
-    const timeNews = this.credentialsService.getNewsStorage();
+    const newsStorage = this.credentialsService.getNewsStorage();
     let session = moment().diff(data?.time, 'days');  
-    let newsStorage = moment().diff(timeNews, 'days', true); 
-    if (!(window.location.href.includes('/signin')) && (newsStorage < -1)) {
+    if (!(window.location.href.includes('/signin')) && (newsStorage)) {
       this.openDialog();
     }
     if (!(window.location.href.includes('/signin')) && (session != 0)) {
@@ -189,7 +188,7 @@ export class HeaderComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(() => {
-      this.credentialsService.setNewsStorage();
+      this.credentialsService.revokeNewsStorage();
     });
   }
 
