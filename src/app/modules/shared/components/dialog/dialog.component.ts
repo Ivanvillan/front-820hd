@@ -17,7 +17,9 @@ export class DialogComponent {
     insu: 0,
     sopo: 0,
     id7: 0,
-    id7c: 0
+    id7c: 0,
+    name: '',
+    email: ''
   }
 
   randomNumber: number = 0;
@@ -49,6 +51,8 @@ export class DialogComponent {
     this.order.id7 = credential.idClient;
     this.order.id7c = credential.idContact;
     this.order.descripcion = `[Oferta] ${this.data.title} ${this.data.description}`
+    this.order.name = credential.name;
+    this.order.email = credential.email;
 
     this.ordersService.create(this.order).subscribe({
       next: (res) => {

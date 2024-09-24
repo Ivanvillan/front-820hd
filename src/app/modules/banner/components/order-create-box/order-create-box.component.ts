@@ -16,7 +16,8 @@ export class OrderCreateBoxComponent implements OnInit {
     sopo: 0,
     id7: 0,
     id7c: 0,
-    email: ''
+    email: '',
+    name: '',
   }
 
   constructor(
@@ -33,6 +34,7 @@ export class OrderCreateBoxComponent implements OnInit {
     this.order.id7 = data?.idClient;
     this.order.id7c = data?.idContact;
     this.order.email = data?.email;
+    this.order.name = data?.name;
     if (window.location.href.includes('/supplies'))
       this.order.insu = 1;
     else this.order.sopo = 1;
