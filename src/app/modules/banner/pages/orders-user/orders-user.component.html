@@ -13,7 +13,8 @@
         </div>
         <div class="clients-search" *ngIf="userType === 'admin'">
           <ng-select placeholder="Seleccionar cliente" [items]="clients" bindLabel="nombre"
-          [searchFn]="customSearchFn" clearAllText="Clear" dropdownPosition="bottom" [(ngModel)]="client">
+          [searchFn]="customSearchFn" clearAllText="Clear" dropdownPosition="bottom" [(ngModel)]="client"
+          appendTo="body">
           <ng-template ng-label-tmp let-item="item">
               <span>{{ item.nombre }}</span>
             </ng-template>

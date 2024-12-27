@@ -51,20 +51,15 @@ export class WeekoffersComponent implements OnInit {
   }
 
   openDialog(weekoffer: Offer): void {
-    const data = {
-      title: weekoffer.title,
-      description: weekoffer.description,
-      additional: weekoffer.additional,
-      discount: weekoffer.discount,
-      price: weekoffer.price
-    }
     const dialogRef = this.dialog.open(DialogComponent, {
-      width: '500px',
-      height: '250px',
-      data: data
+      width: '480px',
+      height: '360px',
+      data: weekoffer
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      console.log(result);
+      dialogRef.close();
     });
   }
 

@@ -40,6 +40,24 @@
         <div class="price">
           <span>{{data.price | currency: '$'}}</span>
         </div>
+        <div class="quantity">
+          <label for="quantityInput">Cantidad:</label>
+          <div class="quantity-input-container">
+            <button mat-icon-button class="quantity-btn remove" (click)="decrementQuantity()" [disabled]="Number(quantity) <= 1">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <input #quantityInput
+                   id="quantityInput"
+                   type="number"
+                   min="1"
+                   [(ngModel)]="quantity"
+                   placeholder="Cantidad"
+                   (keypress)="validateNumber($event)">
+            <button mat-icon-button class="quantity-btn add" (click)="incrementQuantity()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
         <div class="send">
           <button (click)="send()">Solicitar</button>
         </div>

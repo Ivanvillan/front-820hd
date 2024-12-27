@@ -27,7 +27,7 @@ export class OffersComponent implements OnInit {
   }
   ngOnInit(): void {
     this.offersService.readStandard().subscribe({
-      next: (res) => {
+      next: (res) => {        
         this.offers = res
       },
       error: (err) => {
@@ -36,14 +36,15 @@ export class OffersComponent implements OnInit {
     })
   }
 
-  openDialog(offer: Offer): void {
+  openDialog(offer: Offer): void {    
     const dialogRef = this.dialog.open(DialogComponent, {
-      width: '500px',
-      height: '250px',
+      width: '480px',
+      height: '360px',
       data: offer
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      dialogRef.close();
     });
   }
 

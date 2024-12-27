@@ -11,8 +11,8 @@ export class TwitterService {
   
   constructor(private http: HttpClient) { }
 
-readAll() {
-  return this.http.get(this.API_URI)
+readAll(userId: string) {
+  return this.http.get(`${this.API_URI}/${userId}`)
 }
 
 }

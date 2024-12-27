@@ -84,7 +84,7 @@ export class OrdersUserComponent implements OnInit {
           this.dataTable = this.dataTable.concat(res);
           this.dataTable = this.dataTable.filter(
             (el: { insu: any; sopo: any }) => el.sopo == true || (el.insu == false && el.sopo == false))
-        }
+        }        
       },
       error: (err) => {
         this.searchButtonText = 'Buscar';

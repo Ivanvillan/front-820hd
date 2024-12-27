@@ -39,6 +39,7 @@
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
+        margin: 3px;
     }
 
     .name {
@@ -52,7 +53,7 @@
     }
 
     .text {
-        margin-top: 6px;
+        margin-top: 3px;
         font-size: 12px;
         font-weight: 300;
         margin-left: 3px;
@@ -99,6 +100,7 @@
         flex-direction: column;
         align-items: flex-start;
         justify-content: space-around;
+        margin: 3px;
     }
 
     .name {
@@ -112,8 +114,8 @@
     }
 
     .text {
-        margin-top: 6px;
-        font-size: 14px;
+        margin-top: 3px;
+        font-size: 13px;
         font-weight: 300;
         margin-left: 3px;
     }
@@ -163,6 +165,7 @@
         flex-direction: column;
         align-items: flex-start;
         justify-content: space-around;
+        margin: 3px;
     }
 
     .name {
@@ -176,8 +179,8 @@
     }
 
     .text {
-        margin-top: 6px;
-        font-size: 14px;
+        margin-top: 3px;
+        font-size: 13px;
         font-weight: 300;
         margin-left: 3px;
     }

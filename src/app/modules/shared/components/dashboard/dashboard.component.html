@@ -1,0 +1,92 @@
+<div class="dashboard-container">
+  <!-- Panel de Estadísticas -->
+  <div class="stats-panel">
+    <div class="stat-card recent" 
+         [class.active]="activeFilter === 'recent'"
+         (click)="filterByStatus('recent')">
+      <div class="stat-value">{{getTotalTickets().recent}}</div>
+      <div class="stat-label">Recientes</div>
+    </div>
+    <div class="stat-card pending" 
+         [class.active]="activeFilter === 'pending'"
+         (click)="filterByStatus('pending')">
+      <div class="stat-value">{{getTotalTickets().pending}}</div>
+      <div class="stat-label">Pendientes</div>
+    </div>
+    <div class="stat-card urgent" 
+         [class.active]="activeFilter === 'urgent'"
+         (click)="filterByStatus('urgent')">
+      <div class="stat-value">{{getTotalTickets().urgent}}</div>
+      <div class="stat-label">Urgentes</div>
+    </div>
+    <div class="stat-card critical" 
+         [class.active]="activeFilter === 'critical'"
+         (click)="filterByStatus('critical')">
+      <div class="stat-value">{{getTotalTickets().critical}}</div>
+      <div class="stat-label">Críticos</div>
+    </div>
+  </div>
+
+  <!-- Tabla unificada -->
+  <div class="ticket-section">
+    <mat-table [dataSource]="ticketsDataSource" class="mat-elevation-z8">
+      <ng-container matColumnDef="estado">
+        <mat-header-cell *matHeaderCellDef>Estado</mat-header-cell>
+        <mat-cell *matCellDef="let ticket">
+          <div class="indicator-status" [ngClass]="getTicketStatus(ticket.fecha).class">
+            {{getTicketStatus(ticket.fecha).text}}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="fecha">
+        <mat-header-cell *matHeaderCellDef>Fecha</mat-header-cell>
+        <mat-cell *matCellDef="let ticket">
+          {{ticket.fecha | date:'dd/MM/yyyy'}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="hora">
+        <mat-header-cell *matHeaderCellDef>Hora</mat-header-cell>
+        <mat-cell *matCellDef="let ticket">
+          {{ticket.hora}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="numero">
+        <mat-header-cell *matHeaderCellDef>Número</mat-header-cell>
+        <mat-cell *matCellDef="let ticket">
+          {{ticket.numero}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="descripcion">
+        <mat-header-cell *matHeaderCellDef>Descripción</mat-header-cell>
+        <mat-cell *matCellDef="let ticket">
+          {{ticket.descripcion}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="contacto">
+        <mat-header-cell *matHeaderCellDef>Contacto</mat-header-cell>
+        <mat-cell *matCellDef="let ticket" [title]="ticket.contacto">
+          {{ticket.contacto.length > 20 ? (ticket.contacto | slice:0:20) + '...' : ticket.contacto}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="empresa">
+        <mat-header-cell *matHeaderCellDef>Empresa</mat-header-cell>
+        <mat-cell *matCellDef="let ticket" [title]="ticket.nombre">
+          {{ticket.nombre.length > 20 ? (ticket.nombre | slice:0:20) + '...' : ticket.nombre}}
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;" 
+               (click)="openTicketDetail(row)"
+               class="clickable-row"></mat-row>
+    </mat-table>
+  </div>
+
+  <!-- Sistema Section (estructura similar) -->
+</div>

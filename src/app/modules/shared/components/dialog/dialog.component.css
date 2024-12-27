@@ -55,6 +55,89 @@
         color: #65BB12;
         font-weight: 400;
     }
+
+    .quantity {
+        margin-top: 20px;
+    }
+
+    .quantity label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .quantity-input-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        padding: 4px;
+        border: 1px solid #ddd;
+        max-width: 140px;
+    }
+
+    .quantity input {
+        width: 80px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        font-size: 16px;
+        padding: 8px;
+        outline: none;
+        -moz-appearance: textfield; /* Firefox */
+    }
+
+    /* Ocultar flechas del input number */
+    .quantity input::-webkit-outer-spin-button,
+    .quantity input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .quantity-btn {
+        background-color: white;
+        border: 1px solid #ddd;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        transition: all 0.2s ease;
+    }
+
+    .quantity-btn.remove {
+        color: #ff0000;
+    }
+
+    .quantity-btn.add {
+        color: #0078bd;
+    }
+
+    .quantity-btn.remove:hover:not([disabled]) {
+        background-color: #ff0000;
+        color: white;
+        border-color: #ff0000;
+    }
+
+    .quantity-btn.add:hover:not([disabled]) {
+        background-color: #0078bd;
+        color: white;
+        border-color: #0078bd;
+    }
+
+    .quantity-btn[disabled] {
+        color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .quantity-btn mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+    }
+
     .send button{
         float: right;
         background-color: #0078bd;
@@ -139,6 +222,89 @@
         color: #65BB12;
         font-weight: 400;
     }
+
+    .quantity {
+        margin-top: 20px;
+    }
+
+    .quantity label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .quantity-input-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        padding: 4px;
+        border: 1px solid #ddd;
+        max-width: 160px;
+    }
+
+    .quantity input {
+        width: 80px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        font-size: 16px;
+        padding: 8px;
+        outline: none;
+        -moz-appearance: textfield; /* Firefox */
+    }
+
+    /* Ocultar flechas del input number */
+    .quantity input::-webkit-outer-spin-button,
+    .quantity input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .quantity-btn {
+        background-color: white;
+        border: 1px solid #ddd;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        transition: all 0.2s ease;
+    }
+
+    .quantity-btn.remove {
+        color: #ff0000;
+    }
+
+    .quantity-btn.add {
+        color: #0078bd;
+    }
+
+    .quantity-btn.remove:hover:not([disabled]) {
+        background-color: #ff0000;
+        color: white;
+        border-color: #ff0000;
+    }
+
+    .quantity-btn.add:hover:not([disabled]) {
+        background-color: #0078bd;
+        color: white;
+        border-color: #0078bd;
+    }
+
+    .quantity-btn[disabled] {
+        color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .quantity-btn mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+    }
+
     .send button{
         float: right;
         background-color: #0078bd;
@@ -222,6 +388,89 @@
         color: #65BB12;
         font-weight: 400;
     }
+
+    .quantity {
+        margin-top: 20px;
+    }
+
+    .quantity label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .quantity-input-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        padding: 4px;
+        border: 1px solid #ddd;
+        max-width: 180px;
+    }
+
+    .quantity input {
+        width: 80px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        font-size: 16px;
+        padding: 8px;
+        outline: none;
+        -moz-appearance: textfield; /* Firefox */
+    }
+
+    /* Ocultar flechas del input number */
+    .quantity input::-webkit-outer-spin-button,
+    .quantity input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .quantity-btn {
+        background-color: white;
+        border: 1px solid #ddd;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        transition: all 0.2s ease;
+    }
+
+    .quantity-btn.remove {
+        color: #ff0000;
+    }
+
+    .quantity-btn.add {
+        color: #0078bd;
+    }
+
+    .quantity-btn.remove:hover:not([disabled]) {
+        background-color: #ff0000;
+        color: white;
+        border-color: #ff0000;
+    }
+
+    .quantity-btn.add:hover:not([disabled]) {
+        background-color: #0078bd;
+        color: white;
+        border-color: #0078bd;
+    }
+
+    .quantity-btn[disabled] {
+        color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .quantity-btn mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+    }
+
     .send button{
         float: right;
         background-color: #0078bd;

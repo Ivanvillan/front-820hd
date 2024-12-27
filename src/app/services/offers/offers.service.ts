@@ -14,7 +14,7 @@ export class OffersService {
   constructor(private http: HttpClient) { }
 
   readAll() {
-    return this.http.get<Offer[]>(`${this.API_URI}/10/all`)
+    return this.http.get<Offer[]>(`${this.API_URI}/`)
   }
 
   readStandard() {

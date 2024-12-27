@@ -32,15 +32,25 @@ export class TokenInterceptor implements HttpInterceptor {
 
   private addToken(request: HttpRequest<unknown>) {
     const token = this.credentialsService.getToken();
-    const data = JSON.parse(this.credentialsService.getCredentials()!);
-    const type = data['type'];
+    const dashToken = this.credentialsService.getDashboardToken();
+    
     if (token) {
+      const data = JSON.parse(this.credentialsService.getCredentials()!);
+      const type = data['type'];
       const authReq = request.clone({
         setHeaders: {
           'access-token': token,
           'type': type,
         },
         withCredentials: true
+      });
+      return authReq;
+    } else if (dashToken && request.url.includes('/api/tickets')) {
+      // Solo permitir acceso a endpoints de tickets con el token del dashboard
+      const authReq = request.clone({
+        setHeaders: {
+          'dashboard-token': dashToken
+        }
       });
       return authReq;
     }

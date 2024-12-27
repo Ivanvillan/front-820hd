@@ -1,0 +1,19 @@
+<div class="auth-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Acceso al Dashboard</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field>
+        <mat-label>Código de acceso</mat-label>
+        <input matInput type="password" [(ngModel)]="accessCode">
+      </mat-form-field>
+      <div class="error" *ngIf="error">{{error}}</div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="validateAccess()">
+        Acceder
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div> 

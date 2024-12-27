@@ -49,4 +49,35 @@ export class CredentialsService {
   revokeCredentials() {
     localStorage.clear();
   }
+
+  saveDashboardToken(token: string): void {
+    const expirationDate = new Date();
+    expirationDate.setHours(expirationDate.getHours() + 24); // Expira en 24 horas
+    
+    const dashboardData = {
+      token: token,
+      expiration: expirationDate.getTime()
+    };
+    
+    localStorage.setItem('dashboard_token', JSON.stringify(dashboardData));
+  }
+
+  getDashboardToken(): string | null {
+    const dashboardData = localStorage.getItem('dashboard_token');
+    
+    if (!dashboardData) {
+      return null;
+    }
+
+    const { token, expiration } = JSON.parse(dashboardData);
+    const now = new Date().getTime();
+
+    if (now > expiration) {
+      // Token expirado, eliminarlo
+      localStorage.removeItem('dashboard_token');
+      return null;
+    }
+
+    return token;
+  }
 }
