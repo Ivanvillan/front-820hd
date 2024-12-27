@@ -31,10 +31,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private initializeDataSources(): void {
+    this.loadTickets();
+  }
+
+  private loadTickets(): void {
     this.ticketsService.getMesaAyuda().subscribe({
       next: (tickets) => {
         this.allTickets = tickets;
-        this.ticketsDataSource.data = this.allTickets;
+        this.updateDataSource();
       },
       error: (error) => {
         console.error('Error al cargar tickets:', error);
@@ -42,14 +46,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  private updateDataSource(): void {
+    if (this.activeFilter) {
+      this.ticketsDataSource.data = this.getFilteredTickets(this.activeFilter);
+    } else {
+      this.ticketsDataSource.data = this.allTickets;
+    }
+  }
+
   private setupAutoRefresh(): void {
-    this.refreshSubscription = timer(0, 600000).pipe(
+    this.refreshSubscription = timer(0, 300000).pipe(
       switchMap(() => this.ticketsService.getMesaAyuda())
     ).subscribe({
       next: (tickets) => {
         this.currentDateTime = new Date();
         this.allTickets = tickets;
-        this.applyFilter(this.activeFilter);
+        this.updateDataSource();
       },
       error: (error) => {
         console.error('Error al cargar tickets:', error);
@@ -57,36 +69,55 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    if (this.refreshSubscription) {
-      this.refreshSubscription.unsubscribe();
-    }
-  }
-
-  getTicketStatus(date: string): { class: string, text: string } {
-    const hours = this.calculateHours(date);
+  getTicketStatus(ticket: Ticket): { class: string, text: string } {
+    const hours = this.calculateHours(ticket.fecha, ticket.hora);
     
     if (hours <= 1) return { class: 'recent-status', text: 'RECIENTE' };
-    if (hours > 1 && hours <= 2) return { class: 'pending-status', text: 'PENDIENTE' };
-    if (hours > 2 && hours <= 4) return { class: 'urgent-status', text: 'URGENTE' };
+    if (hours <= 2) return { class: 'pending-status', text: 'PENDIENTE' };
+    if (hours <= 3) return { class: 'urgent-status', text: 'URGENTE' };
     return { class: 'critical-status', text: 'CRÍTICO' };
   }
 
-  private calculateHours(date: string): number {
-    const ticketDate = new Date(date);
-    const today = new Date();
-    const difference = today.getTime() - ticketDate.getTime();
+  private calculateHours(fecha: string, hora: string): number {
+    const [hours, minutes] = hora.split(':').map(Number);
+    const ticketDate = new Date(fecha);
+    ticketDate.setHours(hours, minutes, 0, 0);
+    
+    const now = new Date();
+    const difference = now.getTime() - ticketDate.getTime();
     return Math.floor(difference / (1000 * 3600));
   }
 
   getTotalTickets(): { recent: number, pending: number, urgent: number, critical: number } {
-    const tickets = this.ticketsDataSource.data;
     return {
-      recent: tickets.filter(t => this.calculateHours(t.fecha) <= 1).length,
-      pending: tickets.filter(t => this.calculateHours(t.fecha) > 1 && this.calculateHours(t.fecha) <= 3).length,
-      urgent: tickets.filter(t => this.calculateHours(t.fecha) > 3 && this.calculateHours(t.fecha) <= 5).length,
-      critical: tickets.filter(t => this.calculateHours(t.fecha) > 5).length
+      recent: this.getFilteredTickets('recent').length,
+      pending: this.getFilteredTickets('pending').length,
+      urgent: this.getFilteredTickets('urgent').length,
+      critical: this.getFilteredTickets('critical').length
     };
+  }
+
+  private getFilteredTickets(status: string): Ticket[] {
+    return this.allTickets.filter(ticket => {
+      const hours = this.calculateHours(ticket.fecha, ticket.hora);
+      switch (status) {
+        case 'recent': return hours <= 1;
+        case 'pending': return hours > 1 && hours <= 2;
+        case 'urgent': return hours > 2 && hours <= 3;
+        case 'critical': return hours > 3;
+        default: return true;
+      }
+    });
+  }
+
+  filterByStatus(status: string): void {
+    if (this.activeFilter === status) {
+      this.activeFilter = null;
+      this.ticketsDataSource.data = this.allTickets;
+    } else {
+      this.activeFilter = status;
+      this.ticketsDataSource.data = this.getFilteredTickets(status);
+    }
   }
 
   openTicketDetail(ticket: Ticket): void {
@@ -100,36 +131,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  filterByStatus(status: string): void {
-    if (this.activeFilter === status) {
-      this.activeFilter = null;
-      this.ticketsDataSource.data = this.allTickets;
-    } else {
-      this.activeFilter = status;
-      this.applyFilter(status);
+  ngOnDestroy() {
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
     }
-  }
-
-  private applyFilter(status: string | null): void {
-    if (!status) {
-      this.ticketsDataSource.data = this.allTickets;
-      return;
-    }
-
-    this.ticketsDataSource.data = this.allTickets.filter(ticket => {
-      const hours = this.calculateHours(ticket.fecha);
-      switch (status) {
-        case 'recent':
-          return hours <= 1;
-        case 'pending':
-          return hours > 1 && hours <= 3;
-        case 'urgent':
-          return hours > 3 && hours <= 5;
-        case 'critical':
-          return hours > 5;
-        default:
-          return true;
-      }
-    });
   }
 }
