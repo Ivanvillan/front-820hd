@@ -25,11 +25,22 @@
     background: white;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    
-    &.recent { border-left: 6px solid #4CAF50; }
-    &.pending { border-left: 6px solid #ffd607; }
-    &.urgent { border-left: 6px solid #ff7b00; }
-    &.critical { border-left: 6px solid #f43636; }
+  }
+  
+  .stat-card.recent { 
+    border-left: 6px solid #4CAF50; 
+  }
+  
+  .stat-card.pending { 
+    border-left: 6px solid #ffd607; 
+  }
+  
+  .stat-card.urgent { 
+    border-left: 6px solid #ff7b00; 
+  }
+  
+  .stat-card.critical { 
+    border-left: 6px solid #f43636; 
   }
   
   .stat-value {
@@ -137,11 +148,22 @@
     background: white;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    
-    &.recent { border-left: 6px solid #4CAF50; }
-    &.pending { border-left: 6px solid #ffd607; }
-    &.urgent { border-left: 6px solid #ff7b00; }
-    &.critical { border-left: 6px solid #f43636; }
+  }
+  
+  .stat-card.recent { 
+    border-left: 6px solid #4CAF50; 
+  }
+  
+  .stat-card.pending { 
+    border-left: 6px solid #ffd607; 
+  }
+  
+  .stat-card.urgent { 
+    border-left: 6px solid #ff7b00; 
+  }
+  
+  .stat-card.critical { 
+    border-left: 6px solid #f43636; 
   }
   
   .stat-value {
@@ -246,11 +268,22 @@
     background: white;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    
-    &.recent { border-left: 6px solid #4CAF50; }
-    &.pending { border-left: 6px solid #ffd607; }
-    &.urgent { border-left: 6px solid #ff7b00; }
-    &.critical { border-left: 6px solid #f43636; }
+  }
+  
+  .stat-card.recent { 
+    border-left: 6px solid #4CAF50; 
+  }
+  
+  .stat-card.pending { 
+    border-left: 6px solid #ffd607; 
+  }
+  
+  .stat-card.urgent { 
+    border-left: 6px solid #ff7b00; 
+  }
+  
+  .stat-card.critical { 
+    border-left: 6px solid #f43636; 
   }
   
   .stat-value {
