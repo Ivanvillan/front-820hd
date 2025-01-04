@@ -138,15 +138,16 @@
     padding: 0 5px;
     min-height: 48px;
     align-items: center;
-    
-    .mat-cell-content {
-      display: -webkit-box;
-      line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
   }
+    
+  .mat-column-descripcion .mat-cell-content {
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .mat-column-empresa { display: none; }
   .mat-column-contacto { flex: 0 0 80px; padding: 0 5px; }
 
