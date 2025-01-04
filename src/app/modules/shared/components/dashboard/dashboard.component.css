@@ -1,3 +1,13 @@
+/* .mobile-datetime {
+  display: none;
+  font-size: 12px;
+  color: #666;
+  
+  span {
+    display: block;
+  }
+} */
+ 
 @media screen and (max-width: 39.9em){
   .dashboard-container {
     padding: 5px;
@@ -61,10 +71,16 @@
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     overflow: hidden;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
   
   mat-table {
     flex: 1;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
 
   .mat-header-cell {
@@ -72,11 +88,16 @@
   }
   
   .mat-row {
-    height: 30px;
+    min-height: 48px;
+    height: auto;
+    padding: 8px 0;
   }
   
   .mat-cell {
     font-size: 0.7em;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.2;
   }
   
   .indicator-status {
@@ -115,9 +136,26 @@
   .mat-column-descripcion { 
     flex: 1 1 auto;
     padding: 0 5px;
+    min-height: 48px;
+    align-items: center;
+    
+    .mat-cell-content {
+      display: -webkit-box;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
   .mat-column-empresa { display: none; }
   .mat-column-contacto { flex: 0 0 80px; padding: 0 5px; }
+
+  /* .mobile-datetime {
+    display: block;
+    margin-top: 5px;
+    font-size: 10px;
+    color: #666;
+  } */
 }
 
 /* tablets */
@@ -184,6 +222,9 @@
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     overflow: hidden;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
 
   mat-header-cell {
@@ -192,14 +233,22 @@
   
   mat-table {
     flex: 1;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
   
   .mat-row {
-    height: 40px;
+    min-height: 48px;
+    height: auto;
+    padding: 8px 0;
   }
   
   .mat-cell {
     font-size: 0.7em;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.2;
   }
   
   .indicator-status {
@@ -304,18 +353,29 @@
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     overflow: hidden;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
   
   mat-table {
     flex: 1;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
   
   .mat-row {
-    height: 60px;
+    min-height: 60px;
+    height: auto;
+    padding: 8px 0;
   }
   
   .mat-cell {
     font-size: 0.8em;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.2;
   }
   
   .indicator-status {
@@ -394,6 +454,50 @@
 
 .stat-card.active.critical { 
   background-color: rgba(244, 67, 54, 0.1);
+}
+
+/* Para navegadores WebKit (Chrome, Safari, Edge) */
+.ticket-section::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.ticket-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ticket-section::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.ticket-section::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* También aplicar a la tabla */
+mat-table {
+  /* Estilos existentes */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+mat-table::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+mat-table::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+mat-table::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+mat-table::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 

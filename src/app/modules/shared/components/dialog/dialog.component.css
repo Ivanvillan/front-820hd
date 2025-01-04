@@ -88,7 +88,7 @@
         font-size: 16px;
         padding: 8px;
         outline: none;
-        -moz-appearance: textfield; /* Firefox */
+        appearance: textfield; /* Firefox */
     }
 
     /* Ocultar flechas del input number */
@@ -256,7 +256,7 @@
         font-size: 16px;
         padding: 8px;
         outline: none;
-        -moz-appearance: textfield; /* Firefox */
+        appearance: textfield; /* Firefox */
     }
 
     /* Ocultar flechas del input number */
@@ -423,7 +423,7 @@
         font-size: 16px;
         padding: 8px;
         outline: none;
-        -moz-appearance: textfield; /* Firefox */
+        appearance: textfield; /* Firefox */
     }
 
     /* Ocultar flechas del input number */

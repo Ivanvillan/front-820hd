@@ -6,7 +6,10 @@
     <mat-card-content>
       <mat-form-field>
         <mat-label>Código de acceso</mat-label>
-        <input matInput type="password" [(ngModel)]="accessCode">
+        <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="accessCode">
+        <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
       </mat-form-field>
       <div class="error" *ngIf="error">{{error}}</div>
     </mat-card-content>

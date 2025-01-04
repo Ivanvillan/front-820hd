@@ -33,9 +33,15 @@
       <ng-container matColumnDef="estado">
         <mat-header-cell *matHeaderCellDef>Estado</mat-header-cell>
         <mat-cell *matCellDef="let ticket">
-          <div class="indicator-status" [ngClass]="getTicketStatus(ticket).class">
-            {{getTicketStatus(ticket).text}}
-          </div>
+          <!-- <div class="status-container"> -->
+            <div class="indicator-status" [ngClass]="getTicketStatus(ticket).class">
+              {{getTicketStatus(ticket).text}}
+            </div>
+            <!-- <div class="mobile-datetime">
+              <span>{{ticket.fecha | date:'d/M/yy'}}</span>
+              <span>{{ticket.hora}}</span>
+            </div> -->
+          <!-- </div> -->
         </mat-cell>
       </ng-container>
 
@@ -63,7 +69,9 @@
       <ng-container matColumnDef="descripcion">
         <mat-header-cell *matHeaderCellDef>Descripción</mat-header-cell>
         <mat-cell *matCellDef="let ticket">
-          {{ticket.descripcion}}
+          <div class="mat-cell-content" [title]="ticket.descripcion">
+            {{ticket.descripcion}}
+          </div>
         </mat-cell>
       </ng-container>
 

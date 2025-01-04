@@ -10,6 +10,7 @@ import { CredentialsService } from 'src/app/services/credentials/credentials.ser
 export class DashboardAuthComponent {
   accessCode: string = '';
   error: string = '';
+  hidePassword: boolean = true;
 
   constructor(
     private credentialsService: CredentialsService,
