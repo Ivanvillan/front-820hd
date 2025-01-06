@@ -18,8 +18,7 @@ export class DashboardAuthComponent {
   ) {}
 
   validateAccess() {
-    const currentDate = new Date();
-    const validCode = 'pcassi' + currentDate.getDate() + (currentDate.getMonth() + 1) + currentDate.getFullYear();
+    const validCode = 'pcassi.2016';
     if (this.accessCode === validCode) {
       this.credentialsService.saveDashboardToken('dashboard_view_only');
       this.router.navigate(['/dashboard-view']);

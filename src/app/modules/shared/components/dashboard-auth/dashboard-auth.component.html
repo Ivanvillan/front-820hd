@@ -3,20 +3,25 @@
     <mat-card-header>
       <mat-card-title>Acceso al Dashboard</mat-card-title>
     </mat-card-header>
-    <mat-card-content>
-      <mat-form-field>
-        <mat-label>Código de acceso</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="accessCode">
-        <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
-          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+    <form (keyup.enter)="validateAccess()">
+      <mat-card-content>
+        <mat-form-field>
+          <mat-label>Código de acceso</mat-label>
+          <input matInput 
+                 [type]="hidePassword ? 'password' : 'text'" 
+                 [(ngModel)]="accessCode"
+                 name="accessCode">
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+        <div class="error" *ngIf="error">{{error}}</div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="validateAccess()">
+          Acceder
         </button>
-      </mat-form-field>
-      <div class="error" *ngIf="error">{{error}}</div>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button color="primary" (click)="validateAccess()">
-        Acceder
-      </button>
-    </mat-card-actions>
+      </mat-card-actions>
+    </form>
   </mat-card>
 </div> 

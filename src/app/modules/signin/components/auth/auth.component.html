@@ -1,4 +1,4 @@
-<form>
+<form (keyup.enter)="auth()">
   <div class="form-inputs">
     <input type="email" placeholder="Email" name="email" [(ngModel)]="login.email" autofocus>
     <input type="password" placeholder="Contraseña" name="password" [(ngModel)]="login.password">

@@ -24,14 +24,13 @@ mat-form-field {
 
 .error {
   color: #f44336;
-  margin-top: 10px;
-  font-size: 0.9rem;
 }
 
 mat-card-actions {
   display: flex;
   justify-content: flex-end;
   padding: 8px 0;
+  margin-bottom: 0;
 }
 
 @media screen and (max-width: 480px) {

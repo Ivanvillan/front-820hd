@@ -36,7 +36,6 @@
   font-weight: 500;
 }
 
-/* Mantener los mismos estilos de estados y tipos del dashboard */
 .recent-status {
   background-color: rgba(76, 175, 80, 0.1);
   color: #2e7d32;

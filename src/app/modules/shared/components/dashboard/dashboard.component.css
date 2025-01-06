@@ -108,7 +108,6 @@
     text-align: center;
   }
   
-  /* Estados con colores más sutiles */
   .recent-status {
     border-left: 3px solid #4CAF50;
     background-color: rgba(76, 175, 80, 0.1);
@@ -139,7 +138,7 @@
     min-height: 48px;
     align-items: center;
   }
-    
+
   .mat-column-descripcion .mat-cell-content {
     display: -webkit-box;
     line-clamp: 3;
@@ -148,8 +147,8 @@
     text-overflow: ellipsis;
   }
 
-  .mat-column-empresa { display: none; }
-  .mat-column-contacto { flex: 0 0 80px; padding: 0 5px; }
+  .mat-column-empresa { flex: 0 0 80px; padding: 0 5px; }
+  .mat-column-contacto { display: none; }
 
   /* .mobile-datetime {
     display: block;
@@ -260,7 +259,6 @@
     text-align: center;
   }
   
-  /* Estados con colores más sutiles */
   .recent-status {
     border-left: 3px solid #4CAF50;
     background-color: rgba(76, 175, 80, 0.1);
@@ -286,8 +284,8 @@
   .mat-column-hora { display: none; }
   .mat-column-numero { flex: 0 0 40px; padding: 0 5px; }
   .mat-column-descripcion { flex: 1 1 auto; padding: 0 5px; }
-  .mat-column-empresa { display: none; }
-  .mat-column-contacto { flex: 0 0 80px; padding: 0 5px; }
+  .mat-column-empresa { flex: 0 0 80px; padding: 0 5px; }
+  .mat-column-contacto { display: none; }
 }
 
 /* web */
@@ -457,7 +455,6 @@
   background-color: rgba(244, 67, 54, 0.1);
 }
 
-/* Para navegadores WebKit (Chrome, Safari, Edge) */
 .ticket-section::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -476,9 +473,7 @@
   background-color: rgba(0, 0, 0, 0.3);
 }
 
-/* También aplicar a la tabla */
 mat-table {
-  /* Estilos existentes */
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
