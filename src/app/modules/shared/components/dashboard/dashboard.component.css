@@ -22,7 +22,7 @@
   .stats-panel {
     display: flex;
     gap: 5px;
-    height: 50px;
+    height: 30px;
   }
   
   .stat-card {
@@ -75,6 +75,10 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
+
+  mat-header-cell {
+    font-size: 0.6em;
+  }
   
   mat-table {
     flex: 1;
@@ -83,14 +87,14 @@
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
 
-  .mat-header-cell {
-    font-size: 0.6em;
+  .mat-header-row {
+    min-height: 30px;
   }
   
   .mat-row {
-    min-height: 48px;
+    min-height: 30px;
     height: auto;
-    padding: 8px 0;
+    padding: 6px 0; 
   }
   
   .mat-cell {
@@ -173,7 +177,8 @@
   .stats-panel {
     display: flex;
     gap: 8px;
-    height: 50px;
+    height: 30px;
+    font-size: 13px;
   }
   
   .stat-card {
@@ -238,8 +243,12 @@
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
   
+  .mat-header-row {
+    min-height: 30px;
+  }
+
   .mat-row {
-    min-height: 48px;
+    min-height: 30px;
     height: auto;
     padding: 8px 0;
   }
@@ -303,7 +312,8 @@
   .stats-panel {
     display: flex;
     gap: 10px;
-    height: 60px;
+    height: 45px;
+    font-size: 14px;
   }
   
   .stat-card {
@@ -363,15 +373,20 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
+
+  .mat-header-row {
+    min-height: 30px;
+    font-size: 12px;
+  }
   
   .mat-row {
-    min-height: 60px;
+    min-height: 30px;
     height: auto;
     padding: 8px 0;
   }
   
   .mat-cell {
-    font-size: 0.8em;
+    font-size: 12px;
     white-space: normal;
     word-wrap: break-word;
     line-height: 1.2;
