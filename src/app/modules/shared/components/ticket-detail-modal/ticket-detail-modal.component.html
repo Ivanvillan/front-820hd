@@ -29,6 +29,11 @@
       <span>{{ticket.nombre}}</span>
     </div>
 
+    <div class="detail-row">
+      <span class="label">Asignado:</span>
+      <span>{{ticket.asignado || 'Sin asignar'}}</span>
+    </div>
+
     <div class="detail-row description">
       <span class="label">Descripción:</span>
       <p>{{ticket.descripcion}}</p>

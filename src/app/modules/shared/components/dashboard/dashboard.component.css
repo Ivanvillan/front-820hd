@@ -153,6 +153,7 @@
 
   .mat-column-empresa { flex: 0 0 80px; padding: 0 5px; }
   .mat-column-contacto { display: none; }
+  .mat-column-asignado { flex: 0 0 70px; padding: 0 5px; }
 
   /* .mobile-datetime {
     display: block;
@@ -295,6 +296,7 @@
   .mat-column-descripcion { flex: 1 1 auto; padding: 0 5px; }
   .mat-column-empresa { flex: 0 0 80px; padding: 0 5px; }
   .mat-column-contacto { display: none; }
+  .mat-column-asignado { flex: 0 0 70px; padding: 0 5px; }
 }
 
 /* web */
@@ -428,6 +430,7 @@
   .mat-column-descripcion { flex: 1 1 auto; padding: 0 10px; }
   .mat-column-contacto { flex: 0 0 80px; padding: 0 10px; }
   .mat-column-empresa { flex: 0 0 80px; padding: 0 10px; }
+  .mat-column-asignado { flex: 0 0 70px; padding: 0 10px; }
 }
 
 .clickable-row {

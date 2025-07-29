@@ -88,6 +88,13 @@
         </mat-cell>
       </ng-container>
 
+      <ng-container matColumnDef="asignado">
+        <mat-header-cell *matHeaderCellDef>Asignado</mat-header-cell>
+        <mat-cell *matCellDef="let ticket" [title]="ticket.asignado || 'Sin asignar'">
+          {{ticket.asignado ? (ticket.asignado.length > 15 ? (ticket.asignado | slice:0:15) + '...' : ticket.asignado) : 'Sin asignar'}}
+        </mat-cell>
+      </ng-container>
+
       <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
       <mat-row *matRowDef="let row; columns: displayedColumns;" 
                (click)="openTicketDetail(row)"
