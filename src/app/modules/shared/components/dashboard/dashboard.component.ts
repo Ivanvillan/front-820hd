@@ -55,7 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private setupAutoRefresh(): void {
-    this.refreshSubscription = timer(0, 300000).pipe(
+    this.refreshSubscription = timer(0, 60000).pipe(
       switchMap(() => this.ticketsService.getMesaAyuda())
     ).subscribe({
       next: (tickets) => {
