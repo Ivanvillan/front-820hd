@@ -1,4 +1,4 @@
-<nav [ngStyle]="setStyles()" *ngIf="setHeader && isHome">
+<nav [ngStyle]="setStyles()" *ngIf="setHeader && isHome && !isAdmin">
     <section id="profile">
         <div class="profile-info" (click)="toggleLogout()">
             <span class="username">{{ username }}</span>
@@ -29,7 +29,7 @@
     </section>
 </nav>
 
-<nav [ngStyle]="setStyles()" *ngIf="setHeader && isAdmin">
+<nav [ngStyle]="setStyles()" *ngIf="setHeader && isAdmin && false">
     <section id="profile">
         <div class="profile-info" (click)="toggleLogout()">
             <span class="username">{{ username }}</span>
@@ -49,7 +49,7 @@
     </section>
 </nav>
 
-<nav [ngStyle]="setStyles()" *ngIf="setHeader && isUser && bannerSupplies">
+<nav [ngStyle]="setStyles()" *ngIf="setHeader && isUser && bannerSupplies && !isAdmin">
     <section id="profile">
         <div class="profile-info" (click)="toggleLogout()">
             <span class="username">{{ username }}</span>
@@ -82,7 +82,7 @@
     </section>
 </nav>
 
-<nav [ngStyle]="setStyles()" *ngIf="setHeader && isUser && !bannerSupplies;">
+<nav [ngStyle]="setStyles()" *ngIf="setHeader && isUser && !bannerSupplies && !isAdmin">
     <section id="profile">
         <div class="profile-info" (click)="toggleLogout()">
             <span class="username">{{ username }}</span>

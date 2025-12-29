@@ -1,0 +1,546 @@
+@use 'src/styles/variables' as vars;
+
+.create-order-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+// ========== HEADER ==========
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: vars.$spacing-md;
+  padding-bottom: vars.$spacing-md;
+  border-bottom: vars.$border-width solid vars.$border-color;
+  
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    margin: 0;
+    font-size: vars.$font-size-xl;
+    font-weight: vars.$font-weight-medium;
+    color: vars.$text-primary;
+    
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+  
+  .close-button {
+    mat-icon {
+      color: vars.$text-secondary;
+    }
+    
+    &:hover mat-icon {
+      color: vars.$text-primary;
+    }
+  }
+}
+
+// ========== CONTENT ==========
+.dialog-content {
+  padding: vars.$spacing-sm vars.$spacing-lg;
+  overflow-y: auto;
+  flex: 1;
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: vars.$spacing-md;
+  }
+}
+
+// ========== FORM GRID (2 columnas) ==========
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: vars.$spacing-md;
+  
+  mat-form-field, .form-field {
+    width: 100%;
+  }
+}
+
+// ========== FORM FIELDS ==========
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: vars.$spacing-sm;
+  font-weight: vars.$font-weight-medium;
+  color: vars.$text-primary;
+  font-size: vars.$font-size-base;
+}
+
+.form-error {
+  color: vars.$warn;
+  font-size: vars.$font-size-sm;
+  margin-top: vars.$spacing-xs;
+  margin-left: vars.$spacing-xs;
+}
+
+.form-help {
+  color: vars.$text-secondary;
+  font-size: vars.$font-size-sm;
+  font-weight: vars.$font-weight-semibold;
+  margin-top: vars.$spacing-xs;
+  margin-left: vars.$spacing-xs;
+  font-style: italic;
+}
+
+// ========== FULL WIDTH FIELDS ==========
+.full-width {
+  width: 100%;
+}
+
+// ========== SERVICE OPTIONS ==========
+.service-option {
+  display: flex;
+  flex-direction: column;
+  padding: vars.$spacing-sm 0;
+}
+
+.service-name {
+  font-weight: vars.$font-weight-medium;
+  font-size: vars.$font-size-base;
+  color: vars.$text-primary;
+  margin-bottom: vars.$spacing-xs;
+}
+
+.service-details {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-xs;
+}
+
+.service-cost {
+  font-size: vars.$font-size-sm;
+  color: vars.$primary;
+  font-weight: vars.$font-weight-medium;
+}
+
+.service-comment {
+  font-size: 11px;
+  color: vars.$text-secondary;
+  font-style: italic;
+  line-height: vars.$line-height-tight;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ========== NG-SELECT CUSTOM STYLES ==========
+.ng-select-custom {
+  width: 100%;
+}
+
+:host ::ng-deep .ng-option {
+  padding: vars.$spacing-sm vars.$spacing-md !important;
+  border-bottom: vars.$border-width solid vars.$gray-100;
+}
+
+:host ::ng-deep .ng-option:last-child {
+  border-bottom: none;
+}
+
+:host ::ng-deep .ng-option.ng-option-highlighted {
+  background-color: vars.$gray-50;
+}
+
+:host ::ng-deep .ng-option.ng-option-selected {
+  background-color: lighten(vars.$primary, 45%);
+  color: vars.$primary;
+}
+
+// ========== MAT-SELECT PANEL STYLES ==========
+:host ::ng-deep .mat-select-panel .mat-option {
+  height: auto !important;
+  min-height: 48px;
+  padding: vars.$spacing-sm vars.$spacing-md;
+}
+
+:host ::ng-deep .mat-select-panel .mat-option .mat-option-text {
+  line-height: vars.$line-height-normal;
+}
+
+// ========== ACTIONS ==========
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: vars.$spacing-md;
+  padding: vars.$spacing-md vars.$spacing-lg;
+  border-top: vars.$border-width solid vars.$border-color;
+  
+  .save-btn {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    min-width: 140px;
+    height: 40px;
+    font-weight: vars.$font-weight-medium;
+    font-size: vars.$font-size-base;
+    border-radius: vars.$border-radius-lg;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+    
+    mat-spinner {
+      margin: 0;
+    }
+    
+    &:hover:not(:disabled) {
+      background-color: darken(vars.$primary, 8%);
+    }
+    
+    &:disabled {
+      background-color: vars.$gray-400;
+      color: vars.$text-muted;
+    }
+  }
+}
+
+// ========== RESPONSIVE ==========
+
+// Tablet
+@media (max-width: 992px) {
+  .dialog-header {
+    padding: vars.$spacing-sm vars.$spacing-md;
+    
+    h2 {
+      font-size: vars.$font-size-lg;
+      
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+  
+  .dialog-content {
+    padding: vars.$spacing-md;
+  }
+  
+  .form-grid {
+    gap: vars.$spacing-sm;
+  }
+  
+  .dialog-actions {
+    padding: vars.$spacing-sm vars.$spacing-md;
+  }
+}
+
+// Móvil
+@media (max-width: 768px) {
+  .dialog-header {
+    h2 {
+      font-size: vars.$font-size-md;
+      gap: vars.$spacing-xs;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+  
+  .dialog-content {
+    padding: vars.$spacing-sm;
+  }
+  
+  // Grid pasa a 1 columna en móviles
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: vars.$spacing-sm;
+  }
+  
+  .dialog-actions {
+    padding: vars.$spacing-sm;
+    
+    .save-btn {
+      width: 100%;
+      justify-content: center;
+      min-width: unset;
+    }
+  }
+}
+
+// ========== MATERIALS SECTION ==========
+
+.material-selector {
+  display: flex;
+  gap: vars.$spacing-sm;
+  align-items: flex-end;
+  margin: vars.$spacing-md 0;
+  
+  .material-select-field {
+    flex: 1;
+  }
+  
+  .quantity-field {
+    width: 120px;
+    height: 45px;
+    
+    ::ng-deep {
+      .mat-form-field-flex {
+        height: 45px;
+        align-items: center;
+      }
+      
+      .mat-form-field-infix {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      
+      input {
+        height: 45px;
+        line-height: 45px;
+      }
+    }
+  }
+  
+  .add-material-btn {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-xs;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.material-option {
+  display: flex;
+  flex-direction: column;
+  padding: vars.$spacing-xs 0;
+  
+  .material-code {
+    font-weight: vars.$font-weight-medium;
+    font-size: vars.$font-size-sm;
+    color: vars.$text-secondary;
+    margin-bottom: vars.$spacing-xs;
+  }
+  
+  .material-description {
+    font-weight: vars.$font-weight-medium;
+    font-size: vars.$font-size-base;
+    color: vars.$text-primary;
+    margin-bottom: vars.$spacing-xs;
+  }
+  
+  .material-details {
+    display: flex;
+    gap: vars.$spacing-md;
+    font-size: vars.$font-size-sm;
+    color: vars.$text-secondary;
+    
+    .material-unit {
+      font-style: italic;
+    }
+    
+    .material-price {
+      color: vars.$primary;
+      font-weight: vars.$font-weight-medium;
+    }
+  }
+}
+
+.selected-materials-table {
+  margin-top: vars.$spacing-md;
+  overflow-x: auto;
+}
+
+.materials-table {
+  width: 100%;
+  background-color: white;
+  border-radius: vars.$border-radius-sm;
+  
+  th {
+    font-weight: vars.$font-weight-medium;
+    color: vars.$text-primary;
+    background-color: vars.$gray-100;
+  }
+  
+  td {
+    color: vars.$text-primary;
+  }
+  
+  .quantity-input {
+    width: 80px;
+    padding: vars.$spacing-xs;
+    border: vars.$border-width solid vars.$border-color;
+    border-radius: vars.$border-radius-sm;
+    text-align: center;
+    
+    &:focus {
+      outline: none;
+      border-color: vars.$primary;
+    }
+  }
+}
+
+.no-materials-message {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-md;
+  background-color: vars.$gray-100;
+  border-radius: vars.$border-radius-sm;
+  color: vars.$text-secondary;
+  font-size: vars.$font-size-sm;
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: vars.$text-secondary;
+  }
+}
+
+// ========== CREATE MATERIAL SECTION ==========
+.create-material-section {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  gap: 12px;
+  
+  .create-material-text {
+    font-size: 13px;
+    color: #666;
+    flex: 1;
+  }
+  
+  .toggle-create-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    padding: 4px 12px;
+    line-height: 1.5;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.create-material-form {
+  padding: 16px;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+    
+    &:last-of-type {
+      margin-bottom: 24px;
+    }
+  }
+  
+  .form-field-descripcion {
+    width: 100%;
+  }
+  
+  .form-field-unidad {
+    width: 100%;
+  }
+  
+  .form-field-precio {
+    width: 100%;
+  }
+  
+  .form-field-rubro {
+    width: 100%;
+  }
+  
+  .form-field-iva {
+    width: 100%;
+  }
+  
+  .form-field-cantidad {
+    width: 100%;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid #dee2e6;
+    
+    button {
+      min-width: 120px;
+    }
+  }
+}
+
+// Responsive para formulario de crear material
+@media (max-width: 768px) {
+  .create-material-form {
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+}
+
+// Móvil pequeño
+@media (max-width: 480px) {
+  .dialog-header h2 {
+    font-size: vars.$font-size-sm;
+  }
+  
+  .service-comment {
+    max-width: 200px;
+  }
+  
+  .material-selector {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .quantity-field {
+      width: 100%;
+    }
+    
+    .add-material-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .materials-table {
+    font-size: vars.$font-size-sm;
+    
+    .quantity-input {
+      width: 60px;
+    }
+  }
+}

@@ -6,7 +6,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TokenInterceptor } from './interceptors/token.interceptor';
+import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { MatDialogModule } from '@angular/material/dialog';
+import { LayoutsModule } from './layouts/layouts.module';
 
 @NgModule({
   declarations: [
@@ -17,10 +19,12 @@ import { MatDialogModule } from '@angular/material/dialog';
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    MatDialogModule
+    MatDialogModule,
+    LayoutsModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true}
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true},
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true}
   ],
   bootstrap: [AppComponent]
 })

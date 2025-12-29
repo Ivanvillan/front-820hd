@@ -1,0 +1,182 @@
+@use 'src/styles/variables' as vars;
+
+.create-customer-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+// ========== HEADER ==========
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: vars.$spacing-md;
+  padding-bottom: vars.$spacing-md;
+  border-bottom: vars.$border-width solid vars.$border-color;
+  
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    margin: 0;
+    font-size: vars.$font-size-xl;
+    font-weight: vars.$font-weight-medium;
+    color: vars.$text-primary;
+    
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: vars.$primary;
+    }
+  }
+  
+  .close-button {
+    mat-icon {
+      color: vars.$text-secondary;
+    }
+    
+    &:hover mat-icon {
+      color: vars.$text-primary;
+    }
+  }
+}
+
+// ========== CONTENT ==========
+.dialog-content {
+  padding: vars.$spacing-sm vars.$spacing-lg;
+  overflow-y: auto;
+  flex: 1;
+}
+
+// ========== FORM GRID (2 columnas) ==========
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: vars.$spacing-md;
+  
+  .form-column {
+    display: flex;
+    flex-direction: column;
+    gap: vars.$spacing-md;
+  }
+}
+
+// ========== FULL WIDTH FIELDS ==========
+.full-width {
+  width: 100%;
+}
+
+// ========== ACTIONS ==========
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: vars.$spacing-md;
+  padding: vars.$spacing-md vars.$spacing-lg;
+  border-top: vars.$border-width solid vars.$border-color;
+  
+  .save-btn {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    min-width: 140px;
+    height: 40px;
+    font-weight: vars.$font-weight-medium;
+    font-size: vars.$font-size-base;
+    border-radius: vars.$border-radius-lg;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+    
+    mat-spinner {
+      margin: 0;
+    }
+    
+    &:hover:not(:disabled) {
+      background-color: darken(vars.$primary, 8%);
+    }
+    
+    &:disabled {
+      background-color: vars.$gray-400;
+      color: vars.$text-muted;
+    }
+  }
+}
+
+// ========== RESPONSIVE ==========
+
+// Tablet
+@media (max-width: 992px) {
+  .dialog-header {
+    padding: vars.$spacing-sm vars.$spacing-md;
+    
+    h2 {
+      font-size: vars.$font-size-lg;
+      
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+  
+  .dialog-content {
+    padding: vars.$spacing-md;
+  }
+  
+  .form-grid {
+    gap: vars.$spacing-sm;
+  }
+  
+  .dialog-actions {
+    padding: vars.$spacing-sm vars.$spacing-md;
+  }
+}
+
+// Móvil
+@media (max-width: 768px) {
+  .dialog-header {
+    h2 {
+      font-size: vars.$font-size-md;
+      gap: vars.$spacing-xs;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+  
+  .dialog-content {
+    padding: vars.$spacing-sm;
+  }
+  
+  // Grid pasa a 1 columna en móviles
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: vars.$spacing-sm;
+  }
+  
+  .dialog-actions {
+    padding: vars.$spacing-sm;
+    
+    .save-btn {
+      width: 100%;
+      justify-content: center;
+      min-width: unset;
+    }
+  }
+}
+
+// Móvil pequeño
+@media (max-width: 480px) {
+  .dialog-header h2 {
+    font-size: vars.$font-size-sm;
+  }
+}

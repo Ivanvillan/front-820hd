@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 import { faUserShield } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,13 +14,12 @@ export class LoginComponent implements OnInit {
   faUserShield = faUserShield;
   API_URI: string = '';
 
-  constructor(private _snackBar: MatSnackBar) {
-    if (window.location.hostname.includes('localhost')) {
-      this.API_URI = 'http://localhost:3001/images';
-    }
-    if (!window.location.hostname.includes('localhost')) {
-      this.API_URI = 'https://api.820hd.com.ar/images'
-    }
+  constructor(
+    private _snackBar: MatSnackBar,
+    private configService: ConfigService
+  ) {
+    // ✅ Usar configuración centralizada
+    this.API_URI = this.configService.IMAGE_URL;
   }
 
   ngOnInit() {

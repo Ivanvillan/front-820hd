@@ -1,0 +1,56 @@
+<div class="contact-detail-dialog">
+  <!-- Header del diálogo -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="header-icon">contact_page</mat-icon>
+      Detalles del Contacto
+    </h2>
+    <button mat-icon-button (click)="onClose()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido del diálogo -->
+  <mat-dialog-content class="dialog-content">
+    <div class="contact-info-container">
+      <!-- Información del contacto -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <mat-icon>person</mat-icon>
+          Información del Contacto
+        </h3>
+        
+        <div class="info-grid">
+          <div *ngFor="let info of getContactInfo()" class="info-item">
+            <div class="info-label">
+              <mat-icon class="info-icon">{{info.icon}}</mat-icon>
+              <span>{{info.label}}</span>
+            </div>
+            <div class="info-value" [class.no-value]="info.value === 'No especificado'">
+              {{info.value}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="additional-info">
+        <div class="info-card">
+          <mat-icon class="card-icon">schedule</mat-icon>
+          <div class="card-content">
+            <span class="card-label">Fecha de Creación</span>
+            <span class="card-value">Información no disponible</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <!-- Acciones del diálogo -->
+  <mat-dialog-actions class="dialog-actions" align="end">
+    <button mat-button (click)="onClose()" class="close-btn">
+      <mat-icon>close</mat-icon>
+      Cerrar
+    </button>
+  </mat-dialog-actions>
+</div>

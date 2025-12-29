@@ -1,0 +1,97 @@
+@use '@angular/material' as mat;
+@use './variables' as vars;
+
+// Include Material core styles
+@include mat.core();
+
+// Define palettes
+$primary-palette: mat.define-palette(mat.$indigo-palette, 500);
+$accent-palette: mat.define-palette(mat.$orange-palette, 500);
+$warn-palette: mat.define-palette(mat.$red-palette, 500);
+
+// Define typography config
+$custom-typography: mat.define-typography-config(
+  $font-family: vars.$font-family,
+  $headline-1: mat.define-typography-level(32px, 40px, 700),
+  $headline-2: mat.define-typography-level(28px, 36px, 600),
+  $headline-3: mat.define-typography-level(24px, 32px, 600),
+  $headline-4: mat.define-typography-level(20px, 28px, 500),
+  $headline-5: mat.define-typography-level(18px, 24px, 500),
+  $headline-6: mat.define-typography-level(16px, 22px, 500),
+  $body-1: mat.define-typography-level(14px, 20px, 400),
+  $body-2: mat.define-typography-level(14px, 24px, 400),
+  $subtitle-1: mat.define-typography-level(16px, 28px, 500),
+  $subtitle-2: mat.define-typography-level(14px, 22px, 500),
+  $caption: mat.define-typography-level(12px, 20px, 400),
+  $button: mat.define-typography-level(14px, 14px, 500)
+);
+
+// Define the light theme
+$light-theme: mat.define-light-theme((
+  color: (
+    primary: $primary-palette,
+    accent: $accent-palette,
+    warn: $warn-palette,
+  ),
+  typography: $custom-typography,
+  density: 0  // Densidad media (0 = default, -1 = más compacto, -2 = muy compacto)
+));
+
+// Include theme styles for all Material components
+@include mat.all-component-themes($light-theme);
+
+// Customizaciones adicionales de Material
+.mat-toolbar {
+  font-weight: vars.$font-weight-medium;
+}
+
+.mat-button,
+.mat-raised-button,
+.mat-flat-button,
+.mat-stroked-button {
+  text-transform: none;
+  border-radius: vars.$border-radius;
+}
+
+.mat-form-field {
+  font-size: vars.$font-size-base;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: vars.$border-color;
+}
+
+.mat-card {
+  border-radius: vars.$card-border-radius;
+}
+
+.mat-table {
+  font-size: vars.$font-size-base;
+}
+
+.mat-header-cell {
+  font-weight: vars.$font-weight-medium;
+  color: vars.$text-primary;
+}
+
+.mat-cell {
+  color: vars.$text-primary;
+}
+
+.mat-paginator {
+  font-size: vars.$font-size-sm;
+}
+
+.mat-menu-panel {
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$shadow-lg;
+}
+
+.mat-dialog-container {
+  border-radius: vars.$border-radius-lg;
+}
+
+.mat-snack-bar-container {
+  border-radius: vars.$border-radius;
+}
+

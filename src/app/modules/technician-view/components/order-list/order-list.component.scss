@@ -1,0 +1,447 @@
+@use 'src/styles/variables' as vars;
+
+// ==================== CONTAINER ====================
+
+.order-list-container {
+  padding: vars.$spacing-sm;
+  max-width: vars.$container-xxl;
+  margin: 0 auto;
+  
+  @media (min-width: vars.$breakpoint-md) {
+    padding: vars.$spacing-md;
+  }
+}
+
+// ==================== HEADER SECTION ====================
+
+.header-section {
+  background: vars.$bg-white;
+  border-radius: vars.$border-radius-lg;
+  box-shadow: vars.$shadow-sm;
+  margin-bottom: vars.$spacing-md;
+  padding: vars.$spacing-md;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: vars.$spacing-sm;
+  flex-wrap: wrap;
+}
+
+.title-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.main-title {
+  font-size: vars.$font-size-xl;
+  font-weight: vars.$font-weight-semibold;
+  color: vars.$text-primary;
+  margin: 0 0 vars.$spacing-xs 0;
+}
+
+.subtitle {
+  font-size: vars.$font-size-sm;
+  color: vars.$text-secondary;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-sm;
+  flex-wrap: wrap;
+  
+  button {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-xs;
+    font-weight: vars.$font-weight-medium;
+    min-height: 36px;
+    padding: 0 vars.$spacing-md;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// ==================== CONTENT SECTION ====================
+
+.content-section {
+  background: vars.$bg-white;
+  border-radius: vars.$border-radius-lg;
+  box-shadow: vars.$shadow-sm;
+  min-height: 400px;
+}
+
+// ==================== LOADING STATE ====================
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: vars.$spacing-xl;
+  text-align: center;
+  
+  p {
+    margin-top: vars.$spacing-md;
+    color: vars.$text-secondary;
+    font-size: vars.$font-size-base;
+  }
+}
+
+// ==================== ERROR STATE ====================
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: vars.$spacing-xl;
+  text-align: center;
+  
+  .error-icon {
+    font-size: 64px;
+    color: vars.$warn;
+    margin-bottom: vars.$spacing-md;
+  }
+  
+  h3 {
+    color: vars.$text-primary;
+    margin-bottom: vars.$spacing-xs;
+  }
+  
+  p {
+    color: vars.$text-secondary;
+    margin-bottom: vars.$spacing-md;
+  }
+}
+
+// ==================== NO ORDERS STATE ====================
+
+.no-orders-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: vars.$spacing-xl;
+  text-align: center;
+  
+  .no-orders-icon {
+    font-size: 64px;
+    color: vars.$gray-300;
+    margin-bottom: vars.$spacing-md;
+  }
+  
+  h3 {
+    color: vars.$text-primary;
+    margin-bottom: vars.$spacing-xs;
+  }
+  
+  p {
+    color: vars.$text-secondary;
+    margin: 0;
+  }
+}
+
+// ==================== FILTERS SECTION ====================
+
+.filters-section {
+  background: vars.$gray-50;
+  border-radius: vars.$border-radius-lg;
+  margin-bottom: vars.$spacing-md;
+  padding: vars.$spacing-sm;
+  border: 1px solid vars.$border-color;
+}
+
+.filters-form {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-sm;
+}
+
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-sm;
+  flex-wrap: wrap;
+}
+
+.filter-field {
+  min-width: 160px;
+  flex: 1;
+  max-width: 200px;
+}
+
+.filters-actions {
+  display: flex;
+  gap: vars.$spacing-sm;
+  margin-left: auto;
+  
+  button {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-xs;
+    font-weight: vars.$font-weight-medium;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// ==================== TABLE ====================
+
+.table-container {
+  padding: vars.$spacing-md;
+  overflow-x: auto;
+}
+
+.orders-table {
+  width: 100%;
+  border-radius: vars.$border-radius-lg;
+  overflow: hidden;
+  box-shadow: vars.$shadow-sm;
+  
+  .mat-header-cell {
+    background-color: vars.$gray-50;
+    color: vars.$text-primary;
+    font-weight: vars.$font-weight-semibold;
+    font-size: vars.$font-size-sm;
+    padding: vars.$spacing-sm;
+  }
+  
+  .mat-cell {
+    padding: vars.$spacing-sm;
+    border-bottom: 1px solid vars.$gray-200;
+    font-size: vars.$font-size-sm;
+  }
+  
+  .mat-row {
+    transition: vars.$transition-base;
+    
+    &:hover {
+      background-color: vars.$gray-50;
+    }
+  }
+}
+
+// ==================== PRIORITY BADGES ====================
+
+.priority-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.priority-badge {
+  display: inline-block;
+  padding: vars.$badge-padding-y vars.$badge-padding-x;
+  font-size: vars.$badge-font-size;
+  font-weight: vars.$badge-font-weight;
+  border-radius: vars.$badge-border-radius;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+}
+
+.priority-low {
+  background-color: lighten(vars.$success, 40%);
+  color: vars.$success;
+  border: 1px solid vars.$success;
+}
+
+.priority-medium {
+  background-color: lighten(vars.$accent, 40%);
+  color: darken(vars.$accent, 10%);
+  border: 1px solid vars.$accent;
+}
+
+.priority-high {
+  background-color: lighten(vars.$warn, 40%);
+  color: vars.$warn;
+  border: 1px solid vars.$warn;
+}
+
+.priority-urgent {
+  background-color: lighten(vars.$warn, 30%);
+  color: darken(vars.$warn, 20%);
+  border: 2px solid vars.$warn;
+  font-weight: vars.$font-weight-bold;
+  animation: pulse 2s infinite;
+}
+
+.priority-none {
+  background-color: vars.$gray-100;
+  color: vars.$text-muted;
+  border: 1px solid vars.$gray-300;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+// ==================== STATUS CHIPS ====================
+
+.status-chip {
+  font-size: 12px !important;
+  font-weight: vars.$font-weight-medium !important;
+  min-height: 24px;
+  line-height: 24px;
+  padding: 0 vars.$spacing-xs;
+  white-space: nowrap;
+}
+
+// ==================== TECHNICIAN BADGE ====================
+
+.technician-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: vars.$font-weight-medium;
+  border-radius: 3px;
+  background-color: vars.$primary;
+  color: vars.$text-white;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.technician-badge-na {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: vars.$font-weight-medium;
+  border-radius: 3px;
+  background-color: vars.$gray-100;
+  color: vars.$text-muted;
+}
+
+.action-button-take .mat-icon {
+  color: vars.$accent;
+}
+
+// ==================== PROBLEM CELL ====================
+
+.problem-cell {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-xs;
+}
+
+.problem-title {
+  font-weight: vars.$font-weight-medium;
+  color: vars.$text-primary;
+  line-height: 1.4;
+}
+
+// ==================== ACTIONS CELL ====================
+
+.mat-column-acciones {
+  &.mat-cell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .mat-icon-button {
+    margin: 0;
+  }
+}
+
+// ==================== PAGINATOR ====================
+
+.orders-paginator {
+  border-top: 1px solid vars.$border-color;
+  margin-top: vars.$spacing-md;
+}
+
+// ==================== RESPONSIVE ====================
+
+@media (max-width: vars.$breakpoint-md) {
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-field {
+    max-width: none;
+  }
+  
+  .filters-actions {
+    margin-left: 0;
+    justify-content: center;
+    width: 100%;
+    
+    button {
+      flex: 1;
+    }
+  }
+}
+
+@media (max-width: vars.$breakpoint-sm) {
+  .order-list-container {
+    padding: vars.$spacing-xs;
+  }
+  
+  .header-section {
+    padding: vars.$spacing-sm;
+    margin-bottom: vars.$spacing-sm;
+  }
+  
+  .main-title {
+    font-size: vars.$font-size-lg;
+  }
+  
+  .subtitle {
+    font-size: vars.$font-size-xs;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: vars.$spacing-sm;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+    
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .table-container {
+    padding: vars.$spacing-sm;
+  }
+  
+  .orders-table {
+    min-width: 600px;
+    
+    .mat-cell, .mat-header-cell {
+      padding: vars.$spacing-xs;
+      font-size: 11px;
+    }
+  }
+  
+  .filters-section {
+    padding: vars.$spacing-xs;
+  }
+}
+
+// Estilos para botones de acción
+.action-button-pdf {
+  color: vars.$warn;
+}
+

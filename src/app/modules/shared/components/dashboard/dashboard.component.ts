@@ -15,7 +15,7 @@ import { TicketDetailModalComponent } from '../ticket-detail-modal/ticket-detail
 export class DashboardComponent implements OnInit, OnDestroy {
   currentDateTime = new Date();
   ticketsDataSource = new MatTableDataSource<Ticket>();
-  displayedColumns: string[] = ['estado', 'fecha', 'hora', 'numero', 'descripcion', 'contacto', 'empresa', 'asignado'];
+  displayedColumns: string[] = ['estado', 'fecha', 'hora', 'numero', 'descripcion', 'contacto', 'empresa', 'tipoServicio', 'asignado'];
   private refreshSubscription?: Subscription;
   private allTickets: Ticket[] = [];
   activeFilter: string | null = null;

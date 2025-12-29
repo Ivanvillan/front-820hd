@@ -1,0 +1,182 @@
+.contact-detail-dialog {
+  width: 100%;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #1976d2;
+  font-size: 20px;
+}
+
+.dialog-header mat-icon {
+  color: #1976d2;
+}
+
+.close-button {
+  color: #666;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.dialog-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.contact-info-container {
+  margin-bottom: 30px;
+}
+
+.info-section {
+  margin-bottom: 30px;
+}
+
+.info-section h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-section mat-icon {
+  color: #1976d2;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #666;
+  font-size: 14px;
+}
+
+.info-icon {
+  color: #1976d2;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.info-value {
+  color: #333;
+  font-size: 16px;
+  word-wrap: break-word;
+  padding-left: 24px;
+}
+
+.info-value.no-value {
+  color: #999;
+  font-style: italic;
+}
+
+.additional-info {
+  margin-top: 20px;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+}
+
+.card-icon {
+  color: #6c757d;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-label {
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.card-value {
+  font-size: 16px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.dialog-actions {
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.close-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-weight: 500;
+}
+
+.close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-detail-dialog {
+    max-width: 100vw;
+    margin: 0;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .info-card {
+    padding: 12px;
+  }
+  
+  .dialog-header h2 {
+    font-size: 18px;
+  }
+}

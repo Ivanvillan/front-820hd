@@ -1,0 +1,159 @@
+<div class="create-customer-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>add_business</mat-icon>
+      Crear Nuevo Cliente
+    </h2>
+    <button mat-icon-button (click)="onNoClick()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSaveClick()">
+    <mat-dialog-content class="dialog-content">
+      <div class="form-grid">
+        <!-- Columna 1 -->
+        <div class="form-column">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" placeholder="Ingrese el nombre del cliente">
+            <mat-error *ngIf="form.get('nombre')?.hasError('required')">
+              El nombre es requerido
+            </mat-error>
+            <mat-error *ngIf="form.get('nombre')?.hasError('minlength')">
+              El nombre debe tener al menos 2 caracteres
+            </mat-error>
+            <mat-error *ngIf="form.get('nombre')?.hasError('maxlength')">
+              El nombre no puede exceder 255 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Dirección</mat-label>
+            <input matInput formControlName="direccion" placeholder="Ingrese la dirección completa">
+            <mat-error *ngIf="form.get('direccion')?.hasError('required')">
+              La dirección es requerida
+            </mat-error>
+            <mat-error *ngIf="form.get('direccion')?.hasError('minlength')">
+              La dirección debe tener al menos 5 caracteres
+            </mat-error>
+            <mat-error *ngIf="form.get('direccion')?.hasError('maxlength')">
+              La dirección no puede exceder 500 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Localidad</mat-label>
+            <input matInput formControlName="localidad" placeholder="Ingrese la localidad">
+            <mat-error *ngIf="form.get('localidad')?.hasError('maxlength')">
+              La localidad no puede exceder 100 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Código Postal</mat-label>
+            <input matInput formControlName="cp" placeholder="Ingrese el código postal" type="text">
+            <mat-error *ngIf="form.get('cp')?.hasError('pattern')">
+              El código postal debe ser numérico
+            </mat-error>
+            <mat-error *ngIf="form.get('cp')?.hasError('maxlength')">
+              El código postal no puede exceder 10 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="cliente@empresa.com" type="email">
+            <mat-error *ngIf="form.get('email')?.hasError('required')">
+              El email es requerido
+            </mat-error>
+            <mat-error *ngIf="form.get('email')?.hasError('email')">
+              Formato de email inválido
+            </mat-error>
+            <mat-error *ngIf="form.get('email')?.hasError('maxlength')">
+              El email no puede exceder 255 caracteres
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Columna 2 -->
+        <div class="form-column">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>CUIT</mat-label>
+            <input matInput formControlName="cuit" placeholder="XX-XXXXXXXX-X" mask="00-00000000-0">
+            <mat-error *ngIf="form.get('cuit')?.hasError('required')">
+              El CUIT es requerido
+            </mat-error>
+            <mat-error *ngIf="form.get('cuit')?.hasError('minlength')">
+              El CUIT debe tener al menos 11 caracteres
+            </mat-error>
+            <mat-error *ngIf="form.get('cuit')?.hasError('maxlength')">
+              El CUIT no puede exceder 20 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Provincia</mat-label>
+            <mat-select formControlName="idprov" placeholder="Seleccione la provincia">
+              <mat-option [value]="null">-- Seleccione --</mat-option>
+              <mat-option *ngFor="let province of provinces" [value]="province.idprovi">
+                {{ province.provincias }}
+              </mat-option>
+            </mat-select>
+            <mat-spinner *ngIf="isLoadingProvinces" diameter="20" style="display: inline-block; margin-left: 10px;"></mat-spinner>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono" placeholder="+54 9 XXX XXX-XXXX">
+            <mat-error *ngIf="form.get('telefono')?.hasError('required')">
+              El teléfono es requerido
+            </mat-error>
+            <mat-error *ngIf="form.get('telefono')?.hasError('minlength')">
+              El teléfono debe tener al menos 7 caracteres
+            </mat-error>
+            <mat-error *ngIf="form.get('telefono')?.hasError('maxlength')">
+              El teléfono no puede exceder 50 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Condición IVA</mat-label>
+            <mat-select formControlName="condicion_iva" placeholder="Seleccione la condición fiscal">
+              <mat-option value="Responsable Inscripto">Responsable Inscripto</mat-option>
+              <mat-option value="Monotributista">Monotributista</mat-option>
+              <mat-option value="Exento">Exento</mat-option>
+              <mat-option value="Consumidor Final">Consumidor Final</mat-option>
+              <mat-option value="No Categorizado">No Categorizado</mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('condicion_iva')?.hasError('required')">
+              La condición IVA es requerida
+            </mat-error>
+            <mat-error *ngIf="form.get('condicion_iva')?.hasError('minlength')">
+              La condición IVA debe tener al menos 2 caracteres
+            </mat-error>
+            <mat-error *ngIf="form.get('condicion_iva')?.hasError('maxlength')">
+              La condición IVA no puede exceder 100 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tipo de Cliente</mat-label>
+            <input matInput formControlName="tipocli" placeholder="Ingrese el tipo de cliente">
+            <mat-error *ngIf="form.get('tipocli')?.hasError('maxlength')">
+              El tipo de cliente no puede exceder 50 caracteres
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-actions">
+      <button type="submit" mat-raised-button color="primary" [disabled]="!form.valid || isSubmitting" class="save-btn">
+        <mat-icon *ngIf="!isSubmitting">save</mat-icon>
+        <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+        {{ isSubmitting ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

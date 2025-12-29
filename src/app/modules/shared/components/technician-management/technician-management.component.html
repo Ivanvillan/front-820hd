@@ -1,0 +1,81 @@
+<div class="management-container">
+  
+  <!-- Filtros con búsqueda instantánea -->
+  <app-filter-bar
+    [filters]="filters"
+    (filterChange)="onFilterChange($event)"
+    (filterClear)="onFilterClear()">
+  </app-filter-bar>
+
+  <!-- Tabla de técnicos -->
+  <app-configurable-table
+    tableId="technicians-table"
+    title="Gestión de Técnicos"
+    [data]="filteredTechnicians"
+    [defaultColumns]="columns"
+    [loading]="loading"
+    [emptyStateMessage]="'No se encontraron técnicos'"
+    [showPaginator]="false"
+    [showColumnSelector]="true"
+    [columnTemplates]="{ 'nombre': nameTemplate, 'area': areaTemplate, 'activo': statusTemplate, 'actions': actionsTemplate }">
+    
+    <!-- Slot de acciones (botones superiores) -->
+    <div tableActions class="table-actions">
+      <button mat-raised-button color="primary" (click)="createTechnician()">
+        <mat-icon>add</mat-icon>
+        Nuevo Técnico
+      </button>
+    </div>
+  </app-configurable-table>
+
+</div>
+
+<!-- ==================== TEMPLATES PERSONALIZADOS ==================== -->
+
+<!-- Template de nombre con apellido y categoría -->
+<ng-template #nameTemplate let-row>
+  <div class="name-cell">
+    <div class="name-primary">{{ row.name }}</div>
+    <div class="name-secondary" *ngIf="row.apellido">{{ row.apellido }}</div>
+    <div class="category-badge" *ngIf="row.categoria_id">
+      <mat-icon>category</mat-icon>
+      {{ getCategoryDescription(row.categoria_id) }}
+    </div>
+  </div>
+</ng-template>
+
+<!-- Template de área con badge coloreado -->
+<ng-template #areaTemplate let-row>
+  <span class="area-badge" [class]="'area-' + row.area">
+    {{ getAreaLabel(row.area) }}
+  </span>
+</ng-template>
+
+<!-- Template de estado activo/inactivo -->
+<ng-template #statusTemplate let-row>
+  <mat-chip-list>
+    <mat-chip [class]="row.activo ? 'status-active' : 'status-inactive'">
+      {{ row.activo ? 'Activo' : 'Inactivo' }}
+    </mat-chip>
+  </mat-chip-list>
+</ng-template>
+
+<!-- Template de acciones -->
+<ng-template #actionsTemplate let-row>
+  <div class="actions-cell">
+    <button mat-icon-button [matMenuTriggerFor]="technicianMenu" (click)="$event.stopPropagation()">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #technicianMenu="matMenu">
+      <button mat-menu-item (click)="editTechnician(row)">
+        Editar técnico
+      </button>
+      <button mat-menu-item (click)="editTechnicianArea(row)">
+        Cambiar área
+      </button>
+      <button mat-menu-item class="delete-action" (click)="deleteTechnician(row)">
+        Eliminar técnico
+      </button>
+    </mat-menu>
+  </div>
+</ng-template>

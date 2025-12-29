@@ -1,0 +1,651 @@
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTableDataSource } from '@angular/material/table';
+import { CustomersService } from '../../../../services/customers/customers.service';
+import { PersonnelService } from '../../../../services/personnel/personnel.service';
+import { ServicesService } from '../../../../services/services/services.service';
+import { MaterialsService } from '../../../../services/materials/materials.service';
+import { Service } from '../../../../models/service.model';
+import { OrderSector, OrderStatus } from '../../../../models/ticket.model';
+import { Material, SelectedMaterial, MaterialDTO } from '../../../../models/material.model';
+
+@Component({
+  selector: 'app-create-order-dialog',
+  templateUrl: './create-order-dialog.component.html',
+  styleUrls: ['./create-order-dialog.component.scss']
+})
+export class CreateOrderDialogComponent implements OnInit {
+  createForm: FormGroup;
+  clientes: any[] = [];
+  contactos: any[] = [];
+  tecnicos: any[] = [];
+  services: Service[] = [];
+  materials: Material[] = [];
+  selectedMaterials: SelectedMaterial[] = [];
+  materialsDataSource = new MatTableDataSource<SelectedMaterial>([]);
+  selectedMaterialForAdd: Material | null = null;
+  cantidadToAdd: number = 1;
+  isSubmitting = false;
+  isLoadingMaterials = false;
+  
+  // Formulario inline para crear material
+  isCreatingMaterial: boolean = false;
+  createMaterialForm: FormGroup;
+  rubros: any[] = [];
+  
+  // Enums para las opciones del formulario
+  sectors = Object.values(OrderSector);
+  statuses = Object.values(OrderStatus);
+  
+  // Opciones de tipo de orden
+  orderTypes = [
+    { value: 'insu', label: 'Insumos' },
+    { value: 'mant', label: 'Mantenimiento' },
+    { value: 'sopo', label: 'Soporte' },
+    { value: 'limp', label: 'Limpieza' }
+  ];
+
+  constructor(
+    private fb: FormBuilder,
+    public dialogRef: MatDialogRef<CreateOrderDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { technicians?: any[], autoAssign?: any, prefill?: any },
+    private snackBar: MatSnackBar,
+    private customersService: CustomersService,
+    private personnelService: PersonnelService,
+    private servicesService: ServicesService,
+    private materialsService: MaterialsService
+  ) {
+    // Configurar valores por defecto basados en autoasignación
+    const defaultSector = data?.autoAssign?.sector ? 
+      this.mapSectorToEnum(data.autoAssign.sector) : OrderSector.HD820;
+    
+    this.createForm = this.fb.group({
+      clientId: [null, [Validators.required]],
+      contactId: [null, [Validators.required]],
+      description: ['', [ Validators.required, Validators.minLength(3), Validators.maxLength(1550)]],
+      txtmateriales: ['', [Validators.maxLength(2000)]], // Campo para materiales utilizados
+      assignedToIds: [data?.autoAssign?.technicianId ? [data.autoAssign.technicianId] : []],
+      sector: [defaultSector, [Validators.required]],
+      status: [OrderStatus.PENDIENTE, [Validators.required]],
+      priority: ['media', [Validators.required]],
+      orderType: ['sopo', [Validators.required]], // NUEVO: tipo de orden manual (default: Soporte)
+      tiposerv: [null],
+      startTime: [''],
+      endTime: ['']
+    });
+
+    // Formulario para crear material inline
+    this.createMaterialForm = this.fb.group({
+      descripcion: ['', [Validators.required, Validators.maxLength(255)]],
+      unidad: ['Unidad', [Validators.maxLength(50)]],
+      punitario: [0, [Validators.min(0)]],
+      idrubro: [null],
+      iva19: [10.5, [Validators.min(0), Validators.max(100)]],
+      cantidad: [1, [Validators.required, Validators.min(1)]]
+    });
+
+    if (data && data.technicians) {
+      this.tecnicos = data.technicians;
+    }
+
+    // Prefill from remito
+    if (data?.prefill) {
+      const pre = data.prefill;
+      if (pre.clientId) {
+        this.createForm.get('clientId')?.setValue(pre.clientId);
+        // Load contacts for the client to enable contact selection
+        this.loadContacts(pre.clientId);
+      }
+      if (pre.description) {
+        this.createForm.get('description')?.setValue(pre.description);
+        // NUEVO: Mantener tipo por defecto (Soporte) - usuario puede cambiar si es necesario
+        // this.createForm.get('orderType') ya está en 'sopo' por defecto
+      }
+      // txtmateriales se parseará después de cargar los materiales en ngOnInit
+      // No establecerlo aquí para evitar conflictos con el parseo automático
+      if (pre.horaEntrada) {
+        this.createForm.get('startTime')?.setValue(pre.horaEntrada);
+      }
+      if (pre.horaSalida) {
+        this.createForm.get('endTime')?.setValue(pre.horaSalida);
+      }
+      
+      // Set contact after a short delay to allow contacts to load
+      if (pre.contactId) {
+        setTimeout(() => {
+          this.createForm.get('contactId')?.setValue(pre.contactId);
+        }, 500);
+      }
+      
+      // Auto-asignar técnico del remito si está disponible
+      if (pre.assignedTechnicianId) {
+        this.createForm.get('assignedToIds')?.setValue([pre.assignedTechnicianId]);
+      }
+    }
+  }
+
+  /**
+   * Inicialización del componente
+   * Flujo de materiales:
+   * 1. Carga materiales disponibles desde la DB (19materiales)
+   * 2. Si hay prefill desde remito, parsea los materiales
+   * 3. Si encuentra materiales no existentes, expande formulario inline automáticamente
+   * 4. Usuario completa datos y crea material → se agrega automáticamente a la lista
+   */
+  ngOnInit(): void {
+    this.loadClients();
+    this.loadTechnicians();
+    this.loadServices();
+    this.loadRubros();
+    // IMPORTANTE: loadMaterials() retorna Promise para esperar antes de parsear
+    this.loadMaterials().then(() => {
+      // Después de cargar materiales, si hay materiales del remito, parsearlos
+      if (this.data?.prefill) {
+        const prefill = this.data.prefill;
+        // Si vienen materiales estructurados, usarlos; sino usar txtmateriales
+        if (prefill.materiales && Array.isArray(prefill.materiales)) {
+          this.parseMaterialsFromRemito(prefill.txtmateriales || '', prefill.materiales);
+        } else if (prefill.txtmateriales) {
+          this.parseMaterialsFromRemito(prefill.txtmateriales);
+        }
+      }
+    });
+    
+    // Cargar contactos cuando se seleccione un cliente
+    this.createForm.get('clientId')?.valueChanges.subscribe(clientId => {
+      if (clientId) {
+        this.loadContacts(clientId);
+      } else {
+        this.contactos = [];
+        this.createForm.get('contactId')?.setValue(null);
+      }
+    });
+  }
+
+  /**
+   * Carga los rubros disponibles
+   */
+  private loadRubros(): void {
+    this.materialsService.getRubros().subscribe({
+      next: (rubros: any[]) => {
+        this.rubros = rubros;
+      },
+      error: (error) => {
+        console.error('Error loading rubros:', error);
+      }
+    });
+  }
+
+  /**
+   * Expande o colapsa el formulario de crear material
+   */
+  toggleCreateMaterialForm(): void {
+    this.isCreatingMaterial = !this.isCreatingMaterial;
+    if (!this.isCreatingMaterial) {
+      this.cancelCreateMaterial();
+    }
+  }
+
+  /**
+   * Crea un nuevo material y lo agrega automáticamente a la lista
+   */
+  createAndAddMaterial(): void {
+    if (this.createMaterialForm.invalid) {
+      this.snackBar.open('Por favor complete todos los campos requeridos', 'Cerrar', { duration: 2000 });
+      return;
+    }
+
+    const formData = this.createMaterialForm.value;
+    const materialData = {
+      descripcion: formData.descripcion,
+      unidad: formData.unidad || 'Unidad',
+      punitario: formData.punitario || 0,
+      idrubro: formData.idrubro || null,
+      iva19: formData.iva19 || 10.5
+    };
+
+    this.materialsService.createMaterial(materialData).subscribe({
+      next: (newMaterial: Material) => {
+        // Recargar lista de materiales
+        this.loadMaterials().then(() => {
+          // Seleccionar el material recién creado
+          this.selectedMaterialForAdd = newMaterial;
+          this.cantidadToAdd = formData.cantidad || 1;
+          
+          // Agregar automáticamente a la lista
+          this.addMaterial();
+          
+          // Colapsar y resetear formulario
+          this.isCreatingMaterial = false;
+          this.createMaterialForm.reset({
+            unidad: 'Unidad',
+            punitario: 0,
+            idrubro: null,
+            iva19: 10.5,
+            cantidad: 1
+          });
+          
+          this.snackBar.open('Material creado y agregado exitosamente', 'Cerrar', { duration: 2000 });
+        });
+      },
+      error: (error: any) => {
+        console.error('Error creating material:', error);
+        const errorMessage = error?.error?.message || 'Error al crear el material';
+        this.snackBar.open(errorMessage, 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  /**
+   * Cancela la creación de material y resetea el formulario
+   */
+  cancelCreateMaterial(): void {
+    this.isCreatingMaterial = false;
+    this.createMaterialForm.reset({
+      unidad: 'Unidad',
+      punitario: 0,
+      idrubro: null,
+      iva19: 10.5,
+      cantidad: 1
+    });
+  }
+
+  /**
+   * Mapea el sector del técnico al enum OrderSector
+   */
+  private mapSectorToEnum(sector: string): OrderSector {
+    switch (sector.toLowerCase()) {
+      case 'campo':
+        return OrderSector.CAMPO;
+      case 'laboratorio':
+        return OrderSector.LABORATORIO;
+      case '820hd':
+        return OrderSector.HD820;
+      default:
+        return OrderSector.HD820;
+    }
+  }
+
+  private loadClients(): void {
+    this.customersService.find().subscribe({
+      next: (clients) => {
+        this.clientes = clients;
+      },
+      error: (error) => {
+        console.error('Error loading clients:', error);
+        this.snackBar.open('Error al cargar los clientes', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  private loadContacts(clientId: number): void {
+    console.log('Loading contacts for clientId:', clientId);
+    this.customersService.getCustomerContacts(clientId).subscribe({
+      next: (contacts: any[]) => {
+        console.log('Contacts loaded:', contacts);
+        // Procesar contactos para crear displayName
+        this.contactos = contacts.map(contact => ({
+          ...contact,
+          displayName: this.createContactDisplayName(contact)
+        }));
+        console.log('Processed contacts:', this.contactos);
+        // Si solo hay un contacto, seleccionarlo automáticamente
+        if (this.contactos.length === 1) {
+          this.createForm.get('contactId')?.setValue(this.contactos[0].id7c);
+        }
+      },
+      error: (error: any) => {
+        console.error('Error loading contacts:', error);
+        this.snackBar.open('Error al cargar los contactos', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  private createContactDisplayName(contact: any): string {
+    // Si tiene nombre, usarlo
+    if (contact.nombre && contact.nombre.trim()) {
+      return contact.nombre;
+    }
+    
+    // Si tiene email, usarlo
+    if (contact.email && contact.email.trim()) {
+      return contact.email;
+    }
+    
+    // Si tiene teléfono, usarlo
+    if (contact.telefono && contact.telefono.trim()) {
+      return contact.telefono;
+    }
+    
+    // Como último recurso, usar el ID
+    return `Contacto #${contact.id7c}`;
+  }
+
+  private loadTechnicians(): void {
+    this.personnelService.getTechnicians(true).subscribe({
+      next: (technicians) => {
+        // Filtrar solo técnicos activos como medida de seguridad adicional
+        this.tecnicos = technicians.filter(t => t.activo !== false);
+      },
+      error: (error) => {
+        console.error('Error loading technicians:', error);
+        this.snackBar.open('Error al cargar los técnicos', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  private loadServices(): void {
+    this.servicesService.getServices().subscribe({
+      next: (services: Service[]) => {
+        this.services = services;
+      },
+      error: (error) => {
+        console.error('Error loading services:', error);
+        this.snackBar.open('Error al cargar los servicios', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+
+  /**
+   * Carga los materiales disponibles desde el servicio
+   * Retorna una Promise para poder esperar a que se carguen antes de parsear materiales del remito
+   */
+  private loadMaterials(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.isLoadingMaterials = true;
+      this.materialsService.getMaterials().subscribe({
+        next: (materials: Material[]) => {
+          this.materials = materials;
+          this.isLoadingMaterials = false;
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error loading materials:', error);
+          this.snackBar.open('Error al cargar los materiales', 'Cerrar', { duration: 3000 });
+          this.isLoadingMaterials = false;
+          reject(error);
+        }
+      });
+    });
+  }
+
+  /**
+   * Parsea los materiales que vienen desde el remito
+   * Si encuentra materiales que no existen en la DB, expande el formulario inline para crearlos
+   */
+  private parseMaterialsFromRemito(txtMateriales: string, remitoMateriales?: any[]): void {
+    const parsedMaterials: SelectedMaterial[] = [];
+    let hasMissingMaterials = false;
+    let firstMissingMaterial: any = null;
+
+    // Prioridad 1: Si vienen materiales estructurados del remito, usarlos directamente
+    if (remitoMateriales && Array.isArray(remitoMateriales) && remitoMateriales.length > 0) {
+      for (const remitoMat of remitoMateriales) {
+        const cantidad = remitoMat.cantidad || 1;
+        const descripcion = remitoMat.descripcion || '';
+        
+        if (!descripcion || cantidad <= 0) continue;
+
+        // Buscar material en la lista de materiales por descripción (búsqueda flexible)
+        const material = this.materials.find(m => 
+          m.descripcion.toLowerCase().includes(descripcion.toLowerCase()) ||
+          descripcion.toLowerCase().includes(m.descripcion.toLowerCase())
+        );
+
+        // Si no se encuentra en la DB, marcar para crear
+        if (!material) {
+          hasMissingMaterials = true;
+          if (!firstMissingMaterial) {
+            firstMissingMaterial = {
+              descripcion: descripcion,
+              punitario: remitoMat.precio || 0,
+              cantidad: cantidad
+            };
+          }
+          continue; // No agregar a parsedMaterials, se creará después
+        }
+
+        // Verificar si el material ya está en la lista
+        const existingIndex = parsedMaterials.findIndex(
+          sm => sm.material.id19 === material.id19
+        );
+
+        if (existingIndex >= 0) {
+          parsedMaterials[existingIndex].cantidad += cantidad;
+        } else {
+          parsedMaterials.push({
+            material: material,
+            cantidad: cantidad
+          });
+        }
+      }
+    } 
+    // Prioridad 2: Si solo viene texto, parsearlo
+    else if (txtMateriales && txtMateriales.trim()) {
+      const lines = txtMateriales.split('\n').filter(line => line.trim());
+
+      for (const line of lines) {
+        const match = line.match(/^(\d+)\s*x\s*(.+)$/i);
+        if (match) {
+          const cantidad = parseInt(match[1], 10);
+          const descripcion = match[2].trim();
+
+          const material = this.materials.find(m => 
+            m.descripcion.toLowerCase().includes(descripcion.toLowerCase()) ||
+            descripcion.toLowerCase().includes(m.descripcion.toLowerCase())
+          );
+
+          if (!material) {
+            hasMissingMaterials = true;
+            if (!firstMissingMaterial) {
+              firstMissingMaterial = {
+                descripcion: descripcion,
+                punitario: 0,
+                cantidad: cantidad
+              };
+            }
+            continue;
+          }
+
+          const existingIndex = parsedMaterials.findIndex(
+            sm => sm.material.id19 === material.id19
+          );
+
+          if (existingIndex >= 0) {
+            parsedMaterials[existingIndex].cantidad += cantidad;
+          } else {
+            parsedMaterials.push({
+              material: material,
+              cantidad: cantidad
+            });
+          }
+        }
+      }
+    }
+
+    // Actualizar selectedMaterials y el dataSource
+    this.selectedMaterials = parsedMaterials;
+    this.materialsDataSource.data = [...this.selectedMaterials];
+    
+    // Actualizar txtmateriales con el formato correcto
+    this.updateTxtMateriales();
+
+    // Si hay materiales faltantes, expandir formulario y prellenarlo
+    if (hasMissingMaterials && firstMissingMaterial) {
+      this.isCreatingMaterial = true;
+      this.createMaterialForm.patchValue({
+        descripcion: firstMissingMaterial.descripcion,
+        punitario: firstMissingMaterial.punitario || 0,
+        cantidad: firstMissingMaterial.cantidad || 1,
+        unidad: 'Unidad',
+        idrubro: null,
+        iva19: 10.5
+      });
+    }
+  }
+
+  /**
+   * Agrega un material seleccionado a la lista de materiales de la orden
+   */
+  addMaterial(): void {
+    if (!this.selectedMaterialForAdd) {
+      this.snackBar.open('Seleccione un material', 'Cerrar', { duration: 2000 });
+      return;
+    }
+
+    if (this.cantidadToAdd <= 0) {
+      this.snackBar.open('La cantidad debe ser mayor a 0', 'Cerrar', { duration: 2000 });
+      return;
+    }
+
+    // Verificar si el material ya está en la lista
+    const existingIndex = this.selectedMaterials.findIndex(
+      sm => sm.material.id19 === this.selectedMaterialForAdd!.id19
+    );
+
+    if (existingIndex >= 0) {
+      // Si ya existe, actualizar la cantidad
+      this.selectedMaterials[existingIndex].cantidad += this.cantidadToAdd;
+      this.snackBar.open(`Cantidad actualizada: ${this.selectedMaterials[existingIndex].cantidad}`, 'Cerrar', { duration: 2000 });
+    } else {
+      // Si no existe, agregarlo
+      this.selectedMaterials.push({
+        material: this.selectedMaterialForAdd,
+        cantidad: this.cantidadToAdd
+      });
+    }
+
+    // Actualizar el dataSource de la tabla
+    this.materialsDataSource.data = [...this.selectedMaterials];
+
+    // Limpiar selección
+    this.selectedMaterialForAdd = null;
+    this.cantidadToAdd = 1;
+    this.updateTxtMateriales();
+  }
+
+  /**
+   * Elimina un material de la lista
+   */
+  removeMaterial(index: number): void {
+    this.selectedMaterials.splice(index, 1);
+    this.materialsDataSource.data = [...this.selectedMaterials];
+    this.updateTxtMateriales();
+  }
+
+  /**
+   * Actualiza la cantidad de un material
+   */
+  updateMaterialQuantity(index: number, newQuantity: number): void {
+    if (newQuantity <= 0) {
+      this.snackBar.open('La cantidad debe ser mayor a 0', 'Cerrar', { duration: 2000 });
+      return;
+    }
+    this.selectedMaterials[index].cantidad = newQuantity;
+    this.materialsDataSource.data = [...this.selectedMaterials];
+    this.updateTxtMateriales();
+  }
+
+  /**
+   * Actualiza el campo txtmateriales con el texto descriptivo de los materiales seleccionados
+   * 
+   * Formato: "cantidadx descripcion" por línea
+   * Ejemplo: "2x HP 56 NEGRO\n1x cinta gtc"
+   * 
+   * Este campo se mantiene para:
+   * - Compatibilidad con código legacy
+   * - Visualización en PDFs y vistas de solo lectura
+   * - Los materiales estructurados se guardan en 21movmat (tabla relacional)
+   */
+  private updateTxtMateriales(): void {
+    const txtMateriales = this.selectedMaterials
+      .map(sm => `${sm.cantidad}x ${sm.material.descripcion}`)
+      .join('\n');
+    this.createForm.get('txtmateriales')?.setValue(txtMateriales);
+  }
+
+  onSave(): void {
+    if (this.createForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
+      
+      // Preparar los datos para enviar al backend
+      const formData = this.createForm.value;
+      
+      /**
+       * Convertir materiales seleccionados a formato DTO para el backend
+       * 
+       * IMPORTANTE: Solo se envían materiales que:
+       * 1. Existen en la DB (19materiales) - verificado por id19
+       * 2. Tienen precio válido (punitario > 0)
+       * 3. Tienen id19 > 0 (materiales válidos, no temporales)
+       * 
+       * Estos materiales se guardan en la tabla 21movmat (relacional)
+       * El campo txtmateriales se guarda por separado para compatibilidad
+       */
+      const materialsDTO: MaterialDTO[] = this.selectedMaterials
+        .filter(sm => {
+          // Verificar que el material existe en la lista de materiales de la DB
+          const existsInDB = this.materials.some(m => m.id19 === sm.material.id19);
+          // Verificar que tiene punitario válido (> 0)
+          const hasValidPrice = sm.material.punitario > 0;
+          return existsInDB && hasValidPrice && sm.material.id19 > 0;
+        })
+        .map(sm => ({
+          id19: sm.material.id19,
+          cantidad: sm.cantidad,
+          punitario: sm.material.punitario
+        }));
+
+      const orderData: any = {
+        clientId: formData.clientId,
+        contactId: formData.contactId, // Usar el contacto seleccionado
+        description: formData.description,
+        txtmateriales: formData.txtmateriales || '', // Campo para materiales utilizados (texto descriptivo)
+        materials: materialsDTO, // Array de materiales para guardar en 21movmat
+        assignedToIds: formData.assignedToIds || [], // Array de IDs de técnicos responsables
+        sector: formData.sector,
+        status: formData.status,
+        priority: formData.priority,
+        tiposerv: formData.tiposerv,
+        // NUEVO: Establecer campos de tipo según selección
+        insu: formData.orderType === 'insu' ? 1 : 0,
+        mant: formData.orderType === 'mant' ? 1 : 0,
+        sopo: formData.orderType === 'sopo' ? 1 : 0,
+        limp: formData.orderType === 'limp' ? 1 : 0
+      };
+      
+      // Mapear campos de hora: startTime → horaini, endTime → horafin
+      if (formData.startTime) {
+        orderData.horaini = formData.startTime;
+      }
+      if (formData.endTime) {
+        orderData.horafin = formData.endTime;
+      }
+      
+      // Simulate API call delay for better UX
+      setTimeout(() => {
+        this.dialogRef.close(orderData);
+        this.isSubmitting = false;
+      }, 500);
+    } else if (!this.createForm.valid) {
+      this.markFormGroupTouched();
+      this.snackBar.open('Por favor, complete todos los campos requeridos', 'Cerrar', { duration: 3000 });
+    }
+  }
+
+  onCancel(): void {
+    if (!this.isSubmitting) {
+      this.dialogRef.close();
+    }
+  }
+
+  private markFormGroupTouched(): void {
+    Object.keys(this.createForm.controls).forEach(key => {
+      const control = this.createForm.get(key);
+      control?.markAsTouched();
+    });
+  }
+
+} 

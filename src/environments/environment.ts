@@ -4,7 +4,10 @@
 
 export const environment = {
   production: false,
-  API_URL: 'http://localhost:3001'
+  API_URL: 'http://localhost:3001',
+  IMAGE_URL: 'http://localhost:3001/images',
+  defaultTimezone: 'America/Argentina/Buenos_Aires',
+  autoDetectTimezone: true
 };
 
 /*

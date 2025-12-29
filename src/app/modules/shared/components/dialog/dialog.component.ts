@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 import { OrdersService } from 'src/app/services/orders/orders.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
   selector: 'app-dialog',
@@ -37,13 +38,10 @@ export class DialogComponent {
     private _snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<DialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
+    private configService: ConfigService
   ) { 
-    if(window.location.hostname.includes('localhost')){   
-      this.API_URI = 'http://localhost:3001/images';
-    }
-    if (!window.location.hostname.includes('localhost')) {
-      this.API_URI = 'https://api.820hd.com.ar/images'
-    } 
+    // ✅ Usar configuración centralizada
+    this.API_URI = this.configService.IMAGE_URL;
     this.randomNumber = Math.floor(Math.random() * 3) + 1;   
   }
 
@@ -58,7 +56,7 @@ export class DialogComponent {
   }
 
   send() {
-    const credential = JSON.parse(this.credentialsService.getCredentials()!);
+    const credential = this.credentialsService.getCredentialsParsed();
     this.order.id7 = credential.idClient;
     this.order.id7c = credential.idContact;
     this.order.descripcion = `[Ofertas] ${this.quantity} ${this.data.title} ${this.data.description}`
@@ -71,8 +69,8 @@ export class DialogComponent {
       this.order.sopo = 1;
     }    
     
-    this.ordersService.create(this.order).subscribe({
-      next: (res) => {
+    this.ordersService.createIssue(this.order).subscribe({
+      next: (res: any) => {
         this._snackBar.open('Pedido solicitado con éxito', 'Cerrar', {
           duration: 5000,
           horizontalPosition: 'end',
@@ -80,7 +78,7 @@ export class DialogComponent {
         });
         this.dialogRef.close();
       },
-      error: (err) => {
+      error: (err: any) => {
         this._snackBar.open('Error al solicitar pedido', 'Cerrar', {
           duration: 5000,
           horizontalPosition: 'end',

@@ -1,0 +1,37 @@
+<div class="area-selection-container">
+  <!-- Header con navegación de retorno -->
+  <div class="header-section">
+    <div class="header-content">
+      <button mat-icon-button (click)="goBackToOrderManagement()" class="back-button" matTooltip="Volver a Gestión de Órdenes">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="title-section">
+        <h1 class="main-title">Selección de Área de Trabajo</h1>
+        <p class="subtitle">Selecciona el área donde deseas ver tus órdenes asignadas</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="areas-grid">
+    <mat-card 
+      *ngFor="let area of areas" 
+      class="area-card"
+      [style.border-left-color]="area.color"
+      (click)="selectArea(area.id)"
+      matRipple>
+      
+      <mat-card-content class="card-content">
+        <div class="icon-container" [style.background-color]="area.color">
+          <mat-icon class="area-icon">{{ area.icon }}</mat-icon>
+        </div>
+        
+        <div class="text-content">
+          <h2 class="area-name">{{ area.name }}</h2>
+          <p class="area-description">{{ area.description }}</p>
+        </div>
+        
+        <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

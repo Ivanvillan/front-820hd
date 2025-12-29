@@ -1,0 +1,202 @@
+@use 'src/styles/variables' as vars;
+
+.confirmation-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+// ========== HEADER ==========
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: vars.$spacing-sm;
+  padding-bottom: vars.$spacing-sm;
+  border-bottom: vars.$border-width solid vars.$border-color;
+  
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    margin: 0;
+    font-size: vars.$font-size-xl;
+    font-weight: vars.$font-weight-semibold;
+    color: vars.$warn;
+    
+    mat-icon {
+      color: vars.$accent;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+  
+  .close-button {
+    mat-icon {
+      color: vars.$text-secondary;
+    }
+    
+    &:hover mat-icon {
+      color: vars.$text-primary;
+    }
+  }
+}
+
+// ========== CONTENT ==========
+.dialog-content {
+  padding: 0 vars.$spacing-sm;
+  margin-bottom: vars.$spacing-md;
+  
+  .message {
+    font-size: vars.$font-size-lg;
+    line-height: vars.$line-height-normal;
+    color: vars.$text-primary;
+    margin-bottom: vars.$spacing-md;
+    font-weight: vars.$font-weight-medium;
+  }
+  
+  .warning-box {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    padding: vars.$spacing-sm vars.$spacing-md;
+    background-color: lighten(vars.$accent, 45%);
+    border-radius: vars.$border-radius-lg;
+    border-left: 3px solid vars.$accent;
+    
+    mat-icon {
+      color: vars.$accent;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    
+    span {
+      font-size: vars.$font-size-md;
+      color: darken(vars.$accent, 10%);
+      font-weight: vars.$font-weight-semibold;
+      line-height: vars.$line-height-normal;
+    }
+  }
+}
+
+// ========== ACTIONS ==========
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: vars.$spacing-md;
+  padding-top: vars.$spacing-md;
+  border-top: vars.$border-width solid vars.$border-color;
+  
+  .confirm-btn {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    min-width: 140px;
+    height: 40px;
+    font-weight: vars.$font-weight-semibold;
+    font-size: vars.$font-size-base;
+    border-radius: vars.$border-radius-lg;
+    background-color: vars.$warn;
+    color: vars.$text-white;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+    
+    &:hover:not(:disabled) {
+      background-color: darken(vars.$warn, 8%);
+    }
+    
+    &:disabled {
+      background-color: vars.$gray-400;
+      color: vars.$text-muted;
+    }
+  }
+}
+
+// ========== RESPONSIVE ==========
+
+// Tablet
+@media (max-width: 992px) {
+  .dialog-header {
+    h2 {
+      font-size: vars.$font-size-lg;
+      
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+  
+  .dialog-content {
+    .message {
+      font-size: vars.$font-size-md;
+    }
+  }
+}
+
+// Móvil
+@media (max-width: 768px) {
+  .dialog-header {
+    h2 {
+      font-size: vars.$font-size-md;
+      gap: vars.$spacing-xs;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+  
+  .dialog-content {
+    padding: 0 vars.$spacing-xs;
+    
+    .message {
+      font-size: vars.$font-size-base;
+      margin-bottom: vars.$spacing-sm;
+    }
+    
+    .warning-box {
+      padding: vars.$spacing-xs vars.$spacing-sm;
+      
+      span {
+        font-size: vars.$font-size-sm;
+      }
+    }
+  }
+  
+  .dialog-actions {
+    .confirm-btn {
+      width: 100%;
+      justify-content: center;
+      min-width: unset;
+    }
+  }
+}
+
+// Móvil pequeño
+@media (max-width: 480px) {
+  .dialog-header h2 {
+    font-size: vars.$font-size-sm;
+  }
+  
+  .dialog-content {
+    .message {
+      font-size: vars.$font-size-sm;
+    }
+    
+    .warning-box span {
+      font-size: 12px;
+    }
+  }
+}
+

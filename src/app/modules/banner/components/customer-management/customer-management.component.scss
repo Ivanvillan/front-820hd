@@ -1,0 +1,77 @@
+@use 'src/styles/variables' as vars;
+
+.management-container {
+  // FilterBar y ConfigurableTable ya tienen sus propios estilos
+}
+
+// ==================== TABLE TITLE WITH BACK ====================
+
+.table-title-with-back {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-xs;
+  
+  .back-button {
+    margin: 0;
+  }
+  
+  h2 {
+    margin: 0;
+    font-size: vars.$font-size-xl;
+    font-weight: vars.$font-weight-semibold;
+    color: vars.$text-primary;
+  }
+}
+
+// ==================== TABLE ACTIONS ====================
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-sm;
+
+  button[mat-raised-button] {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-xs;
+    font-weight: vars.$font-weight-medium;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// ==================== ACTIONS ====================
+
+.actions-cell {
+  display: flex;
+  gap: vars.$spacing-xs;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  
+  button {
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.delete-action {
+  color: vars.$warn !important;
+}
+
+// ==================== RESPONSIVE ====================
+
+@media (max-width: vars.$breakpoint-sm) {
+  .actions-cell {
+    gap: 0;
+    justify-content: flex-start;
+  }
+}
+

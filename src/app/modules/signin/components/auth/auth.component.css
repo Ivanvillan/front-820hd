@@ -71,6 +71,22 @@
 .service p a:visited {
     color: #0078bd;
 }
-::ng-deep .mat-progress-spinner circle, .mat-spinner circle {
+:host ::ng-deep .mat-progress-spinner circle, .mat-spinner circle {
     stroke: #0078bd;
+}
+
+/* Estilos para el snackbar de éxito */
+:host ::ng-deep .success-snackbar {
+    background: #4caf50;
+    color: white;
+    font-weight: 500;
+}
+
+:host ::ng-deep .success-snackbar .mat-simple-snackbar-action {
+    color: white;
+}
+
+:host ::ng-deep .success-snackbar .mat-simple-snackbar-action:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }

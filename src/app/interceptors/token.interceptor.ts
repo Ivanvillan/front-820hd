@@ -30,17 +30,23 @@ export class TokenInterceptor implements HttpInterceptor {
     return next.handle(request);
   }
 
+  /**
+   * Añade tokens a la petición
+   * ✅ Optimizado: usa getCredentialsParsed con caché
+   */
   private addToken(request: HttpRequest<unknown>) {
     const token = this.credentialsService.getToken();
     const dashToken = this.credentialsService.getDashboardToken();
     
     if (token) {
-      const data = JSON.parse(this.credentialsService.getCredentials()!);
-      const type = data['type'];
+      // ✅ Usar método cacheado en lugar de parsear cada vez
+      const credentials = this.credentialsService.getCredentialsParsed();
+      const type = credentials?.type;
+      
       const authReq = request.clone({
         setHeaders: {
           'access-token': token,
-          'type': type,
+          'type': type || '',
         },
         withCredentials: true
       });

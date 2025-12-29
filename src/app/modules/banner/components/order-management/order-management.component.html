@@ -1,0 +1,105 @@
+<div class="management-container">
+  <!-- Filtros con FilterBarComponent -->
+  <app-filter-bar
+    [filters]="filterConfig"
+    [debounceTime]="300"
+    [showClearButton]="true"
+    (filterChange)="onFilterChange($event)">
+  </app-filter-bar>
+
+  <!-- Tabla con ConfigurableTableComponent -->
+  <app-configurable-table
+    tableId="orders_admin"
+    title="Gestión de Órdenes de Trabajo"
+    [defaultColumns]="orderColumns"
+    [data]="orders"
+    [loading]="isLoading"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    [length]="totalItems"
+    [pageIndex]="currentPage - 1"
+    [serverSidePagination]="true"
+    [showColumnSelector]="true"
+    [columnTemplates]="columnTemplates"
+    emptyStateMessage="No se encontraron órdenes con los filtros aplicados"
+    (rowClick)="onRowClick($event)"
+    (pageChange)="onPageChange($event)">
+    
+    <!-- Slot de acciones (botones superiores) -->
+    <div tableActions class="table-actions">
+      <button mat-raised-button color="primary" (click)="openCreateOrderDialog()">
+        <mat-icon>add</mat-icon>
+        Nueva Orden
+      </button>
+      <button mat-stroked-button color="primary" (click)="openCreateFromRemito()">
+        <mat-icon>description</mat-icon>
+        Desde Remito
+      </button>
+      <button mat-stroked-button (click)="navigateToTechnician()">
+        <mat-icon>engineering</mat-icon>
+        Vista Técnicos
+      </button>
+    </div>
+  </app-configurable-table>
+</div>
+
+<!-- Templates personalizados para columnas -->
+<ng-template #fechaTemplate let-row>
+  <span>{{ row.fecha | date:'dd/MM/yyyy' }}</span>
+</ng-template>
+
+<ng-template #descripcionTemplate let-row>
+  <div class="descripcion-cell" [title]="row.descripcion">
+    {{ row.descripcion }}
+  </div>
+</ng-template>
+
+<ng-template #priorityTemplate let-row>
+  <span class="badge" [ngClass]="getPriorityClass(row.prioridad)">
+    {{ getPriorityText(row.prioridad) }}
+  </span>
+</ng-template>
+
+<ng-template #statusTemplate let-row>
+  <mat-chip-list *ngIf="row">
+    <mat-chip 
+      [color]="getStatusColor(row)" 
+      [selected]="true"
+      class="status-chip">
+      {{ getStatusText(row) }}
+    </mat-chip>
+  </mat-chip-list>
+</ng-template>
+
+<ng-template #tipoServicioTemplate let-row>
+  <span>{{ getServiceType(row) }}</span>
+</ng-template>
+
+<ng-template #nombreAsignadoTemplate let-row>
+  <span *ngIf="row" [ngClass]="getNombreAsignadoClass(row)" class="nombre-asignado">{{ getNombreAsignado(row) }}</span>
+</ng-template>
+
+<ng-template #actionsTemplate let-row>
+  <div class="actions-cell">
+    <button mat-icon-button [matMenuTriggerFor]="actionsMenu" (click)="$event.stopPropagation()">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #actionsMenu="matMenu">
+      <button mat-menu-item (click)="verDetalles(row)">
+        Ver detalle
+      </button>
+      <button mat-menu-item (click)="openUpdateDialog(row)">
+        Editar
+      </button>
+      <button mat-menu-item *ngIf="canTakeOrder(row)" (click)="takeOrder(row)">
+        Tomar orden
+      </button>
+      <button mat-menu-item (click)="exportToPdf(row)">
+        Exportar PDF
+      </button>
+      <button mat-menu-item class="delete-action" (click)="deleteOrder(row)">
+        Eliminar
+      </button>
+    </mat-menu>
+  </div>
+</ng-template>

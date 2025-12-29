@@ -1,3 +1,25 @@
+<!-- Header compacto para usuarios admin -->
+<div *ngIf="isAdmin" class="admin-header">
+  <div class="admin-header-content">
+    <div class="admin-logo" routerLink="/home">
+      <img [src]="API_URI + '/front/logo820hd-w.png'" alt="Logo 820hd">
+    </div>
+    
+    <div class="admin-user-info">
+      <div class="user-profile" (click)="toggleLogout()">
+        <span class="username">{{ username }}</span>
+        <span class="usertype">{{ userType }}</span>
+        <div class="profile-image">
+          <img [src]="API_URI + '/front/user.jpg'" alt="User">
+        </div>
+      </div>
+      <div class="logout-dropdown" [class.active]="showLogout">
+        <a (click)="logout()">Salir</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="top" *ngIf="isHome">
   <section id="banner">
     <div class="banner-container">
@@ -14,6 +36,15 @@
   </mat-tab> -->
   <mat-tab class="tabs" label="Ofertas">
     <app-offer-admin> </app-offer-admin>
+  </mat-tab>
+  <mat-tab class="tabs" label="Gestión de Órdenes">
+    <app-order-management></app-order-management>
+  </mat-tab>
+  <mat-tab class="tabs" label="Clientes">
+    <app-customer-management></app-customer-management>
+  </mat-tab>
+  <mat-tab class="tabs" label="Técnicos">
+    <app-technician-management></app-technician-management>
   </mat-tab>
 </mat-tab-group>
 

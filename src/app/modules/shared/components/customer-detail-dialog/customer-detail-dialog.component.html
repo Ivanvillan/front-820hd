@@ -1,0 +1,101 @@
+<div class="customer-detail-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>business</mat-icon>
+      Detalles del Cliente
+    </h2>
+    <button mat-icon-button (click)="closeDialog()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <!-- Información del Cliente -->
+    <div class="customer-info">
+      <h3>Información General</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Nombre:</span>
+          <span class="value">{{customer.nombre}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">CUIT:</span>
+          <span class="value">{{customer.cuit || '--'}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Email:</span>
+          <span class="value">{{customer.email}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Teléfono:</span>
+          <span class="value">{{customer.telefono || '--'}}</span>
+        </div>
+        <div class="info-item full-width">
+          <span class="label">Dirección:</span>
+          <span class="value">{{customer.direccion || '--'}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Localidad:</span>
+          <span class="value">{{customer.localidad || '--'}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Código Postal:</span>
+          <span class="value">{{customer.cp || '--'}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Provincia:</span>
+          <span class="value">{{getProvinceName(customer.idprov)}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Condición IVA:</span>
+          <span class="value">{{customer.condicion_iva || '--'}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Tipo de Cliente:</span>
+          <span class="value">{{customer.tipocli || '--'}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contactos del Cliente -->
+    <div class="contacts-section">
+      <h3>Contactos</h3>
+      
+      <div *ngIf="isLoadingContacts" class="loading-contacts">
+        <mat-spinner diameter="30"></mat-spinner>
+        <span>Cargando contactos...</span>
+      </div>
+
+      <div *ngIf="!isLoadingContacts && contacts.length > 0" class="contacts-list">
+        <div class="contact-item" *ngFor="let contact of contacts">
+          <div class="contact-header">
+            <mat-icon>person</mat-icon>
+            <span class="contact-name">{{contact.nombre}}</span>
+            <span class="contact-role" *ngIf="contact.cargo">({{contact.cargo}})</span>
+          </div>
+          <div class="contact-details">
+            <div class="contact-detail">
+              <mat-icon>email</mat-icon>
+              <span>{{contact.email}}</span>
+            </div>
+            <div class="contact-detail" *ngIf="contact.telefono">
+              <mat-icon>phone</mat-icon>
+              <span>{{contact.telefono}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoadingContacts && contacts.length === 0" class="no-contacts">
+        <mat-icon>people_outline</mat-icon>
+        <span>No se encontraron contactos para este cliente</span>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button (click)="closeDialog()" color="primary">
+      Cerrar
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,155 @@
+@use '../../../styles/variables' as vars;
+
+.filter-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-sm vars.$spacing-sm;
+  background: vars.$bg-white;
+  border-radius: vars.$border-radius-lg;
+  box-shadow: vars.$shadow-sm;
+  margin-bottom: vars.$spacing-md;
+  align-items: start;
+
+  @media (min-width: vars.$breakpoint-sm) {
+    grid-template-columns: repeat(2, 1fr) auto;
+  }
+
+  @media (min-width: vars.$breakpoint-md) {
+    grid-template-columns: repeat(3, 1fr) auto;
+  }
+
+  @media (min-width: vars.$breakpoint-lg) {
+    grid-template-columns: repeat(5, 1fr) auto;
+  }
+}
+
+.filter-item {
+  width: 100%;
+}
+
+.ng-select-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  
+  .ng-select-custom {
+    width: 100%;
+  }
+}
+
+// ng-select styles to match Material Design
+::ng-deep {
+  .filter-bar {
+    .ng-select {
+      &.ng-select-custom {
+        .ng-select-container {
+          min-height: 42px;
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          border-radius: 4px;
+          background-color: #fff;
+          
+          &:hover {
+            border-color: rgba(0, 0, 0, 0.87);
+          }
+          
+          &.ng-select-focused {
+            border-color: vars.$primary;
+            border-width: 2px;
+          }
+        }
+        
+        // Placeholder visible cuando NO hay valor seleccionado
+        .ng-placeholder {
+          color: rgba(0, 0, 0, 0.6);
+          font-size: 14px;
+          padding-left: 8px;
+        }
+
+        // Value container con padding apropiado
+        .ng-value-container {
+          padding-left: 8px;
+          
+          .ng-input {
+            padding-left: 0;
+            
+            input {
+              font-size: 14px;
+            }
+          }
+
+          // El label (valor seleccionado) debe tener el mismo estilo que el placeholder
+          .ng-value {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.87);
+          }
+        }
+
+        // Ocultar placeholder cuando HAY un valor seleccionado
+        &.ng-select-single.ng-has-value {
+          .ng-placeholder {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+.filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  @media (max-width: vars.$breakpoint-sm) {
+    grid-column: 1 / -1; // Full width on mobile
+  }
+}
+
+.clear-button {
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Material form field adjustments (only for text input filters)
+::ng-deep {
+  .filter-bar {
+    .mat-form-field {
+      width: 100%;
+      max-width: none;
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-wrapper {
+      padding-bottom: 0;
+      margin: 0;
+      min-height: 56px; // Altura total del wrapper
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-flex {
+      min-height: 42px; // Altura del input para igualar ng-select
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-infix {
+      padding: 8px 0;
+      min-height: 0 !important;
+    }
+    
+    .mat-form-field-appearance-outline .mat-form-field-label {
+      top: 1.2em;
+    }
+
+    // Ocultar label al hacer focus
+    .mat-form-field.mat-focused .mat-form-field-label {
+      display: none;
+    }
+
+    // Ocultar icono al hacer focus
+    .mat-form-field.mat-focused .mat-icon.mat-icon-no-color {
+      display: none;
+    }
+  }
+}
+

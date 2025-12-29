@@ -1,0 +1,134 @@
+<div class="remitos-selector-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>list_alt</mat-icon>
+      Generar OT desde Remito
+    </h2>
+    <button mat-icon-button (click)="cancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <!-- Filters Section -->
+    <div class="filters-section" [formGroup]="filterForm">
+      <div class="filters-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha Desde</mat-label>
+          <input matInput type="date" formControlName="startDate">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha Hasta</mat-label>
+          <input matInput type="date" formControlName="endDate">
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="loadRemitos()" class="search-button">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Cargando remitos...</span>
+    </div>
+
+    <!-- Table Section -->
+    <div *ngIf="!isLoading" class="table-container">
+      <table mat-table [dataSource]="dataSource" class="remitos-table">
+        <!-- Select Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox 
+              (change)="toggleSelection(row)" 
+              [checked]="isSelected(row)"
+              color="primary">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- Fecha Column -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let row">{{ row.fecha | date: 'dd/MM/yyyy' }}</td>
+        </ng-container>
+
+        <!-- Numero Column -->
+        <ng-container matColumnDef="numero">
+          <th mat-header-cell *matHeaderCellDef>N°</th>
+          <td mat-cell *matCellDef="let row">{{ row.numero }}</td>
+        </ng-container>
+
+        <!-- Cliente Column -->
+        <ng-container matColumnDef="cliente">
+          <th mat-header-cell *matHeaderCellDef>Cliente</th>
+          <td mat-cell *matCellDef="let row">{{ row.cliente?.nombre }}</td>
+        </ng-container>
+
+        <!-- Tecnico Column -->
+        <ng-container matColumnDef="tecnico">
+          <th mat-header-cell *matHeaderCellDef>Técnico</th>
+          <td mat-cell *matCellDef="let row">{{ row.tecnico?.nombre }}</td>
+        </ng-container>
+
+        <!-- Descripcion Column -->
+        <ng-container matColumnDef="descripcion">
+          <th mat-header-cell *matHeaderCellDef>Descripción</th>
+          <td mat-cell *matCellDef="let row" class="descripcion-cell">
+            <div class="descripcion-text" [title]="row.descripcion">
+              {{ row.descripcion }}
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Hora Entrada Column -->
+        <ng-container matColumnDef="horaEntrada">
+          <th mat-header-cell *matHeaderCellDef>Entrada</th>
+          <td mat-cell *matCellDef="let row">{{ row.horaEntrada || '--' }}</td>
+        </ng-container>
+
+        <!-- Hora Salida Column -->
+        <ng-container matColumnDef="horaSalida">
+          <th mat-header-cell *matHeaderCellDef>Salida</th>
+          <td mat-cell *matCellDef="let row">{{ row.horaSalida || '--' }}</td>
+        </ng-container>
+
+        <!-- Materiales Column -->
+        <ng-container matColumnDef="materiales">
+          <th mat-header-cell *matHeaderCellDef>Materiales</th>
+          <td mat-cell *matCellDef="let row" class="materiales-cell">
+            <button mat-icon-button (click)="loadMaterials(row)" matTooltip="Cargar materiales" color="primary">
+              <mat-icon>inventory</mat-icon>
+            </button>
+            <span *ngIf="row.materiales && row.materiales.length > 0" class="materiales-count">
+              {{ row.materiales.length }} items
+            </span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" 
+            [class.selected-row]="isSelected(row)"></tr>
+      </table>
+
+      <!-- Empty State -->
+      <div *ngIf="dataSource.data.length === 0" class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <p>No se encontraron remitos</p>
+        <span>Ajuste los filtros y vuelva a buscar</span>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-flat-button color="primary" 
+            (click)="confirm()" 
+            [disabled]="selection.size === 0"
+            class="confirm-btn">
+      <mat-icon>add_task</mat-icon>
+      Generar Orden ({{ selection.size }})
+    </button>
+  </mat-dialog-actions>
+</div>

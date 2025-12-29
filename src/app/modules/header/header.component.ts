@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 import { faArrowCircleDown } from '@fortawesome/free-solid-svg-icons';
 import { OffersService } from 'src/app/services/offers/offers.service';
@@ -16,7 +19,9 @@ import { DialogComponent } from '../shared/components/dialog/dialog.component';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
+  
+  private destroy$ = new Subject<void>();
 
   setHeader: boolean = false;
   username: string = '';
@@ -37,46 +42,18 @@ export class HeaderComponent implements OnInit {
     private router: Router,
     private offersService: OffersService,
     private _snackBar: MatSnackBar,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private configService: ConfigService
   ) {
-    if (window.location.hostname.includes('localhost')) {
-      this.API_URI = 'http://localhost:3001/images';
-      if (this.isHome) {
-      }
-    }
-    if (!window.location.hostname.includes('localhost')) {
-      this.API_URI = 'https://api.820hd.com.ar/images'
-    }
-    if (window.location.href.includes('/home') || window.location.href.includes('/')) {
-      this.isHome = true;
-      this.isAdmin = false;
-      this.isUser = false;
-    }
-    if (window.location.href.includes('/manage')) {
-      this.isAdmin = true;
-      this.isHome = false;
-      this.isUser = false
-    }
-    if (window.location.href.includes('/supplies')) {
-      this.isUser = true;
-      this.isHome = false;
-      this.isAdmin = false;
-      this.isSupplies = true;
-      this.bannerSupplies = true;
-    }
-    if (window.location.href.includes('/assistance')) {
-      this.isUser = true;
-      this.isHome = false;
-      this.isAdmin = false;
-      this.isAssistance = true;
-      this.bannerSupplies = false;
-    }
+    // ✅ Usar configuración centralizada
+    this.API_URI = this.configService.IMAGE_URL;
+
     this.authService.showHeader$.subscribe({
       next: (res) => {
-        const data = JSON.parse(this.credentialsService.getCredentials()!);
+        const data = this.credentialsService.getCredentialsParsed();
         this.setHeader = res;
         if (data) {
-          this.username = data.name;
+          this.username = data.name || data.contact;
           this.userType = data.type;
         }
       },
@@ -84,22 +61,38 @@ export class HeaderComponent implements OnInit {
         console.log(err);
       }
     });
-    const data = JSON.parse(this.credentialsService.getCredentials()!);
+    
+    const data = this.credentialsService.getCredentialsParsed();
     if (data) {
       this.setHeader = true;
-      this.username = data.name;
+      this.username = data.name || data.contact;
       this.userType = data.type;
     }
   }
 
   ngOnInit(): void {
-    const data = JSON.parse(this.credentialsService.getCredentials()!);
+    // ✅ Suscribirse a cambios de ruta
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.updateViewBasedOnRoute();
+    });
+    
+    // Inicializar vista
+    this.updateViewBasedOnRoute();
+
+    const data = this.credentialsService.getCredentialsParsed();
     const newsStorage = this.credentialsService.getNewsStorage();
     let session = moment().diff(data?.time, 'days');  
-    if (!(window.location.href.includes('/signin')) && (newsStorage)) {
+    
+    // Mostrar diálogo de novedades solo para clientes (no técnicos ni admin)
+    const currentUrl = this.router.url;
+    if (!currentUrl.includes('/signin') && !!newsStorage && data?.type === 'customer') {
       this.openDialog();
     }
-    if (!(window.location.href.includes('/signin')) && (session != 0)) {
+    
+    if (!currentUrl.includes('/signin') && (session != 0)) {
           this._snackBar.open('Tu sesión ha expirado, necesitamos que ingreses tus credenciales nuevamente', 'Cerrar', {
             duration: 5000,
             horizontalPosition: 'end',
@@ -111,6 +104,21 @@ export class HeaderComponent implements OnInit {
           this.authService.logout();
           this.router.navigate(['/signin']);
     }
+  }
+
+  /**
+   * Actualiza estados de vista según la ruta actual
+   * ✅ USA router.url EN LUGAR DE window.location.href
+   */
+  private updateViewBasedOnRoute(): void {
+    const currentUrl = this.router.url;
+    
+    this.isHome = currentUrl.includes('/home') || currentUrl === '/';
+    this.isAdmin = currentUrl.includes('/manage');
+    this.isSupplies = currentUrl.includes('/supplies');
+    this.isAssistance = currentUrl.includes('/assistance');
+    this.isUser = this.isSupplies || this.isAssistance;
+    this.bannerSupplies = this.isSupplies;
   }
 
   toggleLogout() {
@@ -190,6 +198,11 @@ export class HeaderComponent implements OnInit {
     dialogRef.afterClosed().subscribe(() => {
       this.credentialsService.revokeNewsStorage();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 }

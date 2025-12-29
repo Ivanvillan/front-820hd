@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { ManageRoutingModule } from './manage-routing.module';
 import { ManageComponent } from './manage.component';
 import { BannerModule } from '../banner/banner.module';
-import { HeaderModule } from '../header/header.module';
+import { SharedModule } from '../shared/shared.module';
+import { LayoutsModule } from 'src/app/layouts/layouts.module';
 
 
 @NgModule({
@@ -14,8 +15,9 @@ import { HeaderModule } from '../header/header.module';
   imports: [
     CommonModule,
     ManageRoutingModule,
-    HeaderModule,
-    BannerModule
+    LayoutsModule,
+    BannerModule,
+    SharedModule
   ]
 })
 export class ManageModule { }

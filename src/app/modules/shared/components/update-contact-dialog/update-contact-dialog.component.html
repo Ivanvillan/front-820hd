@@ -1,0 +1,71 @@
+<div class="update-contact-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>edit</mat-icon>
+      Editar Contacto
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+    <mat-dialog-content class="dialog-content">
+      <div class="form-grid">
+        <div class="form-column">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre del Contacto</mat-label>
+            <input matInput formControlName="nombre" placeholder="Ingrese el nombre completo">
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error *ngIf="isFieldInvalid('nombre')">
+              {{getErrorMessage('nombre')}}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono" placeholder="Ingrese el número de teléfono">
+            <mat-icon matSuffix>phone</mat-icon>
+            <mat-error *ngIf="isFieldInvalid('telefono')">
+              {{getErrorMessage('telefono')}}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-column">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="ejemplo@email.com" type="email">
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error *ngIf="isFieldInvalid('email')">
+              {{getErrorMessage('email')}}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput formControlName="pass" placeholder="Ingrese la contraseña" type="text">
+            <mat-icon matSuffix>vpn_key</mat-icon>
+            <mat-error *ngIf="isFieldInvalid('pass')">
+              {{getErrorMessage('pass')}}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="form-note">
+        <mat-icon class="note-icon">info</mat-icon>
+        <span>Los campos marcados con * son obligatorios</span>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-actions">
+      <button type="submit" mat-flat-button color="primary" class="submit-btn" 
+              [disabled]="contactForm.invalid || isLoading || !hasChanges()">
+        <mat-icon *ngIf="!isLoading">save</mat-icon>
+        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+        {{ isLoading ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

@@ -1,0 +1,62 @@
+<mat-toolbar color="primary" class="top-navbar">
+  <!-- Logo -->
+  <div class="navbar-brand">
+    <span class="navbar-title">OT Admin</span>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="navbar-menu">
+    <button mat-button (click)="navigateToOrders()" class="navbar-menu-item">
+      <mat-icon>assignment</mat-icon>
+      <span>Órdenes</span>
+    </button>
+    
+    <button mat-button (click)="navigateToClients()" class="navbar-menu-item">
+      <mat-icon>business</mat-icon>
+      <span>Clientes</span>
+    </button>
+    
+    <button mat-button (click)="navigateToTechnicians()" class="navbar-menu-item">
+      <mat-icon>engineering</mat-icon>
+      <span>Técnicos</span>
+    </button>
+    
+    <button mat-button (click)="navigateToOffers()" class="navbar-menu-item">
+      <mat-icon>local_offer</mat-icon>
+      <span>Ofertas</span>
+    </button>
+    
+    <a mat-button href="https://twitter.com/helpdesk820" target="_blank" class="navbar-menu-item" rel="noopener noreferrer">
+      <mat-icon>newspaper</mat-icon>
+      <span>Noticias</span>
+      <mat-icon class="external-link-icon" fontSet="fa" fontIcon="fa-external-link-alt" style="font-size: 15px; margin-left: 4px;"></mat-icon>
+    </a>
+  </nav>
+
+  <!-- Spacer -->
+  <span class="navbar-spacer"></span>
+
+  <!-- User Info -->
+  <div class="navbar-user">
+    <button mat-button [matMenuTriggerFor]="userMenu" class="navbar-user-button">
+      <mat-icon>account_circle</mat-icon>
+      <span class="user-name">{{ userName }}</span>
+      <span class="user-role">{{ userRole }}</span>
+      <mat-icon>arrow_drop_down</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <div class="user-menu-header">
+        <div class="user-info-detail">
+          <p class="user-name-detail">{{ userName }}</p>
+          <p class="user-role-detail">{{ userRole }}</p>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Cerrar Sesión</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>
+

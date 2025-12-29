@@ -1,0 +1,48 @@
+<div class="delete-technician-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="warning-icon">warning</mat-icon>
+      Eliminar Técnico
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <p class="message">
+      ¿Está seguro que desea eliminar este técnico?
+    </p>
+    
+    <div class="technician-info">
+      <div class="info-item">
+        <span class="label">Nombre:</span>
+        <span class="value">{{ data.technician.name }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Área:</span>
+        <span class="value">{{ data.technician.area }}</span>
+      </div>
+      <div class="info-item" *ngIf="data.technician.email">
+        <span class="label">Email:</span>
+        <span class="value">{{ data.technician.email }}</span>
+      </div>
+      <div class="info-item" *ngIf="data.technician.telefono">
+        <span class="label">Teléfono:</span>
+        <span class="value">{{ data.technician.telefono }}</span>
+      </div>
+    </div>
+    
+    <div class="warning-box">
+      <mat-icon>info</mat-icon>
+      <span>Esta acción no se puede deshacer. El técnico será eliminado permanentemente del sistema.</span>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-raised-button color="warn" (click)="onConfirm()" cdkFocusInitial class="confirm-btn">
+      <mat-icon>delete_forever</mat-icon>
+      Confirmar
+    </button>
+  </mat-dialog-actions>
+</div>

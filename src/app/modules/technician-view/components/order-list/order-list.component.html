@@ -1,0 +1,218 @@
+<div class="order-list-container">
+  <!-- Header sin navegación -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="main-title">Mis Órdenes de {{ areaDisplayName }}</h1>
+        <p class="subtitle">Órdenes asignadas en el área de {{ areaDisplayName }}</p>
+      </div>
+      <div class="header-actions">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="createOrder()"
+          class="create-order-button">
+          <mat-icon>add</mat-icon>
+          Crear Orden
+        </button>
+        <button 
+          *ngIf="area !== 'laboratorio'"
+          mat-stroked-button 
+          color="primary" 
+          (click)="createOrderFromRemito()"
+          class="create-from-remito-button">
+          <mat-icon>assignment_turned_in</mat-icon>
+          Desde Remito
+        </button>
+        <button 
+          mat-stroked-button 
+          (click)="logout()"
+          class="logout-button">
+          <mat-icon>logout</mat-icon>
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="content-section">
+    <!-- Estado de carga -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando órdenes...</p>
+    </div>
+
+    <!-- Estado de error -->
+    <div *ngIf="error && !loading" class="error-container">
+      <mat-icon class="error-icon">error</mat-icon>
+      <h3>Error al cargar las órdenes</h3>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="loadOrders()">
+        Reintentar
+      </button>
+    </div>
+
+    <!-- Lista de órdenes -->
+    <div *ngIf="!loading && !error" class="orders-content">
+      
+      <!-- Filtros -->
+      <div *ngIf="orders.length > 0">
+        <app-filter-bar
+          [filters]="filterConfig"
+          [debounceTime]="300"
+          [showClearButton]="true"
+          (filterChange)="onFilterChange($event)">
+        </app-filter-bar>
+      </div>
+      <!-- Mensaje cuando no hay órdenes -->
+      <div *ngIf="orders.length === 0" class="no-orders-container">
+        <mat-icon class="no-orders-icon">assignment</mat-icon>
+        <h3>No hay órdenes asignadas</h3>
+        <p>No tienes órdenes asignadas en el área de {{ areaDisplayName }} en este momento.</p>
+      </div>
+
+      <!-- Tabla de órdenes -->
+      <div *ngIf="orders.length > 0" class="table-container">
+        <table mat-table [dataSource]="filteredOrders" class="orders-table">
+          
+          <!-- Columna Fecha -->
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let order">
+              {{ order.fecha | date:'dd/MM/yyyy' }}
+            </td>
+          </ng-container>
+
+          <!-- Columna Hora -->
+          <ng-container matColumnDef="hora">
+            <th mat-header-cell *matHeaderCellDef>Hora</th>
+            <td mat-cell *matCellDef="let order">
+              {{ getHoraDisplay(order) }}
+            </td>
+          </ng-container>
+
+          <!-- Columna N° Orden -->
+          <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef>N° Orden</th>
+            <td mat-cell *matCellDef="let order">{{ order.numero }}</td>
+          </ng-container>
+
+          <!-- Columna Contacto -->
+          <ng-container matColumnDef="contacto">
+            <th mat-header-cell *matHeaderCellDef>Contacto</th>
+            <td mat-cell *matCellDef="let order">{{ order.contacto || order.nombre || 'N/A' }}</td>
+          </ng-container>
+
+          <!-- Columna Empresa -->
+          <ng-container matColumnDef="empresa">
+            <th mat-header-cell *matHeaderCellDef>Empresa</th>
+            <td mat-cell *matCellDef="let order">
+              {{ getEmpresaDisplay(order) }}
+            </td>
+          </ng-container>
+
+          <!-- Columna Tipo de Servicio -->
+          <ng-container matColumnDef="tipoServicio">
+            <th mat-header-cell *matHeaderCellDef>Tipo Servicio</th>
+            <td mat-cell *matCellDef="let order">
+              {{ order.tipoServicioNombre || 'Sin servicio' }}
+            </td>
+          </ng-container>
+
+          <!-- Columna Descripción -->
+          <ng-container matColumnDef="descripcion">
+            <th mat-header-cell *matHeaderCellDef>Descripción</th>
+            <td mat-cell *matCellDef="let order">
+              <div class="problem-cell">
+                <span class="problem-title">{{ order.descripcion || 'Sin descripción' }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+
+          <!-- Columna Prioridad -->
+          <ng-container matColumnDef="prioridad">
+            <th mat-header-cell *matHeaderCellDef>Prioridad</th>
+            <td mat-cell *matCellDef="let order">
+              <div class="priority-cell">
+                <span class="priority-badge" [ngClass]="getPriorityClass(order.prioridad)">
+                  {{ getPriorityText(order.prioridad) }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Columna Estado Operativo -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado Operativo</th>
+            <td mat-cell *matCellDef="let order">
+              <mat-chip-list>
+                <mat-chip 
+                  [color]="getStatusColor(order)" 
+                  [selected]="true"
+                  class="status-chip">
+                  {{ getStatusDisplayName(getOrderStatus(order)) }}
+                </mat-chip>
+              </mat-chip-list>
+            </td>
+          </ng-container>
+
+          <!-- Columna Técnico Asignado -->
+          <ng-container matColumnDef="nombreAsignado">
+            <th mat-header-cell *matHeaderCellDef>Técnico Asignado</th>
+            <td mat-cell *matCellDef="let order">
+              <span *ngIf="order.referente != ' ' && order.nombreAsignado != ' '" class="technician-badge">{{ order.nombreAsignado || order.referente}}</span>
+              <span *ngIf="order.referente == ' '" class="technician-badge-na">N/A</span>
+            </td>
+          </ng-container>
+
+          <!-- Columna Acciones -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let order">
+              <button
+                mat-icon-button 
+                [matMenuTriggerFor]="actionsMenu"
+                (click)="$event.stopPropagation()">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #actionsMenu="matMenu">
+                <button mat-menu-item (click)="viewOrderDetails(order)">
+                  <mat-icon>visibility</mat-icon>
+                  Ver detalles
+                </button>
+                <button mat-menu-item (click)="openUpdateDialog(order)">
+                  <mat-icon>edit</mat-icon>
+                  Editar
+                </button>
+                <button mat-menu-item *ngIf="canTakeOrder(order)" (click)="takeOrder(order)">
+                  <mat-icon>assignment_ind</mat-icon>
+                  Tomar orden
+                </button>
+                <button mat-menu-item (click)="exportOrderToPdf(order)">
+                  <mat-icon>picture_as_pdf</mat-icon>
+                  Exportar PDF
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Paginación -->
+        <mat-paginator 
+          [length]="totalItems"
+          [pageSize]="pageSize"
+          [pageIndex]="currentPage"
+          [pageSizeOptions]="[5, 10, 25, 50]"
+          showFirstLastButtons
+          (page)="onPageChange($event)"
+          class="orders-paginator">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</div>

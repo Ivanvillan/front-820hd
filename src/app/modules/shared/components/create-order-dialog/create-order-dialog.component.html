@@ -1,0 +1,374 @@
+<div class="create-order-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>add_circle</mat-icon>
+      Crear Nueva Orden
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="createForm" (ngSubmit)="onSave()">
+    <mat-dialog-content class="dialog-content">
+      <!-- Grid de 2 columnas para los campos principales -->
+      <div class="form-grid">
+        <!-- Cliente -->
+        <div class="form-field">
+          <ng-select
+            formControlName="clientId"
+            [items]="clientes"
+            bindLabel="nombre"
+            bindValue="id"
+            placeholder="Seleccionar cliente..."
+            [searchable]="true"
+            [clearable]="true"
+            class="ng-select-custom">
+          </ng-select>
+          <div class="form-error" *ngIf="createForm.get('clientId')?.hasError('required') && createForm.get('clientId')?.touched">
+            El cliente es requerido
+          </div>
+        </div>
+
+        <!-- Contacto -->
+        <div class="form-field">
+          <ng-select
+            formControlName="contactId"
+            [items]="contactos"
+            bindLabel="displayName"
+            bindValue="id7c"
+            placeholder="Seleccionar contacto..."
+            [searchable]="true"
+            [clearable]="true"
+            [disabled]="!createForm.get('clientId')?.value"
+            class="ng-select-custom">
+          </ng-select>
+          <div class="form-error" *ngIf="createForm.get('contactId')?.hasError('required') && createForm.get('contactId')?.touched">
+            El contacto es requerido
+          </div>
+          <div class="form-help" *ngIf="!createForm.get('clientId')?.value">
+            Primero seleccione un cliente
+          </div>
+        </div>
+
+        <!-- Tipo de orden -->
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de orden</mat-label>
+          <mat-select formControlName="orderType" required>
+            <mat-option *ngFor="let type of orderTypes" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="createForm.get('orderType')?.hasError('required')">
+            El tipo de orden es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Servicio específico -->
+        <div class="form-field">
+          <ng-select
+            formControlName="tiposerv"
+            [items]="services"
+            bindLabel="nombre"
+            bindValue="id1rs"
+            placeholder="Buscar y seleccionar servicio..."
+            [searchable]="true"
+            [clearable]="true"
+            [loading]="services.length === 0"
+            loadingText="Cargando servicios..."
+            notFoundText="No se encontraron servicios"
+            class="ng-select-custom">
+            <ng-option *ngFor="let service of services" [value]="service.id1rs">
+              <div class="service-option">
+                <div class="service-name">{{service.nombre}}</div>
+                <div class="service-details">
+                  <span class="service-cost" *ngIf="service.costo1">Costo: ${{service.costo1}}</span>
+                  <span class="service-comment" *ngIf="service.comentario">{{service.comentario}}</span>
+                </div>
+              </div>
+            </ng-option>
+          </ng-select>
+        </div>
+
+        <!-- Asignar a (Responsables) -->
+        <div class="form-field">
+          <ng-select
+            formControlName="assignedToIds"
+            [items]="tecnicos"
+            bindLabel="name"
+            bindValue="id"
+            placeholder="Seleccionar responsables..."
+            [searchable]="true"
+            [clearable]="true"
+            [multiple]="true"
+            class="ng-select-custom">
+          </ng-select>
+          <div class="form-help">Seleccione uno o más responsables</div>
+        </div>
+
+        <!-- Sector -->
+        <mat-form-field appearance="outline">
+          <mat-label>Sector</mat-label>
+          <mat-select formControlName="sector" required>
+            <mat-option *ngFor="let sector of sectors" [value]="sector">
+              {{ sector }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="createForm.get('sector')?.hasError('required')">
+            El sector es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Estado -->
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="status" required>
+            <mat-option *ngFor="let status of statuses" [value]="status">
+              {{ status }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="createForm.get('status')?.hasError('required')">
+            El estado es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Prioridad -->
+        <mat-form-field appearance="outline">
+          <mat-label>Prioridad</mat-label>
+          <mat-select formControlName="priority" required>
+            <mat-option value="baja">Baja</mat-option>
+            <mat-option value="media">Media</mat-option>
+            <mat-option value="alta">Alta</mat-option>
+            <mat-option value="urgente">Urgente</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Hora de entrada -->
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de entrada</mat-label>
+          <input matInput type="time" formControlName="startTime">
+        </mat-form-field>
+
+        <!-- Hora de salida -->
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de salida</mat-label>
+          <input matInput type="time" formControlName="endTime">
+        </mat-form-field>
+      </div>
+
+      <!-- Descripción (full width) -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Descripción del problema</mat-label>
+        <textarea matInput formControlName="description" 
+                  placeholder="Descripción detallada del problema o solicitud..." 
+                  rows="3" required></textarea>
+        <mat-error *ngIf="createForm.get('description')?.hasError('required')">
+          La descripción es requerida
+        </mat-error>
+        <mat-error *ngIf="createForm.get('description')?.hasError('minlength')">
+          La descripción debe tener al menos 3 caracteres
+        </mat-error>
+        <mat-error *ngIf="createForm.get('description')?.hasError('maxlength')">
+          La descripción no puede exceder 1550 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Materiales utilizados (full width) -->
+      <div class="full-width">
+        <!-- Selector de materiales -->
+        <div class="material-selector">
+          <div class="form-field material-select-field">
+            <ng-select
+              [(ngModel)]="selectedMaterialForAdd"
+              [items]="materials"
+              bindLabel="descripcion"
+              [ngModelOptions]="{standalone: true}"
+              placeholder="Buscar material por código o descripción..."
+              [searchable]="true"
+              [clearable]="true"
+              [loading]="isLoadingMaterials"
+              loadingText="Cargando materiales..."
+              notFoundText="No se encontraron materiales"
+              class="ng-select-custom">
+              <ng-option *ngFor="let material of materials" [value]="material">
+                <div class="material-option">
+                  <div class="material-code">{{material.codigo}}</div>
+                  <div class="material-description">{{material.descripcion}}</div>
+                  <div class="material-details">
+                    <span class="material-unit">{{material.unidad}}</span>
+                    <span class="material-price" *ngIf="material.punitario">${{material.punitario | number:'1.2-2'}}</span>
+                  </div>
+                </div>
+              </ng-option>
+            </ng-select>
+          </div>
+          
+          <mat-form-field appearance="outline" class="quantity-field">
+            <mat-label>Cantidad</mat-label>
+            <input matInput type="number" 
+                   [(ngModel)]="cantidadToAdd" 
+                   [ngModelOptions]="{standalone: true}"
+                   min="1" 
+                   step="1"
+                   required>
+          </mat-form-field>
+          
+          <button mat-raised-button 
+                  color="primary" 
+                  (click)="addMaterial()"
+                  [disabled]="!selectedMaterialForAdd || cantidadToAdd <= 0"
+                  class="add-material-btn">
+            <mat-icon>add</mat-icon>
+            Agregar
+          </button>
+        </div>
+
+        <!-- Tabla de materiales seleccionados -->
+        <div class="selected-materials-table" *ngIf="selectedMaterials.length > 0">
+          <table mat-table [dataSource]="materialsDataSource" class="materials-table">
+            <!-- Columna Código -->
+            <ng-container matColumnDef="codigo">
+              <th mat-header-cell *matHeaderCellDef>Código</th>
+              <td mat-cell *matCellDef="let element">{{element.material.codigo}}</td>
+            </ng-container>
+
+            <!-- Columna Descripción -->
+            <ng-container matColumnDef="descripcion">
+              <th mat-header-cell *matHeaderCellDef>Descripción</th>
+              <td mat-cell *matCellDef="let element">{{element.material.descripcion}}</td>
+            </ng-container>
+
+            <!-- Columna Unidad -->
+            <ng-container matColumnDef="unidad">
+              <th mat-header-cell *matHeaderCellDef>Unidad</th>
+              <td mat-cell *matCellDef="let element">{{element.material.unidad}}</td>
+            </ng-container>
+
+            <!-- Columna Cantidad -->
+            <ng-container matColumnDef="cantidad">
+              <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+              <td mat-cell *matCellDef="let element; let i = index">
+                <input type="number" 
+                       [(ngModel)]="element.cantidad" 
+                       (change)="updateMaterialQuantity(i, element.cantidad)"
+                       [ngModelOptions]="{standalone: true}"
+                       min="1" 
+                       step="1"
+                       class="quantity-input">
+              </td>
+            </ng-container>
+
+            <!-- Columna Precio Unitario -->
+            <ng-container matColumnDef="punitario">
+              <th mat-header-cell *matHeaderCellDef>Precio Unit.</th>
+              <td mat-cell *matCellDef="let element">${{element.material.punitario | number:'1.2-2'}}</td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let element; let i = index">
+                <button mat-icon-button 
+                        color="warn" 
+                        (click)="removeMaterial(i)"
+                        matTooltip="Eliminar material">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['codigo', 'descripcion', 'unidad', 'cantidad', 'punitario', 'acciones']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['codigo', 'descripcion', 'unidad', 'cantidad', 'punitario', 'acciones'];"></tr>
+          </table>
+        </div>
+
+        <!-- Sección para crear nuevo material (siempre visible) -->
+        <div class="create-material-section" *ngIf="!isCreatingMaterial">
+          <span class="create-material-text">¿No encuentras el material?</span>
+          <button mat-button color="primary" (click)="toggleCreateMaterialForm()" class="toggle-create-btn">
+            <mat-icon>add_circle</mat-icon>
+            Crear Nuevo Material
+          </button>
+        </div>
+        
+        <!-- Formulario expandido para crear material -->
+        <div class="create-material-form" *ngIf="isCreatingMaterial" [formGroup]="createMaterialForm">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field-descripcion">
+                <mat-label>Descripción</mat-label>
+                <input matInput formControlName="descripcion" placeholder="Ej: Servicio de Instalación">
+                <mat-error *ngIf="createMaterialForm.get('descripcion')?.hasError('required')">
+                  La descripción es requerida
+                </mat-error>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="form-field-unidad">
+                <mat-label>Unidad</mat-label>
+                <input matInput formControlName="unidad" placeholder="Unidad">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="form-field-precio">
+                <mat-label>Precio Unitario</mat-label>
+                <input matInput type="number" formControlName="punitario" min="0" step="0.01">
+              </mat-form-field>
+            </div>
+            
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field-rubro">
+                <mat-label>Rubro</mat-label>
+                <mat-select formControlName="idrubro">
+                  <mat-option [value]="null">Sin rubro</mat-option>
+                  <mat-option *ngFor="let rubro of rubros" [value]="rubro.id22">
+                    {{rubro.descripcion}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="form-field-iva">
+                <mat-label>IVA (%)</mat-label>
+                <input matInput type="number" formControlName="iva19" min="0" max="100" step="0.1">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="form-field-cantidad">
+                <mat-label>Cantidad</mat-label>
+                <input matInput type="number" formControlName="cantidad" min="1" step="1">
+                <mat-error *ngIf="createMaterialForm.get('cantidad')?.hasError('required')">
+                  La cantidad es requerida
+        </mat-error>
+      </mat-form-field>
+            </div>
+            
+            <div class="form-actions">
+              <button mat-button (click)="cancelCreateMaterial()" type="button">
+                Cancelar
+              </button>
+              <button mat-raised-button color="primary" (click)="createAndAddMaterial()" type="button"
+                      [disabled]="createMaterialForm.invalid">
+                <mat-icon>add</mat-icon>
+                Crear y Agregar
+              </button>
+            </div>
+        </div>
+
+        <!-- Mensaje cuando no hay materiales -->
+        <div class="no-materials-message" *ngIf="selectedMaterials.length === 0 && !isCreatingMaterial">
+          <mat-icon>info</mat-icon>
+          <span>No se han agregado materiales. Use el selector arriba para agregar materiales utilizados.</span>
+        </div>
+
+        <!-- Campo oculto para txtmateriales (se actualiza automáticamente) -->
+        <input type="hidden" formControlName="txtmateriales">
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-actions">
+      <button type="submit" mat-flat-button color="primary" 
+              [disabled]="!createForm.valid || isSubmitting"
+              class="save-btn">
+        <mat-icon *ngIf="!isSubmitting">save</mat-icon>
+        <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+        {{ isSubmitting ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

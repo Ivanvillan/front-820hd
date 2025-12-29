@@ -1,0 +1,283 @@
+@use 'src/styles/variables' as vars;
+
+.ticket-detail-dialog {
+  width: 100%;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: vars.$spacing-md;
+  padding-bottom: vars.$spacing-md;
+  border-bottom: 1px solid vars.$border-color;
+
+  .dialog-header-content {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-md;
+  }
+
+  h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    font-size: vars.$font-size-xl;
+  }
+}
+
+.dialog-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.ticket-info,
+.finalization-info,
+.additional-info {
+  margin-bottom: vars.$spacing-lg;
+
+  h3 {
+    margin: 0 0 vars.$spacing-md 0;
+    font-size: vars.$font-size-lg;
+    font-weight: vars.$font-weight-medium;
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: vars.$spacing-md;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-xs;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .label {
+    font-weight: vars.$font-weight-medium;
+    font-size: vars.$font-size-sm;
+  }
+
+  .value {
+    color: vars.$text-secondary;
+    font-size: vars.$font-size-base;
+    word-wrap: break-word;
+  }
+}
+
+// Status chip - reutiliza estilos de order-management
+.status-chip {
+  font-size: 12px !important;
+  font-weight: vars.$font-weight-medium !important;
+  min-height: 24px;
+  line-height: 24px;
+  padding: 0 vars.$spacing-xs;
+  white-space: nowrap;
+}
+
+// Legacy status indicator badges (deprecated)
+.status-indicator {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: vars.$font-weight-bold;
+  text-align: center;
+  display: inline-block;
+  min-width: 80px;
+}
+
+.recent-status {
+  border-left: 3px solid #4CAF50;
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+}
+
+.pending-status {
+  border-left: 3px solid #FFC107;
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #ff8f00;
+}
+
+.urgent-status {
+  border-left: 3px solid #FF9800;
+  background-color: rgba(255, 152, 0, 0.1);
+  color: #e65100;
+}
+
+.critical-status {
+  border-left: 3px solid #f44336;
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #c62828;
+}
+
+// Priority badges - reutiliza estilos de order-management
+.badge {
+  display: inline-block;
+  padding: vars.$badge-padding-y vars.$badge-padding-x;
+  font-size: vars.$badge-font-size;
+  font-weight: vars.$badge-font-weight;
+  border-radius: vars.$badge-border-radius;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+  width: fit-content;
+}
+
+.priority-low {
+  background-color: lighten(vars.$success, 40%);
+  color: vars.$success;
+  border: 1px solid vars.$success;
+}
+
+.priority-medium {
+  background-color: lighten(vars.$accent, 40%);
+  color: darken(vars.$accent, 10%);
+  border: 1px solid vars.$accent;
+}
+
+.priority-high {
+  background-color: lighten(vars.$warn, 40%);
+  color: vars.$warn;
+  border: 1px solid vars.$warn;
+}
+
+.priority-urgent {
+  background-color: lighten(vars.$warn, 30%);
+  color: darken(vars.$warn, 20%);
+  border: 2px solid vars.$warn;
+  font-weight: vars.$font-weight-bold;
+  animation: pulse 2s infinite;
+}
+
+.priority-none {
+  background-color: vars.$gray-100;
+  color: vars.$text-muted;
+  border: 1px solid vars.$gray-300;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+// Legacy priority badge (deprecated)
+.priority-badge {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: vars.$font-weight-medium;
+  text-align: center;
+  display: inline-block;
+  color: vars.$text-white;
+  
+  &.priority-baja {
+    background-color: vars.$success;
+  }
+  
+  &.priority-media {
+    background-color: vars.$accent;
+  }
+  
+  &.priority-alta {
+    background-color: vars.$warn;
+  }
+  
+  &.priority-urgente {
+    background-color: darken(vars.$warn, 15%);
+  }
+}
+
+// Description and observations
+.description-content,
+.observations-content {
+  background: vars.$gray-50;
+  color: vars.$text-secondary;
+  border-radius: vars.$border-radius-lg;
+  padding: vars.$spacing-md;
+  border: 1px solid vars.$gray-200;
+
+  p {
+    margin: 0;
+    white-space: pre-wrap;
+    font-size: vars.$font-size-base;
+    line-height: vars.$line-height-normal;
+  }
+}
+
+// Materiales content
+.materiales-content {
+  background: vars.$gray-50;
+  color: vars.$text-secondary;
+  border-radius: vars.$border-radius-lg;
+  padding: vars.$spacing-md;
+  border: 1px solid vars.$gray-200;
+
+  p {
+    margin: 0;
+    white-space: pre-line;
+    font-size: vars.$font-size-base;
+    line-height: vars.$line-height-normal;
+  }
+
+  .materiales-text {
+    white-space: pre-line;
+  }
+
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    font-size: vars.$font-size-base;
+    line-height: vars.$line-height-normal;
+    font-family: inherit;
+  }
+}
+
+// Finalization status values
+.finalized {
+  color: vars.$success;
+  font-weight: vars.$font-weight-medium;
+}
+
+.pending {
+  color: vars.$text-secondary;
+}
+
+.cancelled {
+  color: vars.$warn;
+  font-weight: vars.$font-weight-medium;
+}
+
+.active {
+  color: vars.$success;
+}
+
+.dialog-actions {
+  justify-content: flex-end;
+  padding-top: vars.$spacing-md;
+  border-top: 1px solid vars.$border-color;
+}
+
+// Responsive
+@media (max-width: vars.$breakpoint-md) {
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: vars.$spacing-sm;
+  }
+
+  .description-content,
+  .observations-content,
+  .materiales-content {
+    padding: vars.$spacing-sm;
+  }
+
+  .dialog-header h2 {
+    font-size: vars.$font-size-lg;
+  }
+}

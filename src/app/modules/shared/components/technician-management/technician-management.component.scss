@@ -1,0 +1,132 @@
+@use 'src/styles/variables' as vars;
+
+.management-container {
+  // FilterBar y ConfigurableTable ya tienen sus propios estilos
+}
+
+// ==================== TABLE ACTIONS ====================
+
+.table-actions {
+  display: flex;
+  gap: vars.$spacing-sm;
+  align-items: center;
+}
+
+// ==================== NAME CELL ====================
+
+.name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-xs;
+
+  .name-primary {
+    font-weight: vars.$font-weight-semibold;
+    color: vars.$text-primary;
+    font-size: vars.$font-size-base;
+  }
+
+  .name-secondary {
+    font-size: vars.$font-size-sm;
+    color: vars.$text-secondary;
+  }
+
+  .category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: vars.$spacing-xs;
+    font-size: vars.$font-size-xs;
+    color: vars.$text-muted;
+    padding: 2px 8px;
+    background-color: vars.$gray-100;
+    border-radius: vars.$border-radius;
+    width: fit-content;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+// ==================== AREA BADGES ====================
+
+.area-badge {
+  display: inline-block;
+  padding: vars.$badge-padding-y vars.$badge-padding-x;
+  font-size: vars.$badge-font-size;
+  font-weight: vars.$badge-font-weight;
+  border-radius: vars.$badge-border-radius;
+  text-align: center;
+  white-space: nowrap;
+  color: vars.$text-white;
+
+  &.area-campo {
+    background-color: #28a745;
+  }
+
+  &.area-laboratorio {
+    background-color: #17a2b8;
+  }
+
+  &.area-820hd {
+    background-color: #6f42c1;
+  }
+
+  &.area-general {
+    background-color: #6c757d;
+  }
+}
+
+// ==================== STATUS CHIPS ====================
+
+.status-active {
+  background-color: vars.$success !important;
+  color: vars.$text-white !important;
+  font-weight: vars.$font-weight-medium !important;
+}
+
+.status-inactive {
+  background-color: vars.$gray-400 !important;
+  color: vars.$text-white !important;
+  font-weight: vars.$font-weight-medium !important;
+}
+
+// ==================== ACTIONS ====================
+
+.actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  button {
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.delete-action {
+  color: vars.$warn;
+}
+
+// ==================== RESPONSIVE ====================
+
+@media (max-width: vars.$breakpoint-sm) {
+  .actions-cell {
+    justify-content: flex-start;
+  }
+
+  .area-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .category-badge {
+    font-size: 10px !important;
+    padding: 1px 6px;
+  }
+}
+

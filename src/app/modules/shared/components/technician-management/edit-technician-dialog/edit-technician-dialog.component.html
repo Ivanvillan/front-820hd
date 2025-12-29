@@ -1,0 +1,116 @@
+<div class="edit-technician-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>edit</mat-icon>
+      Editar Técnico
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="technicianForm" (ngSubmit)="onSave()">
+    <mat-dialog-content class="dialog-content">
+      <div class="form-grid">
+        <!-- Columna 1 -->
+        <div class="form-column">
+          <!-- Nombre -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre *</mat-label>
+            <input matInput 
+                   formControlName="name" 
+                   placeholder="Ingrese el nombre del técnico">
+            <mat-error *ngIf="getFieldError('name')">
+              {{ getFieldError('name') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Área -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Área de trabajo *</mat-label>
+            <mat-select formControlName="area">
+              <mat-option *ngFor="let area of areaOptions" [value]="area.value">
+                {{ area.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="getFieldError('area')">
+              {{ getFieldError('area') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Teléfono -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput 
+                   formControlName="telefono" 
+                   placeholder="+54 9 11 1234-5678">
+          </mat-form-field>
+
+          <!-- Estado Activo -->
+          <div class="checkbox-container">
+            <mat-checkbox formControlName="activo">
+              Técnico activo
+            </mat-checkbox>
+            <p class="checkbox-description">
+              Los técnicos inactivos no aparecerán en las listas de asignación
+            </p>
+          </div>
+        </div>
+
+        <!-- Columna 2 -->
+        <div class="form-column">
+          <!-- Apellido -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Apellido</mat-label>
+            <input matInput 
+                   formControlName="apellido" 
+                   placeholder="Ingrese el apellido del técnico">
+          </mat-form-field>
+
+          <!-- Email -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput 
+                   type="email" 
+                   formControlName="email" 
+                   placeholder="ejemplo@empresa.com">
+            <mat-error *ngIf="getFieldError('email')">
+              {{ getFieldError('email') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Categoría -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Categoría</mat-label>
+            <mat-select formControlName="categoria_id">
+              <mat-option [value]="null">Sin categoría</mat-option>
+              <mat-option *ngFor="let category of categories" [value]="category.id">
+                {{ category.descripcion }} (Precio/hora: ${{ category.preciohora }})
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Nueva Contraseña -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nueva Contraseña</mat-label>
+            <input matInput 
+                   type="password" 
+                   formControlName="password" 
+                   placeholder="Dejar vacío para mantener la contraseña actual">
+            <mat-hint>Dejar vacío para mantener la contraseña actual</mat-hint>
+            <mat-error *ngIf="getFieldError('password')">
+              {{ getFieldError('password') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-actions">
+      <button type="submit" mat-raised-button color="primary" [disabled]="!isFormValid || !hasChanges" class="save-btn">
+        <mat-icon>save</mat-icon>
+        Guardar Cambios
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

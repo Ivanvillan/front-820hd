@@ -1,46 +1,148 @@
-<h2 mat-dialog-title>Detalles del Pedido #{{ticket.numero}}</h2>
+<div class="ticket-detail-dialog">
+  <div class="dialog-header">
+    <div class="dialog-header-content">
+      <h2 mat-dialog-title>
+        <mat-icon>assignment</mat-icon>
+        Detalles del Pedido #{{ticket.numero}}
+      </h2>
+      <button mat-icon-button [matMenuTriggerFor]="detailActionsMenu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #detailActionsMenu="matMenu">
+        <button mat-menu-item *ngIf="canTakeOrder()" (click)="takeOrder()">
+          Tomar orden
+        </button>
+        <button mat-menu-item (click)="exportToPdf()">
+          Exportar PDF
+        </button>
+      </mat-menu>
+    </div>
+    <button mat-icon-button (click)="closeDialog()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-<mat-dialog-content>
-  <div class="ticket-details">
-    <div class="detail-row">
-      <span class="label">Estado:</span>
-      <div class="indicator-status" [ngClass]="getTicketStatus(ticket).class">
-        {{getTicketStatus(ticket).text}}
+  <mat-dialog-content class="dialog-content">
+    <!-- Información del Ticket -->
+    <div class="ticket-info">
+      <h3>Información General</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Estado:</span>
+          <mat-chip-list>
+            <mat-chip 
+              [color]="getStatusColor(ticket)" 
+              [selected]="true"
+              class="status-chip">
+              {{ getStatusText(ticket) }}
+            </mat-chip>
+          </mat-chip-list>
+        </div>
+        <div class="info-item">
+          <span class="label">Prioridad:</span>
+          <span class="badge" [ngClass]="getPriorityClass(ticket.prioridad)">
+            {{ getPriorityText(ticket.prioridad) }}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="label">Fecha:</span>
+          <span class="value">{{ticket.fecha | date:'dd/MM/yyyy'}} {{ticket.hora}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Empresa:</span>
+          <span class="value">{{ticket.nombre || ticket.empresa || '--'}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Contacto:</span>
+          <span class="value">{{ticket.contacto || '--'}}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Responsables:</span>
+          <div class="value" *ngIf="ticket.responsables && ticket.responsables.length > 0; else soloReferente">
+            <mat-chip-list>
+              <mat-chip *ngFor="let resp of ticket.responsables" color="accent" selected>
+                {{resp.nombre}}
+              </mat-chip>
+            </mat-chip-list>
+          </div>
+          <ng-template #soloReferente>
+            <span class="value">{{ticket.referente || 'Sin asignar'}}</span>
+          </ng-template>
+        </div>
+        <div class="info-item">
+          <span class="label">Sector:</span>
+          <span class="value">{{ticket.sector || '--'}}</span>
+        </div>
+        <div class="info-item" *ngIf="ticket.tipoServicioNombre">
+          <span class="label">Tipo de Servicio:</span>
+          <span class="value">{{ticket.tipoServicioNombre}}</span>
+        </div>
+        <div class="info-item full-width">
+          <span class="label">Descripción:</span>
+          <div class="description-content">
+            <p>{{ticket.descripcion}}</p>
+          </div>
+        </div>
+        <div class="info-item full-width">
+          <span class="label">Materiales Utilizados:</span>
+          <div class="materiales-content">
+            <p *ngIf="ticket.txtmateriales && ticket.txtmateriales.trim(); else noMateriales" class="materiales-text">
+              {{ticket.txtmateriales}}
+            </p>
+            <ng-template #noMateriales>
+              <span class="value">Sin materiales registrados</span>
+            </ng-template>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="detail-row">
-      <span class="label">Fecha:</span>
-      <span>{{ticket.fecha | date:'dd/MM/yyyy'}}</span>
+    <!-- Estado de Finalización -->
+    <div class="finalization-info" *ngIf="ticket.finalizado !== undefined || ticket.anulada !== undefined">
+      <h3>Estado de Finalización</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Finalizada:</span>
+                  <span class="value" [ngClass]="{'finalized': ticket.finalizado === true, 'pending': ticket.finalizado === false}">
+          {{ticket.finalizado === true ? 'Sí' : 'No'}}
+        </span>
+        </div>
+        <div class="info-item" *ngIf="ticket.fechafin && ticket.finalizado">
+          <span class="label">Fecha de Finalización:</span>
+          <span class="value finalized">
+            {{ticket.fechafin | date:'dd/MM/yyyy HH:mm':'UTC'}}
+        </span>
+        </div>
+        <div class="info-item">
+          <span class="label">Anulada:</span>
+          <span class="value" [ngClass]="{'cancelled': ticket.anulada === true, 'active': ticket.anulada === false}">
+            {{ticket.anulada === true ? 'Sí' : 'No'}}
+          </span>
+        </div>
+      </div>
     </div>
 
-    <div class="detail-row">
-      <span class="label">Hora:</span>
-      <span>{{ticket.hora}}</span>
+    <!-- Información Adicional del Ticket -->
+    <div class="additional-info" *ngIf="hasAdditionalInfo()">
+      <h3>Información Adicional</h3>
+      <div class="info-grid">
+        <div class="info-item" *ngIf="ticket.tipo">
+          <span class="label">Tipo:</span>
+          <span class="value">{{ticket.tipo}}</span>
+        </div>
+        <div class="info-item full-width" *ngIf="ticket.observaciones">
+          <span class="label">Observaciones:</span>
+          <div class="observations-content">
+            <p>{{formatObservaciones(ticket.observaciones)}}</p>
+          </div>
+        </div>
+      </div>
     </div>
+  </mat-dialog-content>
 
-    <div class="detail-row">
-      <span class="label">Contacto:</span>
-      <span>{{ticket.contacto}}</span>
-    </div>
-
-    <div class="detail-row">
-      <span class="label">Empresa:</span>
-      <span>{{ticket.nombre}}</span>
-    </div>
-
-    <div class="detail-row">
-      <span class="label">Asignado:</span>
-      <span>{{ticket.asignado || 'Sin asignar'}}</span>
-    </div>
-
-    <div class="detail-row description">
-      <span class="label">Descripción:</span>
-      <p>{{ticket.descripcion}}</p>
-    </div>
-  </div>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cerrar</button>
-</mat-dialog-actions> 
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-button (click)="closeDialog()">
+      Cerrar
+    </button>
+  </mat-dialog-actions>
+</div> 

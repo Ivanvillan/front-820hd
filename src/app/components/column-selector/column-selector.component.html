@@ -1,0 +1,89 @@
+<div class="column-selector-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>settings</mat-icon>
+    {{ title }}
+  </h2>
+
+  <mat-dialog-content>
+    <div class="column-selector-info">
+      <p class="info-text">
+        Selecciona las columnas que deseas mostrar en la tabla.
+        Las columnas marcadas con <mat-icon inline>lock</mat-icon> son obligatorias.
+      </p>
+      <p class="visible-count">
+        <strong>{{ getVisibleCount() }}</strong> de <strong>{{ columns.length }}</strong> columnas visibles
+      </p>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="columns-list">
+      <mat-list>
+        <ng-container *ngFor="let column of columns; let i = index">
+          <mat-list-item
+            class="column-item"
+            [class.mandatory]="isMandatory(column)"
+            [class.hidden-column]="!column.visible">
+            
+            <!-- Checkbox -->
+            <mat-checkbox
+              [checked]="column.visible"
+              [disabled]="isMandatory(column)"
+              (change)="toggleColumn(column)"
+              color="primary">
+              {{ column.label }}
+            </mat-checkbox>
+
+            <!-- Mandatory indicator -->
+            <mat-icon
+              *ngIf="isMandatory(column)"
+              class="mandatory-icon"
+              matTooltip="Campo obligatorio">
+              lock
+            </mat-icon>
+
+            <!-- Future: Drag handle
+            <mat-icon
+              *ngIf="!isMandatory(column)"
+              class="drag-handle"
+              cdkDragHandle>
+              drag_indicator
+            </mat-icon>
+            -->
+          </mat-list-item>
+        </ng-container>
+      </mat-list>
+    </div>
+  </mat-dialog-content>
+
+  <mat-divider></mat-divider>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      (click)="restoreDefaults()"
+      [disabled]="!hasChanges()"
+      class="restore-button">
+      <mat-icon>restore</mat-icon>
+      Restaurar Defaults
+    </button>
+
+    <span class="action-spacer"></span>
+
+    <button
+      mat-button
+      (click)="onCancel()">
+      Cancelar
+    </button>
+
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onApply()"
+      [disabled]="!hasChanges()">
+      <mat-icon>check</mat-icon>
+      Aplicar
+    </button>
+  </mat-dialog-actions>
+</div>
+

@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Offer } from 'src/app/models/offers.model';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 import { OffersService } from 'src/app/services/offers/offers.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 import SwiperCore, { Navigation, Pagination, Swiper, Autoplay } from "swiper";
 import { DialogComponent } from '../../components/dialog/dialog.component';
 
@@ -12,8 +13,7 @@ SwiperCore.use([Navigation, Pagination, Autoplay]);
 @Component({
   selector: 'app-weekoffers',
   templateUrl: './weekoffers.component.html',
-  styleUrls: ['./weekoffers.component.css'],
-  encapsulation: ViewEncapsulation.None,
+  styleUrls: ['./weekoffers.component.css']
 })
 export class WeekoffersComponent implements OnInit {
 
@@ -25,18 +25,15 @@ export class WeekoffersComponent implements OnInit {
   constructor(
     private credentialsService: CredentialsService, 
     private offersService: OffersService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private configService: ConfigService
   ) { 
-    const data = JSON.parse(this.credentialsService.getCredentials()!)
-    if(data.type !== 'customer') {
+    const data = this.credentialsService.getCredentialsParsed();
+    if(data && data.type !== 'customer') {
       this.isAdmin = true;
     }
-    if(window.location.hostname.includes('localhost')){   
-      this.API_URI = 'http://localhost:3001/images';
-    }
-    if (!window.location.hostname.includes('localhost')) {
-      this.API_URI = 'https://api.820hd.com.ar/images'
-    }
+    // ✅ Usar configuración centralizada
+    this.API_URI = this.configService.IMAGE_URL;
   }
 
   ngOnInit() {

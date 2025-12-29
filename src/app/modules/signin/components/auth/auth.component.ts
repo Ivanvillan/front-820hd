@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 
 import { Auth } from '../../../../models/auth.model';
 
@@ -21,7 +22,8 @@ export class AuthComponent {
   constructor(
     private loginService: AuthService,
     private router: Router,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private credentialsService: CredentialsService
   ) { }
 
   auth(): void {
@@ -30,10 +32,33 @@ export class AuthComponent {
       .subscribe({
         next: (res) => {
           this.isLoading = false;
-          this.router.navigate(['/home']);
+          
+          try {
+            // Obtener credenciales del usuario logueado
+            const credentials = this.credentialsService.getCredentialsParsed();
+            if (credentials) {              
+              // Mostrar mensaje de bienvenida
+              this._snackBar.open(`Hola ${credentials.name}!`, 'Cerrar', {
+                duration: 3000,
+                horizontalPosition: 'center',
+                verticalPosition: 'top',
+                panelClass: ['success-snackbar']
+              });
+              
+              // La redirección se maneja automáticamente en AuthService
+              // No necesitamos hacer nada aquí
+            } else {
+              console.warn('No se pudieron obtener las credenciales del usuario');
+              this.router.navigate(['/home']);
+            }
+          } catch (error) {
+            console.error('Error al procesar las credenciales:', error);
+            this.router.navigate(['/home']);
+          }
         },
         error: (err) => {
           this.isLoading = false;
+          console.error('Error en el login:', err);
           this._snackBar.open('Hubo un error al iniciar sesión, por favor revise sus credenciales', 'Cerrar', {
             duration: 5000,
             horizontalPosition: 'end',

@@ -1,0 +1,791 @@
+.order-detail-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header Section */
+.header-section {
+  margin-bottom: 30px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 120px;
+  height: 40px;
+}
+
+.back-button mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.take-order-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 140px;
+  height: 40px;
+}
+
+.take-order-button mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.export-pdf-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 140px;
+  height: 40px;
+}
+
+.export-pdf-button mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.title-section .main-title {
+  margin: 0;
+  color: #333;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.title-section .subtitle {
+  margin: 5px 0 0 0;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Content Section */
+.content-section {
+  min-height: 400px;
+}
+
+/* Loading and Error States */
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-container p {
+  margin-top: 20px;
+  color: #666;
+  font-size: 16px;
+}
+
+.error-container .error-icon {
+  font-size: 48px;
+  color: #f44336;
+  margin-bottom: 20px;
+}
+
+.error-container h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.error-container p {
+  margin: 0 0 20px 0;
+  color: #666;
+}
+
+/* Two Column Layout */
+.two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+/* Left Column - Information Cards */
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.info-card .mat-card-header {
+  padding-bottom: 0;
+}
+
+.info-card .mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+}
+
+.card-icon {
+  color: #1976d2;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #666;
+  font-size: 14px;
+}
+
+.info-value {
+  color: #333;
+  font-size: 16px;
+  word-break: break-word;
+}
+
+.description-text {
+  line-height: 1.5;
+}
+
+.info-value.finalized {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+/* Right Column - Status Card */
+.right-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.status-card .mat-card-header {
+  padding-bottom: 0;
+}
+
+.status-card .mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  color: #333;
+}
+
+.status-section {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-top: 10px;
+}
+
+.current-status,
+.status-change {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-label {
+  font-weight: 500;
+  color: #666;
+  font-size: 14px;
+}
+
+.current-status mat-chip-list {
+  margin: 0;
+}
+
+.status-chip {
+  align-self: flex-start;
+}
+
+.status-select {
+  width: 100%;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.save-button {
+  min-width: 180px;
+  height: 48px;
+  font-size: 16px;
+}
+
+.save-button .mat-icon {
+  margin-right: 8px;
+}
+
+/* Work Section */
+.work-section {
+  margin-top: 30px;
+}
+
+.work-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.work-card .mat-card-header {
+  padding-bottom: 0;
+}
+
+.work-card .mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+}
+
+.work-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.work-time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.work-form .full-width {
+  width: 100%;
+}
+
+.work-form textarea {
+  resize: vertical;
+}
+
+.work-time-section {
+  margin-bottom: 24px;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  margin: 0 0 16px 0;
+}
+
+.hours-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #e3f2fd;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.hours-icon {
+  color: #1976d2;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.hours-label {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.hours-value {
+  font-weight: 600;
+  color: #1976d2;
+  font-size: 18px;
+}
+
+/* Add Note Section */
+.add-note-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.add-note-btn {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  min-width: 140px;
+  font-weight: 500;
+}
+
+.add-note-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Existing Notes Section */
+.existing-notes-section {
+  padding: 16px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.existing-notes-section h4 {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Custom scrollbar for notes list */
+.notes-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notes-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.notes-list::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  border-radius: 3px;
+}
+
+.notes-list::-webkit-scrollbar-thumb:hover {
+  background: #9e9e9e;
+}
+
+.note-item {
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.note-technician {
+  font-weight: 600;
+  color: #1976d2;
+  font-size: 14px;
+}
+
+.note-timestamp {
+  color: #757575;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.note-content {
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .two-column-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .right-column {
+    order: -1;
+  }
+  
+  .work-time-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .order-detail-container {
+    padding: 15px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .title-section .main-title {
+    font-size: 24px;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .work-time-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .add-note-section {
+    gap: 10px;
+  }
+  
+  .add-note-btn {
+    align-self: stretch;
+    width: 100%;
+  }
+  
+  .note-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-detail-container {
+    padding: 10px;
+  }
+  
+  .title-section .main-title {
+    font-size: 20px;
+  }
+  
+  .title-section .subtitle {
+    font-size: 14px;
+  }
+  
+  .save-button {
+    min-width: 100%;
+  }
+}
+
+/* ========== MATERIALS SECTION ========== */
+
+.material-selector {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin: 16px 0;
+}
+
+.material-select-field {
+  flex: 1;
+}
+
+.quantity-field {
+  width: 120px;
+  height: 45px;
+}
+
+.quantity-field ::ng-deep .mat-form-field-wrapper .mat-form-field-flex {
+  height: 45px;
+  align-items: center;
+}
+
+.quantity-field ::ng-deep .mat-form-field-wrapper .mat-form-field-infix {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.quantity-field ::ng-deep .mat-form-field-wrapper input {
+  height: 45px;
+  line-height: 45px;
+}
+
+.add-material-btn {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.add-material-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.material-option {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+.material-code {
+  font-weight: 500;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.material-description {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.material-details {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #666;
+}
+
+.material-unit {
+  font-style: italic;
+}
+
+.material-price {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.selected-materials-table {
+  margin-top: 16px;
+  overflow-x: auto;
+}
+
+.materials-table {
+  width: 100%;
+  background-color: white;
+  border-radius: 4px;
+}
+
+.materials-table th {
+  font-weight: 500;
+  color: #333;
+  background-color: #f1f3f5;
+}
+
+.materials-table td {
+  color: #333;
+}
+
+.quantity-input {
+  width: 80px;
+  padding: 4px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.quantity-input:focus {
+  outline: none;
+  border-color: #1976d2;
+}
+
+.no-materials-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background-color: #f1f3f5;
+  border-radius: 4px;
+  color: #666;
+  font-size: 12px;
+}
+
+.no-materials-message mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #666;
+}
+
+.ng-select-custom {
+  width: 100%;
+}
+
+/* Responsive para materiales */
+@media (max-width: 480px) {
+  .material-selector {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .quantity-field {
+    width: 100%;
+  }
+  
+  .add-material-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .materials-table {
+    font-size: 12px;
+  }
+  
+  .quantity-input {
+    width: 60px;
+  }
+}
+
+/* ========== CREATE MATERIAL SECTION ========== */
+.create-material-section {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  gap: 12px;
+  
+  .create-material-text {
+    font-size: 13px;
+    color: #666;
+    flex: 1;
+  }
+  
+  .toggle-create-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    padding: 4px 12px;
+    line-height: 1.5;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.create-material-form {
+  margin-top: 12px;
+  padding: 16px;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+    
+    &:last-of-type {
+      margin-bottom: 24px;
+    }
+  }
+  
+  .form-field-descripcion {
+    width: 100%;
+  }
+  
+  .form-field-unidad {
+    width: 100%;
+  }
+  
+  .form-field-precio {
+    width: 100%;
+  }
+  
+  .form-field-rubro {
+    width: 100%;
+  }
+  
+  .form-field-iva {
+    width: 100%;
+  }
+  
+  .form-field-cantidad {
+    width: 100%;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid #dee2e6;
+    
+    button {
+      min-width: 120px;
+    }
+  }
+}
+
+/* Responsive para formulario de crear material */
+@media (max-width: 768px) {
+  .create-material-form {
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+}

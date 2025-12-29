@@ -1,0 +1,149 @@
+@use 'src/styles/variables' as vars;
+
+.management-container {
+  // FilterBar y ConfigurableTable ya tienen sus propios estilos
+  // Solo necesitamos estilos específicos para badges y templates
+  .table-actions {
+    display: flex;
+    gap: vars.$spacing-xs;
+    align-items: center;
+  }
+}
+
+// Badges de prioridad - estilos elaborados con borders y animación
+.badge {
+  display: inline-block;
+  padding: vars.$badge-padding-y vars.$badge-padding-x;
+  font-size: vars.$badge-font-size;
+  font-weight: vars.$badge-font-weight;
+  border-radius: vars.$badge-border-radius;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+}
+
+.priority-low {
+  background-color: lighten(vars.$success, 40%);
+  color: vars.$success;
+  border: 1px solid vars.$success;
+}
+
+.priority-medium {
+  background-color: lighten(vars.$accent, 40%);
+  color: darken(vars.$accent, 10%);
+  border: 1px solid vars.$accent;
+}
+
+.priority-high {
+  background-color: lighten(vars.$warn, 40%);
+  color: vars.$warn;
+  border: 1px solid vars.$warn;
+}
+
+.priority-urgent {
+  background-color: lighten(vars.$warn, 30%);
+  color: darken(vars.$warn, 20%);
+  border: 2px solid vars.$warn;
+  font-weight: vars.$font-weight-bold;
+  animation: pulse 2s infinite;
+}
+
+.priority-none {
+  background-color: vars.$gray-100;
+  color: vars.$text-muted;
+  border: 1px solid vars.$gray-300;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+// Chips de estado (usando mat-chip con colores Material)
+.status-chip {
+  font-size: 12px !important;
+  font-weight: vars.$font-weight-medium !important;
+  min-height: 24px;
+  line-height: 24px;
+  padding: 0 vars.$spacing-xs;
+  white-space: nowrap;
+}
+
+// Nombre asignado
+.nombre-asignado {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: vars.$font-weight-medium;
+  border-radius: 3px;
+  background-color: vars.$primary;
+  color: vars.$text-white;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.nombre-asignado-na {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: vars.$font-weight-medium;
+  border-radius: 3px;
+  background-color: vars.$gray-100;
+  color: vars.$text-muted;
+}
+
+.descripcion-cell {
+  display: flex;
+  flex-direction: column;
+  gap: vars.$spacing-xs;
+}
+
+.descripcion-title {
+  font-weight: vars.$font-weight-medium;
+  color: vars.$text-primary;
+  line-height: 1.4;
+}
+
+// Estilos específicos de columnas
+::ng-deep {
+  .configurable-table-container {
+    .mat-column-descripcion {
+      min-height: 48px;
+      align-items: center;
+    }
+    
+    .mat-column-fecha {
+      width: 80px !important;
+      min-width: 80px;
+      max-width: 80px;
+    }
+  }
+}
+// Acciones
+.actions-cell {
+  display: flex;
+  gap: vars.$spacing-xs;
+  align-items: center;
+  
+  button {
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// Menu action styles
+.delete-action {
+  color: vars.$warn !important;
+}
+
+// Responsive
+@media (max-width: vars.$breakpoint-sm) {
+  .actions-cell {
+    gap: 0;
+  }
+}
+

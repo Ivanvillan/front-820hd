@@ -1,0 +1,274 @@
+@use './variables' as vars;
+
+// Botones personalizados
+.btn-primary {
+  background-color: vars.$primary;
+  color: vars.$text-white;
+  padding: vars.$btn-padding-y vars.$btn-padding-x;
+  border: none;
+  border-radius: vars.$btn-border-radius;
+  font-weight: vars.$btn-font-weight;
+  cursor: pointer;
+  transition: vars.$transition-base;
+
+  &:hover {
+    background-color: darken(vars.$primary, 10%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  background-color: vars.$bg-white;
+  color: vars.$primary;
+  padding: vars.$btn-padding-y vars.$btn-padding-x;
+  border: vars.$border-width solid vars.$primary;
+  border-radius: vars.$btn-border-radius;
+  font-weight: vars.$btn-font-weight;
+  cursor: pointer;
+  transition: vars.$transition-base;
+
+  &:hover {
+    background-color: vars.$primary;
+    color: vars.$text-white;
+  }
+}
+
+.btn-danger {
+  background-color: vars.$warn;
+  color: vars.$text-white;
+  padding: vars.$btn-padding-y vars.$btn-padding-x;
+  border: none;
+  border-radius: vars.$btn-border-radius;
+  font-weight: vars.$btn-font-weight;
+  cursor: pointer;
+  transition: vars.$transition-base;
+
+  &:hover {
+    background-color: darken(vars.$warn, 10%);
+  }
+}
+
+.btn-success {
+  background-color: vars.$success;
+  color: vars.$text-white;
+  padding: vars.$btn-padding-y vars.$btn-padding-x;
+  border: none;
+  border-radius: vars.$btn-border-radius;
+  font-weight: vars.$btn-font-weight;
+  cursor: pointer;
+  transition: vars.$transition-base;
+
+  &:hover {
+    background-color: darken(vars.$success, 10%);
+  }
+}
+
+// Cards personalizadas
+.card {
+  background: vars.$bg-white;
+  border-radius: vars.$card-border-radius;
+  box-shadow: vars.$card-shadow;
+  padding: vars.$card-padding;
+  margin-bottom: vars.$spacing-md;
+  transition: vars.$transition-base;
+
+  &:hover {
+    box-shadow: vars.$shadow-md;
+  }
+}
+
+.card-header {
+  background: vars.$gray-50;
+  padding: vars.$spacing-md;
+  border-bottom: vars.$border-width solid vars.$border-color;
+  border-radius: vars.$card-border-radius vars.$card-border-radius 0 0;
+  font-weight: vars.$font-weight-medium;
+}
+
+.card-body {
+  padding: vars.$spacing-md;
+}
+
+.card-footer {
+  background: vars.$gray-50;
+  padding: vars.$spacing-md;
+  border-top: vars.$border-width solid vars.$border-color;
+  border-radius: 0 0 vars.$card-border-radius vars.$card-border-radius;
+}
+
+// Tablas personalizadas
+.table-container {
+  background: vars.$bg-white;
+  border-radius: vars.$border-radius-lg;
+  box-shadow: vars.$shadow-sm;
+  overflow: hidden;
+}
+
+.mat-table {
+  width: 100%;
+  box-shadow: none;
+
+  .mat-header-row {
+    background: vars.$table-header-bg;
+    font-weight: vars.$font-weight-medium;
+  }
+
+  .mat-row {
+    transition: vars.$transition-base;
+
+    &:hover {
+      background: vars.$table-hover-bg;
+    }
+  }
+
+  .mat-cell,
+  .mat-header-cell {
+    padding: vars.$table-cell-padding;
+    border-bottom-color: vars.$table-border-color;
+  }
+}
+
+// Badges
+.badge {
+  display: inline-block;
+  padding: vars.$badge-padding-y vars.$badge-padding-x;
+  font-size: vars.$badge-font-size;
+  font-weight: vars.$badge-font-weight;
+  border-radius: vars.$badge-border-radius;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+.badge-primary {
+  background-color: vars.$primary;
+  color: vars.$text-white;
+}
+
+.badge-success {
+  background-color: vars.$success;
+  color: vars.$text-white;
+}
+
+.badge-danger {
+  background-color: vars.$warn;
+  color: vars.$text-white;
+}
+
+.badge-warning {
+  background-color: vars.$accent;
+  color: vars.$text-white;
+}
+
+.badge-info {
+  background-color: vars.$info;
+  color: vars.$text-white;
+}
+
+.badge-secondary {
+  background-color: vars.$gray-500;
+  color: vars.$text-white;
+}
+
+// Form fields
+mat-form-field {
+  width: 100%;
+  min-width: 200px;
+  max-width: 300px;
+
+  &.mat-form-field-appearance-outline {
+    .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+  }
+}
+
+// Dividers
+.divider {
+  height: vars.$border-width;
+  background-color: vars.$border-color;
+  margin: vars.$spacing-md 0;
+}
+
+.divider-vertical {
+  width: vars.$border-width;
+  background-color: vars.$border-color;
+  margin: 0 vars.$spacing-md;
+  height: 100%;
+}
+
+// Loading spinner
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: vars.$spacing-xl;
+}
+
+// Empty state
+.empty-state {
+  text-align: center;
+  padding: vars.$spacing-xl;
+  color: vars.$text-muted;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: vars.$spacing-md;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: vars.$font-size-lg;
+    font-weight: vars.$font-weight-medium;
+    margin-bottom: vars.$spacing-sm;
+  }
+
+  p {
+    font-size: vars.$font-size-base;
+    color: vars.$text-secondary;
+  }
+}
+
+// Priority badges (para técnicos)
+.priority-high {
+  background-color: vars.$warn;
+  color: vars.$text-white;
+}
+
+.priority-medium {
+  background-color: vars.$accent;
+  color: vars.$text-white;
+}
+
+.priority-low {
+  background-color: vars.$success;
+  color: vars.$text-white;
+}
+
+// Status badges
+.status-pending {
+  background-color: vars.$accent;
+  color: vars.$text-white;
+}
+
+.status-in-progress {
+  background-color: vars.$info;
+  color: vars.$text-white;
+}
+
+.status-completed {
+  background-color: vars.$success;
+  color: vars.$text-white;
+}
+
+.status-cancelled {
+  background-color: vars.$gray-500;
+  color: vars.$text-white;
+}
+

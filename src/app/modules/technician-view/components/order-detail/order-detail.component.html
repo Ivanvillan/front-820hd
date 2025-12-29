@@ -1,0 +1,441 @@
+<div class="order-detail-container">
+  <!-- Header sin navegación -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="main-title">Detalle de Orden - {{ areaDisplayName }}</h1>
+        <p class="subtitle">Gestionando orden #{{ order?.numero || order?.id1 }}</p>
+      </div>
+      <div class="header-actions">
+        <button 
+          *ngIf="canTakeOrder()"
+          mat-raised-button 
+          color="accent" 
+          (click)="takeOrder()"
+          class="take-order-button">
+          <mat-icon>assignment_ind</mat-icon>
+          Tomar Orden
+        </button>
+        <button 
+          mat-raised-button 
+          color="warn" 
+          (click)="exportToPdf()"
+          class="export-pdf-button">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Exportar PDF
+        </button>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="goBack()"
+          class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="content-section">
+    <!-- Estado de carga -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando detalles de la orden...</p>
+    </div>
+
+    <!-- Estado de error -->
+    <div *ngIf="error && !loading" class="error-container">
+      <mat-icon class="error-icon">error</mat-icon>
+      <h3>Error al cargar la orden</h3>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="loadOrderDetails()">
+        Reintentar
+      </button>
+    </div>
+
+    <!-- Detalles de la orden -->
+    <div *ngIf="!loading && !error && order" class="order-details-content">
+      <!-- Layout de dos columnas -->
+      <div class="two-column-layout">
+        
+        <!-- Columna Izquierda - Información Principal -->
+        <div class="left-column">
+          <mat-card class="info-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon class="card-icon">person</mat-icon>
+                Información del Cliente
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Cliente:</span>
+                  <span class="info-value">{{ order.contacto || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Empresa:</span>
+                  <span class="info-value">{{ order.empresa || order.nombre || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Email:</span>
+                  <span class="info-value">{{ order.email || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">N° Orden:</span>
+                  <span class="info-value">{{ order.numero || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Contacto:</span>
+                  <span class="info-value">{{ order.contacto || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Técnico Asignado:</span>
+                  <span class="info-value">{{ getAssignedTechnician() }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="info-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon class="card-icon">build</mat-icon>
+                Problema y Equipamiento
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="info-grid">
+                <div class="info-item full-width">
+                  <span class="info-label">Descripción:</span>
+                  <span class="info-value description-text">{{ order.descripcion || 'Sin descripción' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Tipo de Orden:</span>
+                  <span class="info-value">{{ getOrderTypeCategory(order) }}</span>
+                </div>
+                <div class="info-item" *ngIf="order.tipoServicioNombre">
+                  <span class="info-label">Tipo de Servicio:</span>
+                  <span class="info-value">{{ order.tipoServicioNombre }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Sector:</span>
+                  <span class="info-value">{{ order.sector || 'Sin asignar' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Fecha:</span>
+                  <span class="info-value">{{ order.fecha | date:'dd/MM/yyyy' }} {{ order.hora || '--' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Referente:</span>
+                  <span class="info-value">{{ order.referente || 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Finalización:</span>
+                  <span class="info-value" [class.finalized]="getStatusDisplayName(getOrderStatus(order)) === 'Finalizada'">
+                    {{ getStatusDisplayName(getOrderStatus(order)) === 'Finalizada' ? 'Finalizada' : 'En Proceso' }}
+                  </span>
+                </div>
+                <div class="info-item" *ngIf="order.fechafin">
+                  <span class="info-label">Fecha de Finalización:</span>
+                  <span class="info-value finalized">{{ order.fechafin | date:'dd/MM/yyyy HH:mm':'UTC' }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Columna Derecha - Acciones y Estado -->
+        <div class="right-column">
+          <mat-card class="status-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon class="card-icon">assignment</mat-icon>
+                Estado Operativo de la Orden
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="status-section">
+                <div class="current-status">
+                  <span class="status-label">Estado Operativo Actual:</span>
+                  <mat-chip-list>
+                    <mat-chip
+                      [color]="getStatusDisplayColor(currentStatus)" 
+                      [selected]="true"
+                      class="status-chip">
+                      {{ getStatusDisplayName(currentStatus) }}
+                    </mat-chip>
+                  </mat-chip-list>
+                </div>
+                
+                <div class="status-change">
+                  <span class="status-label">Cambiar Estado Operativo:</span>
+                  <mat-form-field appearance="outline" class="status-select">
+                    <mat-select [(value)]="currentStatus" (selectionChange)="onStatusChange($event.value)">
+                      <mat-option *ngFor="let status of availableStatuses" [value]="status.value">
+                        {{ status.label }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="action-buttons">
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    (click)="saveChanges()"
+                    [disabled]="saving"
+                    class="save-button">
+                    <mat-icon *ngIf="!saving">save</mat-icon>
+                    <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
+                    {{ saving ? 'Guardando...' : 'Guardar Cambios' }}
+                  </button>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+
+      <!-- Sección de Trabajo del Técnico -->
+      <div class="work-section">
+        <mat-card class="work-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="card-icon">engineering</mat-icon>
+              Materiales Utilizados
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <form [formGroup]="workForm" class="work-form">
+              
+              <!-- Materiales Utilizados -->
+              <div class="full-width">
+                
+                <!-- Selector de materiales -->
+                <div class="material-selector">
+                  <div class="form-field material-select-field">
+                    <ng-select
+                      [(ngModel)]="selectedMaterialForAdd"
+                      [items]="materials"
+                      bindLabel="descripcion"
+                      [ngModelOptions]="{standalone: true}"
+                      placeholder="Buscar material por código o descripción..."
+                      [searchable]="true"
+                      [clearable]="true"
+                      [loading]="isLoadingMaterials"
+                      loadingText="Cargando materiales..."
+                      notFoundText="No se encontraron materiales"
+                      class="ng-select-custom">
+                      <ng-option *ngFor="let material of materials" [value]="material">
+                        <div class="material-option">
+                          <div class="material-code">{{material.codigo}}</div>
+                          <div class="material-description">{{material.descripcion}}</div>
+                          <div class="material-details">
+                            <span class="material-unit">{{material.unidad}}</span>
+                            <span class="material-price" *ngIf="material.punitario">${{material.punitario | number:'1.2-2'}}</span>
+                          </div>
+                        </div>
+                      </ng-option>
+                    </ng-select>
+                  </div>
+                  
+                  <mat-form-field appearance="outline" class="quantity-field">
+                    <mat-label>Cantidad</mat-label>
+                    <input matInput type="number" 
+                           [(ngModel)]="cantidadToAdd" 
+                           [ngModelOptions]="{standalone: true}"
+                           min="1" 
+                           step="1"
+                           required>
+                  </mat-form-field>
+                  
+                  <button mat-raised-button 
+                          color="primary" 
+                          (click)="addMaterial()"
+                          [disabled]="!selectedMaterialForAdd || cantidadToAdd <= 0"
+                          class="add-material-btn">
+                    <mat-icon>add</mat-icon>
+                    Agregar
+                  </button>
+                </div>
+
+                <!-- Tabla de materiales seleccionados -->
+                <div class="selected-materials-table" *ngIf="selectedMaterials.length > 0">
+                  <table mat-table [dataSource]="materialsDataSource" class="materials-table">
+                    <!-- Columna Código -->
+                    <ng-container matColumnDef="codigo">
+                      <th mat-header-cell *matHeaderCellDef>Código</th>
+                      <td mat-cell *matCellDef="let element">{{element.material.codigo}}</td>
+                    </ng-container>
+
+                    <!-- Columna Descripción -->
+                    <ng-container matColumnDef="descripcion">
+                      <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                      <td mat-cell *matCellDef="let element">{{element.material.descripcion}}</td>
+                    </ng-container>
+
+                    <!-- Columna Unidad -->
+                    <ng-container matColumnDef="unidad">
+                      <th mat-header-cell *matHeaderCellDef>Unidad</th>
+                      <td mat-cell *matCellDef="let element">{{element.material.unidad}}</td>
+                    </ng-container>
+
+                    <!-- Columna Cantidad -->
+                    <ng-container matColumnDef="cantidad">
+                      <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+                      <td mat-cell *matCellDef="let element; let i = index">
+                        <input type="number" 
+                               [(ngModel)]="element.cantidad" 
+                               (change)="updateMaterialQuantity(i, element.cantidad)"
+                               [ngModelOptions]="{standalone: true}"
+                               min="1" 
+                               step="1"
+                               class="quantity-input">
+                      </td>
+                    </ng-container>
+
+                    <!-- Columna Precio Unitario -->
+                    <ng-container matColumnDef="punitario">
+                      <th mat-header-cell *matHeaderCellDef>Precio Unit.</th>
+                      <td mat-cell *matCellDef="let element">${{element.material.punitario | number:'1.2-2'}}</td>
+                    </ng-container>
+
+                    <!-- Columna Acciones -->
+                    <ng-container matColumnDef="acciones">
+                      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                      <td mat-cell *matCellDef="let element; let i = index">
+                        <button mat-icon-button 
+                                color="warn" 
+                                (click)="removeMaterial(i)"
+                                matTooltip="Eliminar material">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="['codigo', 'descripcion', 'unidad', 'cantidad', 'punitario', 'acciones']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['codigo', 'descripcion', 'unidad', 'cantidad', 'punitario', 'acciones'];"></tr>
+                  </table>
+                </div>
+
+                <!-- Sección para crear nuevo material (siempre visible) -->
+                <div class="create-material-section" *ngIf="!isCreatingMaterial">
+                  <span class="create-material-text">¿No encuentras el material?</span>
+                  <button mat-button color="primary" (click)="toggleCreateMaterialForm()" class="toggle-create-btn">
+                    <mat-icon>add_circle</mat-icon>
+                    Crear Nuevo Material
+                  </button>
+                </div>
+                
+                <!-- Formulario expandido para crear material -->
+                <div class="create-material-form" *ngIf="isCreatingMaterial" [formGroup]="createMaterialForm">
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="form-field-descripcion">
+                      <mat-label>Descripción</mat-label>
+                      <input matInput formControlName="descripcion" placeholder="Ej: Servicio de Instalación">
+                      <mat-error *ngIf="createMaterialForm.get('descripcion')?.hasError('required')">
+                        La descripción es requerida
+                      </mat-error>
+                    </mat-form-field>
+                    
+                    <mat-form-field appearance="outline" class="form-field-unidad">
+                      <mat-label>Unidad</mat-label>
+                      <input matInput formControlName="unidad" placeholder="Unidad">
+                    </mat-form-field>
+                    
+                    <mat-form-field appearance="outline" class="form-field-precio">
+                      <mat-label>Precio Unitario</mat-label>
+                      <input matInput type="number" formControlName="punitario" min="0" step="0.01">
+                    </mat-form-field>
+                  </div>
+                  
+                  <div class="form-row">
+                    <mat-form-field appearance="outline" class="form-field-rubro">
+                      <mat-label>Rubro</mat-label>
+                      <mat-select formControlName="idrubro">
+                        <mat-option [value]="null">Sin rubro</mat-option>
+                        <mat-option *ngFor="let rubro of rubros" [value]="rubro.id22">
+                          {{rubro.descripcion}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    
+                    <mat-form-field appearance="outline" class="form-field-iva">
+                      <mat-label>IVA (%)</mat-label>
+                      <input matInput type="number" formControlName="iva19" min="0" max="100" step="0.1">
+              </mat-form-field>
+                    
+                    <mat-form-field appearance="outline" class="form-field-cantidad">
+                      <mat-label>Cantidad</mat-label>
+                      <input matInput type="number" formControlName="cantidad" min="1" step="1">
+                      <mat-error *ngIf="createMaterialForm.get('cantidad')?.hasError('required')">
+                        La cantidad es requerida
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  
+                  <div class="form-actions">
+                    <button mat-button (click)="cancelCreateMaterial()" type="button">
+                      Cancelar
+                    </button>
+                    <button mat-raised-button color="primary" (click)="createAndAddMaterial()" type="button"
+                            [disabled]="createMaterialForm.invalid">
+                      <mat-icon>add</mat-icon>
+                      Crear y Agregar
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Mensaje cuando no hay materiales -->
+                <div class="no-materials-message" *ngIf="selectedMaterials.length === 0 && !isCreatingMaterial">
+                  <mat-icon>info</mat-icon>
+                  <span>No se han agregado materiales. Use el selector arriba para agregar materiales utilizados.</span>
+                </div>
+
+                <!-- Campo oculto para txtmateriales (se actualiza automáticamente) -->
+                <input type="hidden" formControlName="txtmateriales">
+              </div>
+
+              <!-- Historial de Notas -->
+              <div class="existing-notes-section" *ngIf="existingNotes.length > 0">
+                <h4>Historial de Observaciones</h4>
+                <div class="notes-list">
+                  <div *ngFor="let note of existingNotes" class="note-item">
+                    <div class="note-header">
+                      <span class="note-technician">{{ note.technician }}</span>
+                      <span class="note-timestamp">{{ note.timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <div class="note-content">{{ note.content }}</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Agregar nueva observación -->
+              <div class="add-note-section">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Agregar Observación</mat-label>
+                  <textarea 
+                    matInput 
+                    formControlName="newNote"
+                    placeholder="Agregar observación sobre el trabajo..."
+                    rows="2">
+                  </textarea>
+                </mat-form-field>
+                <button 
+                  mat-raised-button 
+                  color="accent" 
+                  (click)="addNote()" 
+                  [disabled]="!workForm.get('newNote')?.value?.trim()"
+                  class="add-note-btn">
+                  <mat-icon>add</mat-icon> 
+                  Agregar Nota
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

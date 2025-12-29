@@ -1,0 +1,153 @@
+@use '../../../styles/variables' as vars;
+
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-sm;
+  font-size: vars.$font-size-lg;
+  font-weight: vars.$font-weight-semibold;
+  color: vars.$text-primary;
+
+  mat-icon {
+    color: vars.$primary;
+  }
+}
+
+.column-selector-info {
+  margin-bottom: vars.$spacing-md;
+
+  .info-text {
+    font-size: vars.$font-size-sm;
+    color: vars.$text-secondary;
+    margin-bottom: vars.$spacing-sm;
+    line-height: vars.$line-height-normal;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      color: vars.$text-muted;
+    }
+  }
+
+  .visible-count {
+    font-size: vars.$font-size-sm;
+    color: vars.$text-secondary;
+    margin: 0;
+
+    strong {
+      color: vars.$primary;
+      font-weight: vars.$font-weight-semibold;
+    }
+  }
+}
+
+.columns-list {
+  mat-list {
+    padding: 0;
+  }
+
+  .column-item {
+    height: auto !important;
+    padding: vars.$spacing-sm 0;
+    border-bottom: 1px solid vars.$gray-200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: vars.$transition-base;
+
+    &:hover {
+      background-color: vars.$gray-50;
+    }
+
+    &.mandatory {
+      background-color: vars.$gray-50;
+      
+      mat-checkbox {
+        opacity: 0.7;
+      }
+    }
+
+    &.hidden-column {
+      opacity: 0.6;
+    }
+
+    mat-checkbox {
+      flex: 1;
+    }
+
+    .mandatory-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: vars.$text-muted;
+      margin-left: vars.$spacing-sm;
+    }
+
+    .drag-handle {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: vars.$text-muted;
+      cursor: move;
+      margin-left: vars.$spacing-sm;
+
+      &:hover {
+        color: vars.$primary;
+      }
+    }
+  }
+}
+
+mat-dialog-actions {
+  display: flex;
+  align-items: center;
+  padding: vars.$spacing-md 0;
+  gap: vars.$spacing-sm;
+
+  .restore-button {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-xs;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .action-spacer {
+    flex: 1;
+  }
+
+  button {
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      margin-right: vars.$spacing-xs;
+    }
+  }
+}
+
+// Scrollbar styling
+mat-dialog-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+mat-dialog-content::-webkit-scrollbar-track {
+  background: vars.$gray-100;
+  border-radius: vars.$border-radius;
+}
+
+mat-dialog-content::-webkit-scrollbar-thumb {
+  background: vars.$gray-300;
+  border-radius: vars.$border-radius;
+
+  &:hover {
+    background: vars.$gray-400;
+  }
+}
+

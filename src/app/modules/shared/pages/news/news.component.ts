@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 import { TwitterService } from 'src/app/services/repository/twitter.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
   selector: 'app-news',
@@ -15,17 +16,14 @@ export class NewsComponent implements OnInit {
 
   constructor(
     private twitterService: TwitterService,
-    private credentialsService: CredentialsService
+    private credentialsService: CredentialsService,
+    private configService: ConfigService
   ) { 
-    if(window.location.hostname.includes('localhost')){   
-      this.API_URI = 'http://localhost:3001/images';
-    }
-    if (!window.location.hostname.includes('localhost')) {
-      this.API_URI = 'https://api.820hd.com.ar/images'
-    }
+    // ✅ Usar configuración centralizada
+    this.API_URI = this.configService.IMAGE_URL;
 
-    const credential = JSON.parse(this.credentialsService.getCredentials()!);
-    this.userId = credential.idContact;
+    const credential = this.credentialsService.getCredentialsParsed();
+    this.userId = credential?.idContact;
   }
 
   ngOnInit(): void {

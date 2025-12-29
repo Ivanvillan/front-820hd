@@ -1,0 +1,43 @@
+<div class="edit-technician-area-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>location_on</mat-icon>
+      Editar Área del Técnico
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="technician-info">
+      <div class="info-item">
+        <span class="label">Técnico:</span>
+        <span class="value">{{ data.technician.name }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Área actual:</span>
+        <span class="value current-area">{{ getAreaLabel(data.technician.area) }}</span>
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nueva área</mat-label>
+      <mat-select [formControl]="areaControl">
+        <mat-option *ngFor="let option of data.areaOptions" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="areaControl.hasError('required')">
+        Debe seleccionar un área
+      </mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!areaControl.valid" class="save-btn">
+      <mat-icon>save</mat-icon>
+      Guardar
+    </button>
+  </mat-dialog-actions>
+</div>

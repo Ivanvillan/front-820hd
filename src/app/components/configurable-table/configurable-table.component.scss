@@ -1,0 +1,255 @@
+@use '../../../styles/variables' as vars;
+
+.configurable-table-container {
+  background: vars.$bg-white;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  border-bottom: 1px solid vars.$border-color;
+  background: vars.$gray-50;
+
+  .table-title-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    
+    // Ocultar título estándar si hay contenido proyectado en tableTitle
+    // Si hay más de un hijo (contenido proyectado + título), ocultamos el título
+    // Si solo hay un hijo y no es .table-title, significa que hay contenido proyectado
+    &:has(> *:not(.table-title)) {
+      .table-title {
+        display: none;
+      }
+    }
+  }
+
+  .table-title {
+    font-size: vars.$font-size-lg;
+    font-weight: vars.$font-weight-semibold;
+    color: vars.$text-primary;
+    margin: 0;
+  }
+  
+  // Estilos para el slot tableTitle personalizado
+  // El contenido proyectado con ng-content select="[tableTitle]" se renderiza aquí
+  ::ng-deep [tableTitle] {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    
+    h2 {
+      font-size: vars.$font-size-lg;
+      font-weight: vars.$font-weight-semibold;
+      color: vars.$text-primary;
+      margin: 0;
+    }
+    
+    .back-button {
+      color: vars.$text-secondary;
+      
+      &:hover {
+        color: vars.$primary;
+        background-color: rgba(vars.$primary, 0.1);
+      }
+    }
+  }
+
+  .table-actions {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    flex-wrap: wrap;
+
+    button {
+      margin-left: vars.$spacing-xs;
+      
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+
+    .column-selector-button {
+      color: vars.$text-secondary;
+      transition: vars.$transition-base;
+
+      &:hover {
+        color: vars.$primary;
+        background-color: rgba(vars.$primary, 0.1);
+      }
+    }
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: vars.$spacing-xl;
+  color: vars.$text-secondary;
+
+  p {
+    margin-top: vars.$spacing-md;
+    font-size: vars.$font-size-sm;
+  }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+
+  // Custom scrollbar - thin style like dashboard
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th.mat-header-cell {
+    background: vars.$gray-50;
+    color: vars.$text-primary;
+    font-weight: vars.$font-weight-semibold;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-height: 30px;
+    padding: 0 10px;
+    border-bottom: 2px solid vars.$border-color;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  td.mat-cell {
+    padding: 3px 10px;
+    border-bottom: 1px solid vars.$gray-200;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: normal;
+    word-wrap: break-word;
+    color: vars.$text-primary;
+  }
+
+  .mat-header-row {
+    min-height: 30px;
+  }
+
+  .mat-row {
+    min-height: 30px;
+    height: auto;
+    padding: 8px 0;
+    transition: vars.$transition-base;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &.clickable-row {
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+
+  .no-data-cell {
+    text-align: center;
+    padding: vars.$spacing-xl !important;
+    border-bottom: none !important;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: vars.$spacing-xl;
+  color: vars.$text-muted;
+
+  mat-icon {
+    font-size: vars.$font-size-xl;
+    width: vars.$font-size-xl;
+    height: vars.$font-size-xl;
+    margin-bottom: vars.$spacing-sm;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: vars.$font-size-sm;
+    margin: 0;
+  }
+}
+
+.table-paginator {
+  border-top: 1px solid vars.$border-color;
+  background: vars.$gray-50;
+}
+
+// Responsive adjustments
+@media (max-width: vars.$breakpoint-md) {
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: vars.$spacing-sm;
+
+    .table-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+
+  .data-table {
+    th.mat-header-cell,
+    td.mat-cell {
+      padding: 0 5px;
+      font-size: 11px;
+    }
+
+    .mat-row {
+      min-height: 28px;
+      padding: 6px 0;
+    }
+  }
+}
+
+// Material sort header styles
+::ng-deep {
+  .mat-sort-header-arrow {
+    color: vars.$primary;
+  }
+
+  .mat-sort-header-sorted {
+    color: vars.$primary;
+  }
+}
+

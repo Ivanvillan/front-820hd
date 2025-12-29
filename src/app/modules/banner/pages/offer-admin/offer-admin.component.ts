@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CreateOfferDTO, Offer } from 'src/app/models/offers.model';
 import { OffersService } from 'src/app/services/offers/offers.service';
+import { ConfigService } from 'src/app/services/config/config.service';
 
 @Component({
   selector: 'app-offer-admin',
@@ -41,13 +42,14 @@ export class OfferAdminComponent implements OnInit {
   idOffer: number = 0;
   isEditing: boolean = false;
 
-  constructor(private offersService: OffersService, private _snackBar: MatSnackBar, private changeDetectorRef: ChangeDetectorRef) {
-    if(window.location.hostname.includes('localhost')){   
-      this.API_URI = 'http://localhost:3001/images';
-    }
-    if (!window.location.hostname.includes('localhost')) {
-      this.API_URI = 'https://api.820hd.com.ar/images'
-    }
+  constructor(
+    private offersService: OffersService, 
+    private _snackBar: MatSnackBar, 
+    private changeDetectorRef: ChangeDetectorRef,
+    private configService: ConfigService
+  ) {
+    // ✅ Usar configuración centralizada
+    this.API_URI = this.configService.IMAGE_URL;
    }
 
   ngOnInit() {

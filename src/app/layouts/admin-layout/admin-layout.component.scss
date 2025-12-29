@@ -1,0 +1,33 @@
+@use '../../../styles/variables' as vars;
+
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: vars.$bg-light;
+}
+
+.content-container {
+  flex: 1;
+  max-width: vars.$container-xxl;
+  width: 100%;
+  margin: 0 auto;
+  padding: vars.$spacing-sm;
+  overflow-y: auto;
+
+  @media (min-width: vars.$breakpoint-md) {
+    padding: vars.$spacing-md;
+  }
+
+  @media (min-width: vars.$breakpoint-xl) {
+    padding: vars.$spacing-lg;
+  }
+}
+
+// Responsive
+@media (max-width: vars.$breakpoint-sm) {
+  .content-container {
+    padding: vars.$spacing-sm;
+  }
+}
+

@@ -1,0 +1,205 @@
+@use 'src/styles/variables' as vars;
+
+.delete-technician-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+// ========== HEADER ==========
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: vars.$spacing-md;
+  padding: vars.$spacing-md vars.$spacing-lg vars.$spacing-md vars.$spacing-lg;
+  border-bottom: vars.$border-width solid vars.$border-color;
+  
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    margin: 0;
+    font-size: vars.$font-size-xl;
+    font-weight: vars.$font-weight-medium;
+    color: vars.$text-primary;
+    
+    .warning-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: vars.$warn;
+    }
+  }
+  
+  .close-button {
+    mat-icon {
+      color: vars.$text-secondary;
+    }
+    
+    &:hover mat-icon {
+      color: vars.$text-primary;
+    }
+  }
+}
+
+// ========== CONTENT ==========
+.dialog-content {
+  padding: vars.$spacing-sm vars.$spacing-lg;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.message {
+  font-size: vars.$font-size-base;
+  color: vars.$text-primary;
+  margin-bottom: vars.$spacing-md;
+  font-weight: vars.$font-weight-medium;
+}
+
+// ========== TECHNICIAN INFO ==========
+.technician-info {
+  background: vars.$bg-light;
+  border: vars.$border-width solid vars.$gray-200;
+  border-radius: vars.$border-radius-lg;
+  padding: vars.$spacing-md;
+  margin-bottom: vars.$spacing-md;
+  
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: vars.$spacing-xs 0;
+    border-bottom: vars.$border-width solid vars.$gray-200;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .label {
+      font-weight: vars.$font-weight-medium;
+      color: vars.$text-secondary;
+      font-size: vars.$font-size-sm;
+    }
+    
+    .value {
+      color: vars.$text-primary;
+      font-size: vars.$font-size-base;
+      text-align: right;
+    }
+  }
+}
+
+// ========== WARNING BOX ==========
+.warning-box {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  background: lighten(vars.$warn, 40%);
+  border-radius: vars.$border-radius-lg;
+  border: vars.$border-width solid lighten(vars.$warn, 20%);
+  color: vars.$warn;
+  font-size: vars.$font-size-sm;
+  
+  mat-icon {
+    font-size: vars.$font-size-md;
+    width: vars.$font-size-md;
+    height: vars.$font-size-md;
+  }
+}
+
+// ========== ACTIONS ==========
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: vars.$spacing-md;
+  padding: vars.$spacing-md vars.$spacing-lg;
+  border-top: vars.$border-width solid vars.$border-color;
+  
+  .confirm-btn {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    min-width: 140px;
+    height: 40px;
+    font-weight: vars.$font-weight-medium;
+    font-size: vars.$font-size-base;
+    border-radius: vars.$border-radius-lg;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+    
+    &:hover:not(:disabled) {
+      background-color: darken(vars.$warn, 8%);
+    }
+  }
+}
+
+// ========== RESPONSIVE ==========
+
+// Tablet
+@media (max-width: vars.$breakpoint-lg) {
+  .dialog-header {
+    padding: vars.$spacing-sm vars.$spacing-md;
+    
+    h2 {
+      font-size: vars.$font-size-lg;
+      
+      .warning-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+  
+  .dialog-content {
+    padding: vars.$spacing-md;
+  }
+  
+  .dialog-actions {
+    padding: vars.$spacing-sm vars.$spacing-md;
+  }
+}
+
+// Móvil
+@media (max-width: vars.$breakpoint-md) {
+  .dialog-header {
+    h2 {
+      font-size: vars.$font-size-md;
+      gap: vars.$spacing-xs;
+      
+      .warning-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+  
+  .dialog-content {
+    padding: vars.$spacing-sm;
+  }
+  
+  .dialog-actions {
+    padding: vars.$spacing-sm;
+    
+    .confirm-btn {
+      width: 100%;
+      justify-content: center;
+      min-width: unset;
+    }
+  }
+}
+
+// Móvil pequeño
+@media (max-width: vars.$breakpoint-sm) {
+  .dialog-header h2 {
+    font-size: vars.$font-size-sm;
+  }
+}
+

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Credentials } from 'src/app/models/credentials.models';
+import { TimezoneService } from '../timezone/timezone.service';
 import * as moment from 'moment-timezone';
 
 @Injectable({
@@ -7,10 +8,10 @@ import * as moment from 'moment-timezone';
 })
 export class CredentialsService {
 
-  constructor() { }
+  constructor(private timezoneService: TimezoneService) { }
 
   saveCredentials(credentials: Credentials): void {
-    const timeZone = 'America/Argentina/Buenos_Aires';
+    const timeZone = this.timezoneService.getTimezone();
     const timeString = moment().tz(timeZone).format();
     const token = credentials.token;
     const data = {
@@ -20,6 +21,7 @@ export class CredentialsService {
       'name': credentials.contacto,
       'email': credentials.email,
       'type': credentials.type,
+      'area': credentials.area, // Agregar el campo area
       'time': timeString
     }
     localStorage.setItem('credentials', JSON.stringify(data));
@@ -30,6 +32,11 @@ export class CredentialsService {
   getCredentials() {
     const credentials = localStorage.getItem('credentials');
     return credentials;
+  }
+
+  getCredentialsParsed(): any {
+    const credentials = localStorage.getItem('credentials');
+    return credentials ? JSON.parse(credentials) : null;
   }
 
   getToken() {
@@ -46,8 +53,22 @@ export class CredentialsService {
     localStorage.removeItem('news');
   }
 
-  revokeCredentials() {
-    localStorage.clear();
+  /**
+   * Revoca credenciales de manera quirúrgica
+   * Solo elimina keys específicas de la aplicación
+   */
+  revokeCredentials(): void {
+    // Lista explícita de keys a eliminar
+    const keysToRemove = [
+      'credentials',
+      'token',
+      'dashboard_token',
+      'news'
+    ];
+    
+    keysToRemove.forEach(key => {
+      localStorage.removeItem(key);
+    });
   }
 
   saveDashboardToken(token: string): void {

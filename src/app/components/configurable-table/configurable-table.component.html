@@ -1,0 +1,98 @@
+<div class="configurable-table-container">
+  <!-- Table Header -->
+  <div class="table-header" *ngIf="title || showColumnSelector">
+    <div class="table-title-container">
+      <!-- Slot para título personalizado (ej: con botón back) -->
+      <ng-content select="[tableTitle]"></ng-content>
+      <!-- Título estándar (se oculta automáticamente si hay contenido en tableTitle) -->
+      <h2 class="table-title" *ngIf="title">{{ title }}</h2>
+    </div>
+    <div class="table-actions">
+      <ng-content select="[tableActions]"></ng-content>
+      <button
+        *ngIf="showColumnSelector"
+        mat-icon-button
+        (click)="openColumnSelector()"
+        matTooltip="Configurar columnas"
+        class="column-selector-button">
+        <mat-icon>settings</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="loading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando datos...</p>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper" *ngIf="!loading">
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      matSort
+      class="data-table">
+      
+      <!-- Dynamic Columns -->
+      <ng-container *ngFor="let column of visibleColumns" [matColumnDef]="column.id">
+        <th
+          mat-header-cell
+          *matHeaderCellDef
+          [mat-sort-header]="column.id"
+          [disabled]="!isSortable(column)"
+          [style.width]="getColumnWidth(column)">
+          {{ column.label }}
+        </th>
+        <td
+          mat-cell
+          *matCellDef="let row"
+          [style.width]="getColumnWidth(column)">
+          
+          <!-- Custom Template if provided -->
+          <ng-container *ngIf="hasCustomTemplate(column.id); else defaultCell">
+            <ng-container *ngTemplateOutlet="getCustomTemplate(column.id)!; context: { $implicit: row }">
+            </ng-container>
+          </ng-container>
+
+          <!-- Default Cell -->
+          <ng-template #defaultCell>
+            {{ getCellValue(row, column.id) }}
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <!-- Table Rows -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns;"
+        (click)="onRowClick(row)"
+        [class.clickable-row]="rowClick.observers.length > 0">
+      </tr>
+
+      <!-- No Data Row -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
+          <div class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <p>{{ emptyStateMessage }}</p>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator
+    *ngIf="showPaginator && !loading"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    [showFirstLastButtons]="true"
+    [length]="serverSidePagination ? (length ?? 0) : undefined"
+    [pageIndex]="serverSidePagination ? pageIndex : undefined"
+    (page)="onPageChange($event)"
+    class="table-paginator">
+  </mat-paginator>
+</div>
+

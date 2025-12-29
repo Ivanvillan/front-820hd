@@ -1,13 +1,15 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 import { OrdersService } from 'src/app/services/orders/orders.service';
+import { formatNotesForDisplay } from 'src/app/shared/utils/order-notes.utils';
 
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { faDisplay } from '@fortawesome/free-solid-svg-icons';
 
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
-
+import { Ticket } from 'src/app/models/ticket.model'; 
 import jsPDF from 'jspdf';
 import autoTable, { Styles } from 'jspdf-autotable';
 
@@ -26,8 +28,9 @@ export class OrdersUserComponent implements OnInit {
   secondDate: string = '';
   columns: string[] = ['Inicio', 'Contacto', 'Problema', 'Resolución', 'Tipo', 'Responsable', 'Fin'];
   imageType = '';
-  dataTable: any[] = [];
+  dataTable: Ticket[] = [];
   dataDescribe = {
+    numero: '',
     fechaini: '',
     contacto: '',
     descripcion: '',
@@ -48,13 +51,22 @@ export class OrdersUserComponent implements OnInit {
   ]
   selectedOrderList: string = 'personales';
 
-  constructor(private ordersService: OrdersService, private credentialsService: CredentialsService) { 
-    const data = JSON.parse(this.credentialsService.getCredentials()!);    
-    this.contactName = data.contact;
-    this.userType = data.type;
+  sector: string = 'insumos';
+
+  constructor(
+    private ordersService: OrdersService, 
+    private credentialsService: CredentialsService,
+    private router: Router
+  ) { 
+    const data = this.credentialsService.getCredentialsParsed();    
+    this.contactName = data?.contact || data?.contacto;
+    this.userType = data?.type;
   }
 
   ngOnInit() {
+    // ✅ Determinar sector desde la ruta
+    this.determineSector();
+    
     if(this.userType === 'admin') {
       this.readAllClients();
     }
@@ -63,27 +75,68 @@ export class OrdersUserComponent implements OnInit {
     }    
   }
 
+  /**
+   * Determina el sector según la ruta actual
+   * ✅ USA router.url EN LUGAR DE window.location.href
+   */
+  private determineSector(): void {
+    const currentUrl = this.router.url;
+    
+    if (currentUrl.includes('/supplies')) {
+      this.sector = 'insumos';
+    } else if (currentUrl.includes('/assistance')) {
+      this.sector = 'servicios';
+    } else {
+      this.sector = 'insumos'; // default
+    }
+  }
+
   describeOrder(data: any) {
     this.dataDescribe = data; 
-    this.contactName = this.dataDescribe?.contacto       
+    this.contactName = this.dataDescribe?.contacto;     
+  }
+
+  /**
+   * Formatea las observaciones para mostrar de manera legible
+   * @param observaciones - Campo observaciones del backend
+   * @returns String formateado para mostrar en la UI
+   */
+  formatObservaciones(observaciones: string | undefined): string {
+    if (!observaciones || !observaciones.trim()) {
+      return 'Sin observaciones';
+    }
+
+    try {
+      // Intentar parsear como JSON para formatear
+      const notes = JSON.parse(observaciones);
+      if (Array.isArray(notes)) {
+        return formatNotesForDisplay(notes);
+      }
+    } catch (e) {
+      // Si no es JSON válido, mostrar como texto plano
+      return observaciones;
+    }
+
+    return observaciones;
   }
   readAll() {
-    const data = JSON.parse(this.credentialsService.getCredentials()!);    
+    const data = this.credentialsService.getCredentialsParsed();    
     let contact = data?.idContact;
     this.searchButtonText = 'Buscando...';
     this.dataTable = [];
     this.ordersService.readAllByContact(contact).subscribe({
       next: (res) => {        
         this.searchButtonText = 'Buscar';
-        if (window.location.href.includes('/supplies')) {
+        // ✅ Usar sector determinado desde la ruta
+        if (this.sector === 'insumos') {
           this.dataTable = this.dataTable.concat(res);
           this.dataTable = this.dataTable.filter(
-            (el: { insu: any; sopo: any }) => el.insu == true || (el.insu == false && el.sopo == false) )
+            (el: Ticket) => el && (el.insu == true || (el.insu == false && el.sopo == false)) )
         }
-        if (window.location.href.includes('/assistance')) {
+        if (this.sector === 'servicios') {
           this.dataTable = this.dataTable.concat(res);
           this.dataTable = this.dataTable.filter(
-            (el: { insu: any; sopo: any }) => el.sopo == true || (el.insu == false && el.sopo == false))
+            (el: Ticket) => el && (el.sopo == true || (el.insu == false && el.sopo == false)))
         }        
       },
       error: (err) => {
@@ -111,7 +164,7 @@ export class OrdersUserComponent implements OnInit {
 
   searchByDateAndClient() {
     this.searchButtonText = 'Buscando...';
-    const data = JSON.parse(this.credentialsService.getCredentials()!);    
+    const data = this.credentialsService.getCredentialsParsed();    
     let client = data?.idClient;
     this.dataTable = [];
     this.ordersService.readByDate(client, this.firstDate, this.secondDate).subscribe({
@@ -130,7 +183,7 @@ export class OrdersUserComponent implements OnInit {
 
   readAllByClient() {
     this.searchButtonText = 'Buscando...';
-    const data = JSON.parse(this.credentialsService.getCredentials()!);    
+    const data = this.credentialsService.getCredentialsParsed();    
     let client = data?.idClient;
     this.dataTable = [];
     this.ordersService.readAll(client).subscribe({
@@ -188,12 +241,12 @@ export class OrdersUserComponent implements OnInit {
         if (window.location.href.includes('/supplies')) {
           this.dataTable = this.dataTable.concat(res);
           this.dataTable = this.dataTable.filter(
-            (el: { insu: any; sopo: any }) => el.insu == true || (el.insu == false && el.sopo == false) )
+            (el: Ticket) => el && (el.insu == true || (el.insu == false && el.sopo == false)) )
           }
         if (window.location.href.includes('/assistance')) {
           this.dataTable = this.dataTable.concat(res);
           this.dataTable = this.dataTable.filter(
-            (el: { insu: any; sopo: any }) => el.sopo == true || (el.insu == false && el.sopo == false))
+            (el: Ticket) => el && (el.sopo == true || (el.insu == false && el.sopo == false)))
         }
       },
       error: (err) => {
@@ -235,9 +288,10 @@ export class OrdersUserComponent implements OnInit {
     const data: any[] = [];
 
     this.dataTable.map( row => {
+      if (!row) return; // Skip null/undefined rows
       let type = '';
-      let fechaini = this.formatDate(row.fechaini) ?? '';
-      let fechafin = this.formatDate(row.fechafin) ?? '';
+      let fechaini = this.formatDate(row.fechaini ?? '');
+      let fechafin = this.formatDate(row.fechafin ?? '');
       if(row.insu) type = 'Insumo';
       if(row.sopo) type = 'Servicio';
       data.push([fechaini, row.contacto, row.descripcion, row.observaciones, type, row.referente, fechafin])

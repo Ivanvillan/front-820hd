@@ -1,0 +1,52 @@
+<div class="filter-bar" [formGroup]="filterForm">
+  <!-- Render each filter based on its type -->
+  <ng-container *ngFor="let filter of filters">
+    <!-- Text Input Filter -->
+    <mat-form-field
+      *ngIf="isTextFilter(filter)"
+      [class.filter-item]="true"
+      appearance="outline">
+      <!-- <mat-label>{{ filter.label }}</mat-label> -->
+      <input
+        matInput
+        [formControlName]="filter.name"
+        [placeholder]="filter.placeholder || ''"
+        type="text">
+      <!-- <mat-icon matPrefix>search</mat-icon> -->
+    </mat-form-field>
+
+    <!-- ng-select Filters -->
+    <div *ngIf="isNgSelectFilter(filter)" [class.filter-item]="true" class="ng-select-wrapper">
+      <ng-select
+        [formControlName]="filter.name"
+        [placeholder]="filter.placeholder || 'Seleccionar'"
+        [searchable]="true"
+        [clearable]="true"
+        [bindLabel]="filter.optionLabel || 'label'"
+        [bindValue]="filter.optionValue || 'value'"
+        [items]="filter.options || []"
+        notFoundText="No se encontraron resultados"
+        class="ng-select-custom">
+        <ng-template ng-label-tmp let-item="item">
+          <span>{{ getOptionLabel(filter, item) }}</span>
+        </ng-template>
+        <ng-template ng-option-tmp let-item="item">
+          <span>{{ getOptionLabel(filter, item) }}</span>
+        </ng-template>
+      </ng-select>
+    </div>
+  </ng-container>
+
+  <!-- Clear Button -->
+  <!-- <div class="filter-actions" *ngIf="showClearButton">
+    <button
+      mat-icon-button
+      color="primary"
+      (click)="clearFilters()"
+      matTooltip="Limpiar Filtros"
+      class="clear-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div> -->
+</div>
+

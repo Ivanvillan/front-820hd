@@ -1,0 +1,121 @@
+<div class="management-container">
+  
+  <!-- ==================== VISTA DE CLIENTES ==================== -->
+  <div *ngIf="!showContactsView">
+    <!-- Filtros con búsqueda instantánea -->
+    <app-filter-bar
+      [filters]="customerFilters"
+      (filterChange)="onCustomerFilterChange($event)"
+      (filterClear)="onCustomerFilterClear()">
+    </app-filter-bar>
+
+    <!-- Tabla de clientes -->
+    <app-configurable-table
+      tableId="customers-table"
+      title="Gestión de Clientes"
+      [data]="customers"
+      [defaultColumns]="customerColumns"
+      [loading]="isLoadingCustomers"
+      [pageSize]="customerPageSize"
+      [length]="customerTotalItems"
+      [pageIndex]="customerPage - 1"
+      [serverSidePagination]="true"
+      [showColumnSelector]="true"
+      [columnTemplates]="{ 'actions': actionsTemplate }"
+      emptyStateMessage="No se encontraron clientes con los filtros aplicados"
+      (pageChange)="onCustomerPageChange($event)">
+      
+      <!-- Slot de acciones (botones superiores) -->
+      <div tableActions class="table-actions">
+        <button mat-raised-button color="primary" (click)="openCreateCustomerDialog()">
+          <mat-icon>add</mat-icon>
+          Nuevo Cliente
+        </button>
+      </div>
+    </app-configurable-table>
+  </div>
+
+  <!-- ==================== VISTA DE CONTACTOS ==================== -->
+  <div *ngIf="showContactsView">
+    <!-- Filtros de contactos -->
+    <app-filter-bar
+      [filters]="contactFilters"
+      (filterChange)="onContactFilterChange($event)"
+      (filterClear)="onContactFilterClear()">
+    </app-filter-bar>
+
+    <!-- Tabla de contactos -->
+    <app-configurable-table
+      tableId="contacts-table"
+      [data]="contacts"
+      [defaultColumns]="contactColumns"
+      [loading]="isLoadingContacts"
+      [pageSize]="contactPageSize"
+      [showColumnSelector]="true"
+      [columnTemplates]="{ 'actions': contactActionsTemplate }"
+      emptyStateMessage="No se encontraron contactos para este cliente">
+      
+      <!-- Slot de título personalizado con botón back -->
+      <div tableTitle class="table-title-with-back">
+        <button mat-icon-button (click)="volverAClientes()" matTooltip="Volver a clientes" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h2>Contactos de {{selectedCustomer?.nombre}}</h2>
+      </div>
+      
+      <!-- Slot de acciones (botones superiores) -->
+      <div tableActions class="table-actions">
+        <button mat-raised-button color="primary" (click)="openCreateContactDialog()" [disabled]="!selectedCustomer">
+          <mat-icon>add</mat-icon>
+          Nuevo Contacto
+        </button>
+      </div>
+    </app-configurable-table>
+  </div>
+
+</div>
+
+<!-- ==================== TEMPLATES DE ACCIONES ==================== -->
+
+<!-- Template de acciones para clientes -->
+<ng-template #actionsTemplate let-row>
+  <div class="actions-cell">
+    <button mat-icon-button [matMenuTriggerFor]="customerMenu" (click)="$event.stopPropagation()">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #customerMenu="matMenu">
+      <button mat-menu-item (click)="verDetalles(row)">
+        Ver detalles
+      </button>
+      <button mat-menu-item (click)="openUpdateDialog(row)">
+        Editar
+      </button>
+      <button mat-menu-item (click)="verContactos(row)">
+        Ver contactos
+      </button>
+      <button mat-menu-item class="delete-action" (click)="openDeleteConfirmDialog(row)">
+        Eliminar
+      </button>
+    </mat-menu>
+  </div>
+</ng-template>
+
+<!-- Template de acciones para contactos -->
+<ng-template #contactActionsTemplate let-row>
+  <div class="actions-cell">
+    <button mat-icon-button [matMenuTriggerFor]="contactMenu" (click)="$event.stopPropagation()">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #contactMenu="matMenu">
+      <button mat-menu-item (click)="verDetallesContacto(row)">
+        Ver detalles
+      </button>
+      <button mat-menu-item (click)="openUpdateContactDialog(row)">
+        Editar
+      </button>
+      <button mat-menu-item class="delete-action" (click)="openDeleteContactConfirmDialog(row)">
+        Eliminar
+      </button>
+    </mat-menu>
+  </div>
+</ng-template>
