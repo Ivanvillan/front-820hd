@@ -29,6 +29,11 @@ export class ErrorInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
+        // Ignorar errores de Twitter (no mostrar snackbar)
+        if (request.url.includes('/twitter')) {
+          return throwError(() => error);
+        }
+
         let errorMessage = 'Ha ocurrido un error';
         
         // Error del lado del cliente
