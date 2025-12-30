@@ -50,20 +50,20 @@ export class OrderManagementComponent implements OnInit {
   filterConfig: FilterConfig[] = [];
   currentFilterValues: FilterValues = {};
 
-  // Configuración de columnas
+  // Configuración de columnas - anchos optimizados para mejor visualización
   orderColumns: ColumnConfig[] = [
-    { id: 'fecha', label: 'Fecha', visible: true, mandatory: false, sortable: false, width: '100px' },
-    { id: 'hora', label: 'Hora', visible: true, mandatory: false, sortable: false, width: '80px' },
-    { id: 'numero', label: 'No. Orden', visible: true, mandatory: true, sortable: false, width: '100px' },
-    { id: 'descripcion', label: 'Descripción', visible: true, mandatory: false, sortable: false, width: '250px' },
+    { id: 'fecha', label: 'Fecha', visible: true, mandatory: false, sortable: false, width: '80px' },
+    { id: 'hora', label: 'Hora', visible: true, mandatory: false, sortable: false, width: '60px' },
+    { id: 'numero', label: 'No. Orden', visible: true, mandatory: true, sortable: false, width: '90px' },
+    { id: 'descripcion', label: 'Descripción', visible: true, mandatory: false, sortable: false, width: '280px' },
     { id: 'contacto', label: 'Contacto', visible: false, mandatory: false, sortable: false },
-    { id: 'empresa', label: 'Empresa', visible: true, mandatory: false, sortable: false },
+    { id: 'empresa', label: 'Empresa', visible: true, mandatory: false, sortable: false, width: '120px' },
     { id: 'sector', label: 'Sector', visible: true, mandatory: false, sortable: false, width: '100px' },
-    { id: 'tipoServicio', label: 'Tipo Servicio', visible: true, mandatory: false, sortable: false },
-    { id: 'prioridad', label: 'Prioridad', visible: true, mandatory: false, sortable: false, width: '100px' },
-    { id: 'estado', label: 'Estado', visible: true, mandatory: false, sortable: false, width: '120px' },
-    { id: 'nombreAsignado', label: 'Asignado', visible: true, mandatory: false, sortable: false },
-    { id: 'acciones', label: 'Acciones', visible: true, mandatory: true, sortable: false, width: '150px' }
+    { id: 'tipoServicio', label: 'Tipo Servicio', visible: true, mandatory: false, sortable: false, width: '120px' },
+    { id: 'prioridad', label: 'Prioridad', visible: true, mandatory: false, sortable: false, width: '90px' },
+    { id: 'estado', label: 'Estado', visible: true, mandatory: false, sortable: false, width: '130px' },
+    { id: 'nombreAsignado', label: 'Asignado', visible: true, mandatory: false, sortable: false, width: '100px' },
+    { id: 'acciones', label: '', visible: true, mandatory: true, sortable: false, width: '60px' }
   ];
 
   // Templates personalizados

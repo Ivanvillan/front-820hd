@@ -94,9 +94,19 @@
 }
 
 .descripcion-cell {
-  display: flex;
-  flex-direction: column;
-  gap: vars.$spacing-xs;
+  display: block;
+  max-width: 280px;
+  min-width: 200px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.4;
+  font-size: 12px;
+  color: vars.$text-primary;
+  
+  // Permitir que las URLs largas se rompan correctamente
+  word-wrap: break-word;
+  white-space: normal;
 }
 
 .descripcion-title {
@@ -109,14 +119,65 @@
 ::ng-deep {
   .configurable-table-container {
     .mat-column-descripcion {
-      min-height: 48px;
-      align-items: center;
+      max-width: 300px !important;
+      min-width: 200px;
+      width: 280px;
+      vertical-align: top;
+      padding-top: 8px !important;
+      padding-bottom: 8px !important;
     }
     
     .mat-column-fecha {
       width: 80px !important;
       min-width: 80px;
       max-width: 80px;
+    }
+    
+    .mat-column-hora {
+      width: 60px !important;
+      min-width: 60px;
+      max-width: 60px;
+    }
+    
+    .mat-column-numero {
+      width: 90px !important;
+      min-width: 90px;
+      max-width: 90px;
+    }
+    
+    .mat-column-sector {
+      width: 100px !important;
+      min-width: 80px;
+      max-width: 120px;
+    }
+    
+    .mat-column-tipoServicio {
+      width: 120px;
+      min-width: 100px;
+    }
+    
+    .mat-column-prioridad {
+      width: 90px !important;
+      min-width: 80px;
+      max-width: 100px;
+      text-align: center;
+    }
+    
+    .mat-column-estado {
+      width: 130px;
+      min-width: 110px;
+    }
+    
+    .mat-column-nombreAsignado {
+      width: 100px;
+      min-width: 80px;
+    }
+    
+    .mat-column-acciones {
+      width: 60px !important;
+      min-width: 60px;
+      max-width: 60px;
+      text-align: center;
     }
   }
 }
