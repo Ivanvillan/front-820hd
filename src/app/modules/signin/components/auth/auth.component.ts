@@ -15,7 +15,7 @@ export class AuthComponent {
 
   isLoading = false;
   login: Auth = {
-    email: '',
+    email: '', // Se usará como identifier en el backend
     password: ''
   }
 
@@ -28,7 +28,13 @@ export class AuthComponent {
 
   auth(): void {
     this.isLoading = true;
-    this.loginService.login(this.login)
+    // Enviar 'identifier' al backend (puede ser usuario o email)
+    const loginData: Auth = {
+      email: this.login.email,
+      identifier: this.login.email, // El backend usará esto para técnicos
+      password: this.login.password
+    };
+    this.loginService.login(loginData)
       .subscribe({
         next: (res) => {
           this.isLoading = false;

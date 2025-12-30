@@ -1,4 +1,5 @@
 export interface Auth {
-    email: string;
+    email: string; // Mantener para compatibilidad
+    identifier?: string; // Nuevo: usuario o email (usado para técnicos)
     password: string;
 }
