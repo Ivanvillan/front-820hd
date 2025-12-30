@@ -472,25 +472,25 @@ export class OrderManagementComponent implements OnInit {
 
   /**
    * Obtiene el tipo de servicio de la orden
+   * Lógica:
+   * 1. Si tiene servicio específico (tipoServicioNombre) → mostrar ese
+   * 2. Si no, mostrar según flags: insu → "Insumos", sopo → "Soporte"
    */
   getServiceType(order: any): string {
-    if (order.tipoServicioNombre) {
+    if (!order) return '-';
+    
+    // Prioridad 1: Servicio específico asignado (desde tabla [1reqservicios])
+    if (order.tipoServicioNombre && order.tipoServicioNombre.trim()) {
       return order.tipoServicioNombre;
     }
-    if (order.tipoServicio && typeof order.tipoServicio === 'string') {
-      return order.tipoServicio;
-    }
-    if (order.tiposerv) {
-      // Mapear el ID del tipo de servicio a texto
-      const serviceTypeMap: { [key: number]: string } = {
-        1: 'Mantenimiento',
-        2: 'Reparación',
-        3: 'Instalación',
-        4: 'Soporte',
-        5: 'Consultoría'
-      };
-      return serviceTypeMap[order.tiposerv] || `Servicio ${order.tiposerv}`;
-    }
+    
+    // Prioridad 2: Tipo de pedido según flags (mismo que getOrderType de utils)
+    if (order.insu) return 'Insumos';
+    if (order.sopo) return 'Soporte';
+    if (order.mant) return 'Mantenimiento';
+    if (order.limp) return 'Limpieza';
+    if (order.mda) return 'Mantenimiento'; // Legacy fallback
+    
     return '-';
   }
 

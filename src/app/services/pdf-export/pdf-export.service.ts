@@ -516,9 +516,26 @@ export class PdfExportService {
 
   /**
    * Obtiene el tipo de servicio
+   * Lógica idéntica a getOrderType de order-status.utils
+   * 1. Si tiene servicio específico (tipoServicioNombre) → mostrar ese
+   * 2. Si no, mostrar según flags: insu → "Insumos", sopo → "Soporte"
    */
   private getServiceType(order: Ticket): string {
-    return order.tipoServicioNombre || 'Sin especificar';
+    if (!order) return 'General';
+    
+    // Prioridad 1: Servicio específico asignado
+    if (order.tipoServicioNombre && order.tipoServicioNombre.trim()) {
+      return order.tipoServicioNombre;
+    }
+    
+    // Prioridad 2: Tipo de pedido según flags (mismo que getOrderType de utils)
+    if (order.insu) return 'Insumos';
+    if (order.sopo) return 'Soporte';
+    if (order.mant) return 'Mantenimiento';
+    if (order.limp) return 'Limpieza';
+    if (order.mda) return 'Mantenimiento'; // Legacy fallback
+    
+    return 'General';
   }
 
   /**
