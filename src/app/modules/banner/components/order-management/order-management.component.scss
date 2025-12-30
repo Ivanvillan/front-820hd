@@ -116,13 +116,12 @@
 }
 
 // Estilos específicos de columnas
-::ng-deep {
+:host ::ng-deep {
   .configurable-table-container {
     .mat-column-descripcion {
       max-width: 300px !important;
       min-width: 200px;
       width: 280px;
-      vertical-align: top;
       padding-top: 8px !important;
       padding-bottom: 8px !important;
     }
@@ -140,9 +139,9 @@
     }
     
     .mat-column-numero {
-      width: 90px !important;
-      min-width: 90px;
-      max-width: 90px;
+      width: 60px  !important;
+      min-width: 60px;
+      max-width: 60px;
     }
     
     .mat-column-sector {
