@@ -88,13 +88,6 @@
         </mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef="tipoServicio">
-        <mat-header-cell *matHeaderCellDef>Servicio</mat-header-cell>
-        <mat-cell *matCellDef="let ticket" [title]="ticket.tipoServicioNombre || 'Sin servicio'">
-          {{ticket.tipoServicioNombre || 'Sin servicio'}}
-        </mat-cell>
-      </ng-container>
-
       <ng-container matColumnDef="asignado">
         <mat-header-cell *matHeaderCellDef>Asignado</mat-header-cell>
         <mat-cell *matCellDef="let ticket" [title]="ticket.nombreAsignado || ticket.referente || 'Sin asignar'">
