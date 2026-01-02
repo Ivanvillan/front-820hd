@@ -115,8 +115,18 @@
                   <span class="info-label">Tipo de Orden:</span>
                   <span class="info-value">{{ getOrderTypeCategory(order) }}</span>
                 </div>
-                <div class="info-item" *ngIf="order.tipoServicioNombre">
+                <div class="info-item">
                   <span class="info-label">Tipo de Servicio:</span>
+                  <mat-chip-list>
+                    <mat-chip 
+                      [color]="getModalidadColor(order.tiposerv)" 
+                      [selected]="true">
+                      {{ getModalidadText(order.tiposerv) }}
+                    </mat-chip>
+                  </mat-chip-list>
+                </div>
+                <div class="info-item" *ngIf="order.tipoServicioNombre">
+                  <span class="info-label">Servicio:</span>
                   <span class="info-value">{{ order.tipoServicioNombre }}</span>
                 </div>
                 <div class="info-item">

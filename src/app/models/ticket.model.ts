@@ -67,9 +67,10 @@ export interface Ticket {
   // Campos opcionales para funcionalidad adicional
   tipo?: string;
   
-  // Campo de tipo de servicio
-  tiposerv?: number; // ID del servicio asignado
-  tipoServicioNombre?: string; // Nombre del servicio
+  // Campos de servicio
+  tiposerv?: number; // Tipo de servicio: 0 = Out (Externo), 1 = In (Interno), null/undefined = No definido
+  servicios?: string | number; // ID del servicio específico (referencia a tabla 1reqservicios)
+  tipoServicioNombre?: string; // Nombre del servicio específico (ej: "Instalación", "Reparación")
 }
 
 // Enums para los valores permitidos

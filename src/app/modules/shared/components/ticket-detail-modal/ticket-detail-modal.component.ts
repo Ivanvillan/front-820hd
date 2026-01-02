@@ -290,4 +290,28 @@ export class TicketDetailModalComponent {
       this.showSnackBar('Error al generar el PDF', 'error');
     }
   }
+
+  /**
+   * Obtiene el texto de modalidad (In/Out) manejando datos legacy
+   * @param tiposerv - Valor del campo tiposerv (0=Out, 1=In, null/undefined=No definido)
+   * @returns Texto de modalidad formateado
+   */
+  getModalidadText(tiposerv: number | null | undefined): string {
+    if (tiposerv === null || tiposerv === undefined) {
+      return 'No definido';
+    }
+    return tiposerv === 1 ? 'In (Interno)' : 'Out (Externo)';
+  }
+
+  /**
+   * Obtiene el color del chip de modalidad según el valor de tiposerv
+   * @param tiposerv - Valor del campo tiposerv (0=Out, 1=In, null/undefined=No definido)
+   * @returns Color del chip Material
+   */
+  getModalidadColor(tiposerv: number | null | undefined): string {
+    if (tiposerv === null || tiposerv === undefined) {
+      return 'basic'; // Color neutral para datos no definidos
+    }
+    return tiposerv === 1 ? 'primary' : 'accent';
+  }
 } 

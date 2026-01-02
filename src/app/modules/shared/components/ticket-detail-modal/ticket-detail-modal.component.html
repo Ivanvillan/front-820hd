@@ -73,8 +73,20 @@
           <span class="label">Sector:</span>
           <span class="value">{{ticket.sector || '--'}}</span>
         </div>
-        <div class="info-item" *ngIf="ticket.tipoServicioNombre">
+        <div class="info-item">
           <span class="label">Tipo de Servicio:</span>
+          <span class="value">
+            <mat-chip-list>
+              <mat-chip 
+                [color]="getModalidadColor(ticket.tiposerv)" 
+                [selected]="true">
+                {{ getModalidadText(ticket.tiposerv) }}
+              </mat-chip>
+            </mat-chip-list>
+          </span>
+        </div>
+        <div class="info-item" *ngIf="ticket.tipoServicioNombre">
+          <span class="label">Servicio:</span>
           <span class="value">{{ticket.tipoServicioNombre}}</span>
         </div>
         <div class="info-item full-width">
