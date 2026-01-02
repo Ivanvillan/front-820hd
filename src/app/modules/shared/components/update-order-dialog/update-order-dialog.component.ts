@@ -43,6 +43,7 @@ export class UpdateOrderDialogComponent implements OnInit {
   
   // Servicios
   services: Service[] = [];
+  isLoadingServices = false;
   
   // Materiales
   materials: Material[] = [];
@@ -82,7 +83,8 @@ export class UpdateOrderDialogComponent implements OnInit {
       contactId: [null],
       description: ['', [Validators.maxLength(1550)]],
       orderType: ['sopo'],
-      tiposerv: [null],
+      serviceType: ['out'], // Tipo de servicio: in (interno) o out (externo)
+      tiposerv: [null], // ID del servicio específico
       
       // Asignación
       estado: ['', Validators.required],
@@ -132,6 +134,10 @@ export class UpdateOrderDialogComponent implements OnInit {
       else if (this.data.sopo) orderType = 'sopo';
       else if (this.data.limp) orderType = 'limp';
       
+      // Determinar serviceType (in/out) basado en tiposerv
+      // tiposerv: 1 = in (interno), 0 = out (externo)
+      const serviceType = this.data.tiposerv === 1 ? 'in' : 'out';
+      
       // Convertir notes de array a string si es necesario
       let notesText = '';
       if (this.data.notes) {
@@ -147,13 +153,17 @@ export class UpdateOrderDialogComponent implements OnInit {
         this.loadExistingMaterials();
       });
       
+      // Convertir servicios a number para compatibilidad con ng-select
+      const servicioId = this.data.servicios ? Number(this.data.servicios) : null;
+      
       this.updateForm.patchValue({
         // Información básica
         clientId: this.data.idcliente || null,
         contactId: this.data.idcontacto || null,
         description: this.data.descripcion || '',
         orderType: orderType,
-        tiposerv: this.data.tiposerv || null,
+        serviceType: serviceType,
+        tiposerv: servicioId, // Usar servicios convertido a number
         
         // Asignación
         estado: this.data.estado || 'Pendiente',
@@ -235,12 +245,16 @@ export class UpdateOrderDialogComponent implements OnInit {
    * Carga los servicios disponibles
    */
   private loadServices(): void {
+    this.isLoadingServices = true;
     this.servicesService.getServices().subscribe({
       next: (services: Service[]) => {
         this.services = services;
+        this.isLoadingServices = false;
       },
       error: (error) => {
         console.error('Error loading services:', error);
+        this.isLoadingServices = false;
+        this.snackBar.open('Error al cargar los servicios', 'Cerrar', { duration: 3000 });
       }
     });
   }
@@ -604,7 +618,10 @@ export class UpdateOrderDialogComponent implements OnInit {
         updateData.description = formData.description.trim();
       }
       if (formData.tiposerv) {
-        updateData.tiposerv = formData.tiposerv;
+        updateData.servicioId = formData.tiposerv; // ID del servicio (va a campo "servicios")
+      }
+      if (formData.serviceType) {
+        updateData.serviceType = formData.serviceType; // 'in' o 'out' (va a campo "tiposerv")
       }
       if (formData.orderType) {
         updateData.insu = formData.orderType === 'insu' ? 1 : 0;

@@ -59,7 +59,7 @@ export class OrderManagementComponent implements OnInit {
     { id: 'contacto', label: 'Contacto', visible: false, mandatory: false, sortable: false },
     { id: 'empresa', label: 'Empresa', visible: true, mandatory: false, sortable: false, width: '120px' },
     { id: 'sector', label: 'Sector', visible: true, mandatory: false, sortable: false, width: '100px' },
-    { id: 'tipoServicio', label: 'Tipo Servicio', visible: true, mandatory: false, sortable: false, width: '120px' },
+    { id: 'tipoServicio', label: 'Servicio', visible: true, mandatory: false, sortable: false, width: '120px' },
     { id: 'prioridad', label: 'Prioridad', visible: true, mandatory: false, sortable: false, width: '90px' },
     { id: 'estado', label: 'Estado', visible: true, mandatory: false, sortable: false, width: '130px' },
     { id: 'nombreAsignado', label: 'Asignado', visible: true, mandatory: false, sortable: false, width: '100px' },
@@ -484,7 +484,12 @@ export class OrderManagementComponent implements OnInit {
       return order.tipoServicioNombre;
     }
     
-    // Prioridad 2: Tipo de pedido según flags (mismo que getOrderType de utils)
+    // Prioridad 2: Si tiene servicios asignado pero sin nombre, indicar
+    if (order.servicios && !order.tipoServicioNombre) {
+      return `Servicio #${order.servicios} (no encontrado)`;
+    }
+    
+    // Prioridad 3: Tipo de pedido según flags (mismo que getOrderType de utils)
     if (order.insu) return 'Insumos';
     if (order.sopo) return 'Soporte';
     if (order.mant) return 'Mantenimiento';

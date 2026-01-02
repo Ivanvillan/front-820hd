@@ -1,8 +1,8 @@
 export interface Service {
-  id1rs: number;
+  idcs: number;        // ID principal del servicio (tabla [servicios])
   nombre: string;
-  idcs: number;
   costo1: number;
   costo2: number;
   comentario: string;
+  id1rs?: number;      // Campo legacy (obsoleto, tabla [1reqservicios])
 }

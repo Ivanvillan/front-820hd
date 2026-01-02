@@ -22,6 +22,7 @@ export class CreateOrderDialogComponent implements OnInit {
   contactos: any[] = [];
   tecnicos: any[] = [];
   services: Service[] = [];
+  isLoadingServices = false;
   materials: Material[] = [];
   selectedMaterials: SelectedMaterial[] = [];
   materialsDataSource = new MatTableDataSource<SelectedMaterial>([]);
@@ -59,7 +60,7 @@ export class CreateOrderDialogComponent implements OnInit {
   ) {
     // Configurar valores por defecto basados en autoasignación
     const defaultSector = data?.autoAssign?.sector ? 
-      this.mapSectorToEnum(data.autoAssign.sector) : OrderSector.HD820;
+      this.mapSectorToEnum(data.autoAssign.sector) : OrderSector.CAMPO; // Default: Campo
     
     this.createForm = this.fb.group({
       clientId: [null, [Validators.required]],
@@ -71,7 +72,8 @@ export class CreateOrderDialogComponent implements OnInit {
       status: [OrderStatus.PENDIENTE, [Validators.required]],
       priority: ['media', [Validators.required]],
       orderType: ['sopo', [Validators.required]], // NUEVO: tipo de orden manual (default: Soporte)
-      tiposerv: [null],
+      serviceType: ['out', [Validators.required]], // NUEVO: in (interno) o out (externo), default: in
+      tiposerv: [null], // ID del servicio específico (opcional)
       startTime: [''],
       endTime: ['']
     });
@@ -337,12 +339,16 @@ export class CreateOrderDialogComponent implements OnInit {
   }
 
   private loadServices(): void {
+    this.isLoadingServices = true;
     this.servicesService.getServices().subscribe({
       next: (services: Service[]) => {
         this.services = services;
+        this.isLoadingServices = false;
+        // No auto-seleccionar ningún servicio
       },
       error: (error) => {
         console.error('Error loading services:', error);
+        this.isLoadingServices = false;
         this.snackBar.open('Error al cargar los servicios', 'Cerrar', { duration: 3000 });
       }
     });
@@ -608,7 +614,8 @@ export class CreateOrderDialogComponent implements OnInit {
         sector: formData.sector,
         status: formData.status,
         priority: formData.priority,
-        tiposerv: formData.tiposerv,
+        servicioId: formData.tiposerv, // ID del servicio específico (va al campo "servicios")
+        serviceType: formData.serviceType, // 'in' (interno) o 'out' (externo) - va a tiposerv en BD
         // NUEVO: Establecer campos de tipo según selección
         insu: formData.orderType === 'insu' ? 1 : 0,
         mant: formData.orderType === 'mant' ? 1 : 0,

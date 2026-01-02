@@ -44,13 +44,25 @@
           </mat-error>
         </mat-form-field>
 
-        <!-- Servicio específico -->
+        <!-- Tipo de Servicio: in/out -->
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de Servicio</mat-label>
+          <mat-select formControlName="serviceType" required>
+            <mat-option value="in">In (Interno)</mat-option>
+            <mat-option value="out">Out (Externo)</mat-option>
+          </mat-select>
+          <mat-error *ngIf="updateForm.get('serviceType')?.hasError('required')">
+            El tipo de servicio es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Servicio -->
         <div class="form-field">
-          <ng-select formControlName="tiposerv" [items]="services" bindLabel="nombre" bindValue="id1rs"
+          <ng-select formControlName="tiposerv" [items]="services" bindLabel="nombre" bindValue="idcs"
             placeholder="Buscar y seleccionar servicio..." [searchable]="true" [clearable]="true"
-            [loading]="services.length === 0" loadingText="Cargando servicios..."
+            [loading]="isLoadingServices" loadingText="Cargando servicios..."
             notFoundText="No se encontraron servicios" class="ng-select-custom">
-            <ng-option *ngFor="let service of services" [value]="service.id1rs">
+            <ng-option *ngFor="let service of services" [value]="service.idcs">
               <div class="service-option">
                 <div class="service-name">{{service.nombre}}</div>
                 <div class="service-details">
