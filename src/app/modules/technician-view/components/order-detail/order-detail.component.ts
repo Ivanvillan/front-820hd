@@ -64,11 +64,6 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   selectedMaterialForAdd: Material | null = null;
   cantidadToAdd: number = 1;
   isLoadingMaterials = false;
-  
-  // Formulario inline para crear material
-  isCreatingMaterial: boolean = false;
-  createMaterialForm: FormGroup;
-  rubros: any[] = [];
 
   // Estados disponibles para la orden (usando configuración compartida)
   availableStatuses: OrderStatusOption[] = ORDER_STATUS_CONFIG.map(config => ({
@@ -399,7 +394,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
         if (material) {
           // Verificar si el material ya está en la lista
           const existingIndex = parsedMaterials.findIndex(
-            sm => sm.material.id19 === material.id19
+            sm => sm.material.id === material.id
           );
 
           if (existingIndex >= 0) {
@@ -437,7 +432,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
 
     // Verificar si el material ya está en la lista
     const existingIndex = this.selectedMaterials.findIndex(
-      sm => sm.material.id19 === this.selectedMaterialForAdd!.id19
+      sm => sm.material.id === this.selectedMaterialForAdd!.id19
     );
 
     if (existingIndex >= 0) {
@@ -496,7 +491,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
    */
   private updateTxtMateriales(): void {
     const txtMateriales = this.selectedMaterials
-      .map(sm => `${sm.cantidad}x ${sm.material.descripcion}`)
+      .map(sm => `${sm.cantidad}x ${sm.material.nombre}`)
       .join('\n');
     this.workForm.get('txtmateriales')?.setValue(txtMateriales);
   }
@@ -571,13 +566,13 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
     const materialsDTO: MaterialDTO[] = this.selectedMaterials
       .filter(sm => {
         // Verificar que el material existe en la lista de materiales de la DB
-        const existsInDB = this.materials.some(m => m.id19 === sm.material.id19);
+        const existsInDB = this.materials.some(m => m.id19 === sm.material.id);
         // Verificar que tiene punitario válido (> 0)
         const hasValidPrice = sm.material.punitario > 0;
-        return existsInDB && hasValidPrice && sm.material.id19 > 0;
+        return existsInDB && hasValidPrice && sm.material.id > 0;
       })
       .map(sm => ({
-        id19: sm.material.id19,
+        id19: sm.material.id,
         cantidad: sm.cantidad,
         punitario: sm.material.punitario
       }));
@@ -856,3 +851,4 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
     return tiposerv === 1 ? 'primary' : 'accent';
   }
 }
+
