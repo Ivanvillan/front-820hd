@@ -53,11 +53,6 @@ export class UpdateOrderDialogComponent implements OnInit {
   cantidadToAdd: number = 1;
   isLoadingMaterials = false;
   
-  // Formulario inline para crear material
-  isCreatingMaterial: boolean = false;
-  createMaterialForm: FormGroup;
-  rubros: any[] = [];
-  
   // Opciones de tipo de orden
   orderTypes = [
     { value: 'insu', label: 'Insumos' },
@@ -102,16 +97,6 @@ export class UpdateOrderDialogComponent implements OnInit {
       // Observaciones
       notes: ['']
     });
-    
-    // Formulario para crear material inline
-    this.createMaterialForm = this.fb.group({
-      descripcion: ['', [Validators.required, Validators.maxLength(255)]],
-      unidad: ['Unidad', [Validators.maxLength(50)]],
-      punitario: [0, [Validators.min(0)]],
-      idrubro: [null],
-      iva19: [10.5, [Validators.min(0), Validators.max(100)]],
-      cantidad: [1, [Validators.required, Validators.min(1)]]
-    });
   }
 
   ngOnInit(): void {
@@ -119,7 +104,6 @@ export class UpdateOrderDialogComponent implements OnInit {
     this.loadClients();
     this.loadTechnicians();
     this.loadServices();
-    this.loadRubros();
     
     if (this.data) {
       // Cargar contactos si hay cliente
@@ -283,17 +267,6 @@ export class UpdateOrderDialogComponent implements OnInit {
   /**
    * Carga los rubros disponibles
    */
-  private loadRubros(): void {
-    this.materialsService.getRubros().subscribe({
-      next: (rubros: any[]) => {
-        this.rubros = rubros;
-      },
-      error: (error) => {
-        console.error('Error loading rubros:', error);
-      }
-    });
-  }
-
   /**
    * Carga los materiales existentes de la orden
    */
@@ -339,7 +312,7 @@ export class UpdateOrderDialogComponent implements OnInit {
 
           if (material) {
             const existingIndex = parsedMaterials.findIndex(
-              sm => sm.material.id19 === material.id19
+              sm => sm.material.id === material.id
             );
 
             if (existingIndex >= 0) {
@@ -378,80 +351,6 @@ export class UpdateOrderDialogComponent implements OnInit {
   }
 
   /**
-   * Expande o colapsa el formulario de crear material
-   */
-  toggleCreateMaterialForm(): void {
-    this.isCreatingMaterial = !this.isCreatingMaterial;
-    if (!this.isCreatingMaterial) {
-      this.cancelCreateMaterial();
-    }
-  }
-
-  /**
-   * Crea un nuevo material y lo agrega automáticamente a la lista
-   */
-  createAndAddMaterial(): void {
-    if (this.createMaterialForm.invalid) {
-      this.snackBar.open('Por favor complete todos los campos requeridos', 'Cerrar', { duration: 2000 });
-      return;
-    }
-
-    const formData = this.createMaterialForm.value;
-    const materialData = {
-      descripcion: formData.descripcion,
-      unidad: formData.unidad || 'Unidad',
-      punitario: formData.punitario || 0,
-      idrubro: formData.idrubro || null,
-      iva19: formData.iva19 || 10.5
-    };
-
-    this.materialsService.createMaterial(materialData).subscribe({
-      next: (newMaterial: Material) => {
-        // Recargar lista de materiales
-        this.loadMaterials().then(() => {
-          // Seleccionar el material recién creado
-          this.selectedMaterialForAdd = newMaterial;
-          this.cantidadToAdd = formData.cantidad || 1;
-          
-          // Agregar automáticamente a la lista
-          this.addMaterial();
-          
-          // Colapsar y resetear formulario
-          this.isCreatingMaterial = false;
-          this.createMaterialForm.reset({
-            unidad: 'Unidad',
-            punitario: 0,
-            idrubro: null,
-            iva19: 10.5,
-            cantidad: 1
-          });
-          
-          this.snackBar.open('Material creado y agregado exitosamente', 'Cerrar', { duration: 2000 });
-        });
-      },
-      error: (error: any) => {
-        console.error('Error creating material:', error);
-        const errorMessage = error?.error?.message || 'Error al crear el material';
-        this.snackBar.open(errorMessage, 'Cerrar', { duration: 3000 });
-      }
-    });
-  }
-
-  /**
-   * Cancela la creación de material y resetea el formulario
-   */
-  cancelCreateMaterial(): void {
-    this.isCreatingMaterial = false;
-    this.createMaterialForm.reset({
-      unidad: 'Unidad',
-      punitario: 0,
-      idrubro: null,
-      iva19: 10.5,
-      cantidad: 1
-    });
-  }
-
-  /**
    * Agrega un material seleccionado a la lista de materiales de la orden
    */
   addMaterial(): void {
@@ -467,7 +366,7 @@ export class UpdateOrderDialogComponent implements OnInit {
 
     // Verificar si el material ya está en la lista
     const existingIndex = this.selectedMaterials.findIndex(
-      sm => sm.material.id19 === this.selectedMaterialForAdd!.id19
+      sm => sm.material.id === this.selectedMaterialForAdd!.id19
     );
 
     if (existingIndex >= 0) {
@@ -518,7 +417,7 @@ export class UpdateOrderDialogComponent implements OnInit {
    */
   private updateTxtMateriales(): void {
     const txtMateriales = this.selectedMaterials
-      .map(sm => `${sm.cantidad}x ${sm.material.descripcion}`)
+      .map(sm => `${sm.cantidad}x ${sm.material.nombre}`)
       .join('\n');
     this.updateForm.get('txtmateriales')?.setValue(txtMateriales);
   }
@@ -591,12 +490,12 @@ export class UpdateOrderDialogComponent implements OnInit {
        */
       const materialsDTO: MaterialDTO[] = this.selectedMaterials
         .filter(sm => {
-          const existsInDB = this.materials.some(m => m.id19 === sm.material.id19);
+          const existsInDB = this.materials.some(m => m.id19 === sm.material.id);
           const hasValidPrice = sm.material.punitario > 0;
-          return existsInDB && hasValidPrice && sm.material.id19 > 0;
+          return existsInDB && hasValidPrice && sm.material.id > 0;
         })
         .map(sm => ({
-          id19: sm.material.id19,
+          id19: sm.material.id,
           cantidad: sm.cantidad,
           punitario: sm.material.punitario
         }));
@@ -689,3 +588,4 @@ export class UpdateOrderDialogComponent implements OnInit {
     }
   }
 }
+
