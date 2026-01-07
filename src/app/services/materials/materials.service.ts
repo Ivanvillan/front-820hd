@@ -14,7 +14,7 @@ export class MaterialsService {
   constructor(private http: HttpClient) { }
 
   /**
-   * Obtiene todos los materiales activos
+   * Obtiene todos los materiales activos desde la API externa
    */
   getMaterials(): Observable<Material[]> {
     return this.http.get<Material[]>(this.API_URI);
@@ -28,36 +28,9 @@ export class MaterialsService {
   }
 
   /**
-   * Filtra materiales por rubro
-   */
-  getMaterialsByRubro(idRubro: number): Observable<Material[]> {
-    return this.http.get<Material[]>(`${this.API_URI}/rubro/${idRubro}`);
-  }
-
-  /**
-   * Busca materiales por código o descripción
+   * Busca materiales por nombre o marca
    */
   searchMaterials(term: string): Observable<Material[]> {
     return this.http.get<Material[]>(`${this.API_URI}/search/${encodeURIComponent(term)}`);
-  }
-
-  /**
-   * Crea un nuevo material en la base de datos
-   */
-  createMaterial(materialData: {
-    descripcion: string;
-    unidad?: string;
-    punitario?: number;
-    idrubro?: number | null;
-    iva19?: number;
-  }): Observable<Material> {
-    return this.http.post<Material>(this.API_URI, materialData);
-  }
-
-  /**
-   * Obtiene todos los rubros disponibles
-   */
-  getRubros(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.API_URI}/rubros/list`);
   }
 }

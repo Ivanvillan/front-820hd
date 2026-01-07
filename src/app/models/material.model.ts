@@ -1,17 +1,10 @@
 /**
- * Modelo de Material desde la tabla 19materiales
+ * Modelo de Material desde API externa (stock.pcassi.net/lsart)
  */
 export interface Material {
-  id19: number;
-  codigo: string;
-  descripcion: string;
-  cantidad: number;
-  unidad: string;
-  minimo: number;
-  punitario: number;
-  idrubro: number;
-  rubroDescripcion?: string;
-  iva19: number;
+  id: number;
+  nombre: string;
+  marca: string;
 }
 
 /**
@@ -26,7 +19,6 @@ export interface SelectedMaterial {
  * DTO para enviar materiales al backend
  */
 export interface MaterialDTO {
-  id19: number;
+  id: number;
   cantidad: number;
-  punitario: number;
 }
