@@ -282,7 +282,7 @@ export class UpdateOrderDialogComponent implements OnInit {
     // Prioridad 1: Si la orden tiene materiales desde 21movmat
     if (this.data.materials && Array.isArray(this.data.materials) && this.data.materials.length > 0) {
       for (const mat of this.data.materials) {
-        const fullMaterial = this.materials.find(m => m.id19 === mat.id19);
+        const fullMaterial = this.materials.find(m => m.id === mat.id);
         
         if (fullMaterial) {
           parsedMaterials.push({
@@ -301,13 +301,13 @@ export class UpdateOrderDialogComponent implements OnInit {
         const match = line.match(/^(\d+)\s*x\s*(.+)$/i);
         if (match) {
           const cantidad = parseInt(match[1], 10);
-          const descripcion = match[2].trim();
+          const nombre = match[2].trim();
 
           if (cantidad <= 0) continue;
 
           const material = this.materials.find(m => 
-            m.descripcion.toLowerCase().includes(descripcion.toLowerCase()) ||
-            descripcion.toLowerCase().includes(m.descripcion.toLowerCase())
+            m.nombre.toLowerCase().includes(nombre.toLowerCase()) ||
+            nombre.toLowerCase().includes(m.nombre.toLowerCase())
           );
 
           if (material) {
@@ -366,7 +366,7 @@ export class UpdateOrderDialogComponent implements OnInit {
 
     // Verificar si el material ya está en la lista
     const existingIndex = this.selectedMaterials.findIndex(
-      sm => sm.material.id === this.selectedMaterialForAdd!.id19
+      sm => sm.material.id === this.selectedMaterialForAdd!.id
     );
 
     if (existingIndex >= 0) {
@@ -486,18 +486,16 @@ export class UpdateOrderDialogComponent implements OnInit {
       
       /**
        * Convertir materiales seleccionados a formato DTO para el backend
-       * Solo incluir materiales que existen en la DB y tienen punitario > 0
+       * Solo incluir materiales que existen en la API externa
        */
       const materialsDTO: MaterialDTO[] = this.selectedMaterials
         .filter(sm => {
-          const existsInDB = this.materials.some(m => m.id19 === sm.material.id);
-          const hasValidPrice = sm.material.punitario > 0;
-          return existsInDB && hasValidPrice && sm.material.id > 0;
+          const existsInAPI = this.materials.some(m => m.id === sm.material.id);
+          return existsInAPI && sm.material.id > 0;
         })
         .map(sm => ({
-          id19: sm.material.id,
-          cantidad: sm.cantidad,
-          punitario: sm.material.punitario
+          id: sm.material.id,
+          cantidad: sm.cantidad
         }));
       
       // Construir updateData con todos los campos

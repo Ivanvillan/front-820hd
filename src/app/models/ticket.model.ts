@@ -36,17 +36,10 @@ export interface Ticket {
   // Campos de materiales utilizados
   txtmateriales?: string; // Materiales utilizados por el técnico (texto libre)
   materiales?: number | null; // Campo numérico legacy (raramente usado)
-  materials?: Array<{ // Materiales desde 21movmat (estructurados)
-    id19: number;
-    cantidad: number;
-    punitario: number;
-    codigo?: string;
-    descripcion?: string;
-    unidad?: string;
-    minimo?: number;
-    precio_actual?: number;
-    idrubro?: number;
-    iva19?: number;
+  materials?: Array<{ // Materiales desde 21movmat (estructurados) - API externa
+    id: number;      // ID del material de la API externa
+    cantidad: number; // Cantidad utilizada
+    punitario: number; // Precio unitario (guardado en 21movmat, siempre 0 desde frontend nuevo)
   }>;
   
   // Campos de fechas/horas de ejecución del trabajo
