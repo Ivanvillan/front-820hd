@@ -461,7 +461,8 @@ export class CreateOrderDialogComponent implements OnInit {
         })
         .map(sm => ({
           id: sm.material.id,
-          cantidad: sm.cantidad
+          cantidad: sm.cantidad,
+          punitario: 0
         }));
 
       const orderData: any = {

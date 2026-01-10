@@ -465,7 +465,8 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       })
       .map(sm => ({
         id: sm.material.id,
-        cantidad: sm.cantidad
+        cantidad: sm.cantidad,
+        punitario: 0
       }));
 
     // Preparar datos para guardar

@@ -21,4 +21,5 @@ export interface SelectedMaterial {
 export interface MaterialDTO {
   id: number;
   cantidad: number;
+  punitario: number;
 }
