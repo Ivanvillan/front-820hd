@@ -64,7 +64,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   selectedMaterialForAdd: Material | null = null;
   cantidadToAdd: number = 1;
   isLoadingMaterials = false;
-
+  
   // Estados disponibles para la orden (usando configuración compartida)
   availableStatuses: OrderStatusOption[] = ORDER_STATUS_CONFIG.map(config => ({
     value: config.value,
@@ -90,21 +90,10 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       txtmateriales: [''],
       newNote: [''] // Campo para agregar nuevas observaciones
     });
-    
-    // Formulario para crear material inline
-    this.createMaterialForm = this.formBuilder.group({
-      descripcion: ['', [Validators.required, Validators.maxLength(255)]],
-      unidad: ['Unidad', [Validators.maxLength(50)]],
-      punitario: [0, [Validators.min(0)]],
-      idrubro: [null],
-      iva19: [10.5, [Validators.min(0), Validators.max(100)]],
-      cantidad: [1, [Validators.required, Validators.min(1)]]
-    });
   }
 
   ngOnInit(): void {
     this.initializeComponent();
-    this.loadRubros();
     this.loadMaterials();
     this.loadOrderDetails();
   }
@@ -219,94 +208,6 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los rubros disponibles
-   */
-  private loadRubros(): void {
-    this.materialsService.getRubros().subscribe({
-      next: (rubros: any[]) => {
-        this.rubros = rubros;
-      },
-      error: (error: any) => {
-        console.error('Error loading rubros:', error);
-      }
-    });
-  }
-
-  /**
-   * Expande o colapsa el formulario de crear material
-   */
-  toggleCreateMaterialForm(): void {
-    this.isCreatingMaterial = !this.isCreatingMaterial;
-    if (!this.isCreatingMaterial) {
-      this.cancelCreateMaterial();
-    }
-  }
-
-  /**
-   * Crea un nuevo material y lo agrega automáticamente a la lista
-   */
-  createAndAddMaterial(): void {
-    if (this.createMaterialForm.invalid) {
-      this.showSnackBar('Por favor complete todos los campos requeridos', 'error');
-      return;
-    }
-
-    const formData = this.createMaterialForm.value;
-    const materialData = {
-      descripcion: formData.descripcion,
-      unidad: formData.unidad || 'Unidad',
-      punitario: formData.punitario || 0,
-      idrubro: formData.idrubro || null,
-      iva19: formData.iva19 || 10.5
-    };
-
-    this.materialsService.createMaterial(materialData).subscribe({
-      next: (newMaterial: Material) => {
-        // Recargar lista de materiales
-        this.loadMaterials().then(() => {
-          // Seleccionar el material recién creado
-          this.selectedMaterialForAdd = newMaterial;
-          this.cantidadToAdd = formData.cantidad || 1;
-          
-          // Agregar automáticamente a la lista
-          this.addMaterial();
-          
-          // Colapsar y resetear formulario
-          this.isCreatingMaterial = false;
-          this.createMaterialForm.reset({
-            unidad: 'Unidad',
-            punitario: 0,
-            idrubro: null,
-            iva19: 10.5,
-            cantidad: 1
-          });
-          
-          this.showSnackBar('Material creado y agregado exitosamente', 'success');
-        });
-      },
-      error: (error: any) => {
-        console.error('Error creating material:', error);
-        const errorMessage = error?.error?.message || 'Error al crear el material';
-        this.showSnackBar(errorMessage, 'error');
-      }
-    });
-  }
-
-  /**
-   * Cancela la creación de material y resetea el formulario
-   */
-  cancelCreateMaterial(): void {
-    this.isCreatingMaterial = false;
-    this.createMaterialForm.reset({
-      unidad: 'Unidad',
-      punitario: 0,
-      idrubro: null,
-      iva19: 10.5,
-      cantidad: 1
-    });
-  }
-
-  /**
    * Carga los materiales existentes de la orden
    * Prioriza materiales desde 21movmat (si vienen en la respuesta), 
    * sino intenta parsear txtmateriales y mapear a materiales de la DB
@@ -323,8 +224,8 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       const parsedMaterials: SelectedMaterial[] = [];
       
       for (const mat of this.order.materials) {
-        // Buscar el material completo en la lista de materiales cargados
-        const fullMaterial = this.materials.find(m => m.id19 === mat.id19);
+        // Buscar el material completo en la lista de materiales cargados desde API
+        const fullMaterial = this.materials.find(m => m.id === mat.id);
         
         if (fullMaterial) {
           parsedMaterials.push({
@@ -332,17 +233,11 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
             cantidad: mat.cantidad
           });
         } else {
-          // Si no se encuentra en la lista, crear un material básico desde los datos
+          // Si no se encuentra en la API, crear un material básico con el ID disponible
           const basicMaterial: Material = {
-            id19: mat.id19,
-            codigo: mat.codigo || '',
-            descripcion: mat.descripcion || '',
-            cantidad: mat.precio_actual || 0,
-            unidad: mat.unidad || '',
-            minimo: mat.minimo || 0,
-            punitario: mat.punitario || mat.precio_actual || 0,
-            idrubro: mat.idrubro || 0,
-            iva19: mat.iva19 || 0
+            id: mat.id,
+            nombre: 'Material no disponible',
+            marca: ''
           };
           
           parsedMaterials.push({
@@ -384,10 +279,10 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
 
         if (cantidad <= 0) continue;
 
-        // Buscar material en la lista de materiales por descripción (búsqueda flexible)
+        // Buscar material en la lista de materiales por nombre (búsqueda flexible)
         const material = this.materials.find(m => 
-          m.descripcion.toLowerCase().includes(descripcion.toLowerCase()) ||
-          descripcion.toLowerCase().includes(m.descripcion.toLowerCase())
+          m.nombre.toLowerCase().includes(descripcion.toLowerCase()) ||
+          descripcion.toLowerCase().includes(m.nombre.toLowerCase())
         );
 
         // Solo agregar si el material existe en la DB
@@ -432,7 +327,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
 
     // Verificar si el material ya está en la lista
     const existingIndex = this.selectedMaterials.findIndex(
-      sm => sm.material.id === this.selectedMaterialForAdd!.id19
+      sm => sm.material.id === this.selectedMaterialForAdd!.id
     );
 
     if (existingIndex >= 0) {
@@ -556,25 +451,21 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
      * Convertir materiales seleccionados a formato DTO para el backend
      * 
      * IMPORTANTE: Solo se envían materiales que:
-     * 1. Existen en la DB (19materiales) - verificado por id19
-     * 2. Tienen precio válido (punitario > 0)
-     * 3. Tienen id19 > 0 (materiales válidos, no temporales)
+     * 1. Existen en la API externa (stock.pcassi.net/lsart)
+     * 2. Tienen ID válido (id > 0)
      * 
-     * Estos materiales se guardan en la tabla 21movmat (relacional)
+     * Estos materiales se guardan en la tabla 21movmat (historial)
      * El campo txtmateriales se guarda por separado para compatibilidad
      */
     const materialsDTO: MaterialDTO[] = this.selectedMaterials
       .filter(sm => {
-        // Verificar que el material existe en la lista de materiales de la DB
-        const existsInDB = this.materials.some(m => m.id19 === sm.material.id);
-        // Verificar que tiene punitario válido (> 0)
-        const hasValidPrice = sm.material.punitario > 0;
-        return existsInDB && hasValidPrice && sm.material.id > 0;
+        // Verificar que el material existe en la lista de materiales de la API
+        const existsInAPI = this.materials.some(m => m.id === sm.material.id);
+        return existsInAPI && sm.material.id > 0;
       })
       .map(sm => ({
-        id19: sm.material.id,
-        cantidad: sm.cantidad,
-        punitario: sm.material.punitario
+        id: sm.material.id,
+        cantidad: sm.cantidad
       }));
 
     // Preparar datos para guardar

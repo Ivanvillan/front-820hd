@@ -149,7 +149,7 @@
         <!-- Selector de materiales -->
         <div class="material-selector">
           <div class="form-field material-select-field">
-            <ng-select [(ngModel)]="selectedMaterialForAdd" [items]="materials" bindLabel="descripcion"
+            <ng-select [(ngModel)]="selectedMaterialForAdd" [items]="materials" bindLabel="nombre"
               [ngModelOptions]="{standalone: true}" placeholder="Buscar material por código o descripción..."
               [searchable]="true" [clearable]="true" [loading]="isLoadingMaterials" loadingText="Cargando materiales..."
               notFoundText="No se encontraron materiales" class="ng-select-custom">
