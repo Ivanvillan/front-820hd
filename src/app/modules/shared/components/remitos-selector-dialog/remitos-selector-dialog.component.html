@@ -64,7 +64,9 @@
         <!-- Cliente Column -->
         <ng-container matColumnDef="cliente">
           <th mat-header-cell *matHeaderCellDef>Cliente</th>
-          <td mat-cell *matCellDef="let row">{{ row.cliente?.nombre }}</td>
+          <td mat-cell *matCellDef="let row" [title]="row.cliente?.nombre">
+            {{ row.cliente?.nombre }}
+          </td>
         </ng-container>
 
         <!-- Tecnico Column -->

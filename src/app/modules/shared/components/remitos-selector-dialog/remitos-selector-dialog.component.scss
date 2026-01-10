@@ -134,6 +134,19 @@
     }
   }
   
+  // Truncar nombres largos de cliente
+  .mat-column-cliente {
+    max-width: 250px;
+    
+    .mat-cell {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 250px;
+      cursor: help; // Indica que hay más información al hacer hover
+    }
+  }
+  
   .materiales-cell {
     display: flex;
     align-items: center;
