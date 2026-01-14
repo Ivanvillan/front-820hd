@@ -18,6 +18,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { NgxMaskModule } from 'ngx-mask';
 import { NgSelectModule } from '@ng-select/ng-select';
 
@@ -101,6 +103,8 @@ import { ConfigurableTableModule } from 'src/app/components/configurable-table/c
     MatCheckboxModule,
     MatTooltipModule,
     MatTabsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     NgxMaskModule.forRoot(),
     NgSelectModule,
     // Nuevos componentes reutilizables

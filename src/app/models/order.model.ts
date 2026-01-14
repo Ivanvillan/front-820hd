@@ -20,7 +20,9 @@ export interface CreateOrderDTO {
   priority?: 'baja' | 'media' | 'alta' | 'urgente';
   tiposerv?: number;
   txtmateriales?: string; // Materiales utilizados (texto libre)
+  fechaini?: string; // Fecha inicio del trabajo
   horaini?: string; // Hora inicio del trabajo
+  fechafin?: string; // Fecha fin del trabajo
   horafin?: string; // Hora fin del trabajo
 }
 

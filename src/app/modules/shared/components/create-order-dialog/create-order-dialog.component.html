@@ -155,15 +155,29 @@
           </mat-select>
         </mat-form-field>
 
-        <!-- Hora de entrada -->
+        <!-- Fecha y Hora de Inicio -->
         <mat-form-field appearance="outline">
-          <mat-label>Hora de entrada</mat-label>
+          <mat-label>Fecha de inicio</mat-label>
+          <input matInput [matDatepicker]="pickerIni" formControlName="fechaini">
+          <mat-datepicker-toggle matSuffix [for]="pickerIni"></mat-datepicker-toggle>
+          <mat-datepicker #pickerIni></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de inicio</mat-label>
           <input matInput type="time" formControlName="startTime">
         </mat-form-field>
 
-        <!-- Hora de salida -->
+        <!-- Fecha y Hora de Fin -->
         <mat-form-field appearance="outline">
-          <mat-label>Hora de salida</mat-label>
+          <mat-label>Fecha de fin</mat-label>
+          <input matInput [matDatepicker]="pickerFin" formControlName="fechafin">
+          <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de fin</mat-label>
           <input matInput type="time" formControlName="endTime">
         </mat-form-field>
       </div>

@@ -91,7 +91,9 @@ export class UpdateOrderDialogComponent implements OnInit {
       txtmateriales: ['', [Validators.maxLength(2000)]],
       
       // Trabajo
+      fechaini: [''],  // Fecha inicio trabajo
       horaini: [''],
+      fechafin: [''],  // Fecha fin trabajo
       horafin: [''],
       
       // Observaciones
@@ -155,8 +157,10 @@ export class UpdateOrderDialogComponent implements OnInit {
         assignedToIds: this.data.responsables?.map((r: any) => r.id) || [],
         prioridad: this.data.prioridad || '',
         
-        // Trabajo
+        // Trabajo - Parsear fechas correctamente
+        fechaini: this.parseDateForDatepicker(this.data.fechaini),
         horaini: this.data.horaini || '',
+        fechafin: this.parseDateForDatepicker(this.data.fechafin),
         horafin: this.data.horafin || '',
         
         // Observaciones
@@ -544,7 +548,25 @@ export class UpdateOrderDialogComponent implements OnInit {
         updateData.materials = materialsDTO;
       }
       
-      // Trabajo
+      // Trabajo - Fechas
+      if (formData.fechaini) {
+        // Convertir Date a string ISO si es necesario
+        if (formData.fechaini instanceof Date) {
+          updateData.fechaini = formData.fechaini.toISOString().split('T')[0];
+        } else if (formData.fechaini.trim()) {
+          updateData.fechaini = formData.fechaini;
+        }
+      }
+      if (formData.fechafin) {
+        // Convertir Date a string ISO si es necesario
+        if (formData.fechafin instanceof Date) {
+          updateData.fechafin = formData.fechafin.toISOString().split('T')[0];
+        } else if (formData.fechafin.trim()) {
+          updateData.fechafin = formData.fechafin;
+        }
+      }
+      
+      // Trabajo - Horas
       if (formData.horaini && formData.horaini.trim()) {
         updateData.horaini = formData.horaini;
       }
@@ -584,6 +606,36 @@ export class UpdateOrderDialogComponent implements OnInit {
       
       this.dialogRef.close(updateData);
     }
+  }
+
+  /**
+   * Parsea una fecha desde la BD para el datepicker
+   * Maneja formatos: "2026-01-14 00:00:00", "2026-01-14", Date object, o null/undefined
+   */
+  private parseDateForDatepicker(dateValue: any): Date | null {
+    if (!dateValue) {
+      return null;
+    }
+    
+    // Si ya es un Date object
+    if (dateValue instanceof Date) {
+      return dateValue;
+    }
+    
+    // Si es un string, parsearlo
+    if (typeof dateValue === 'string') {
+      // Extraer solo la parte de fecha (antes del espacio o T)
+      const dateStr = dateValue.split(' ')[0].split('T')[0];
+      if (dateStr) {
+        const parsed = new Date(dateStr);
+        // Verificar que la fecha es válida
+        if (!isNaN(parsed.getTime())) {
+          return parsed;
+        }
+      }
+    }
+    
+    return null;
   }
 }
 

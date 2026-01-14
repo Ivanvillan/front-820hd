@@ -69,7 +69,9 @@ export class CreateOrderDialogComponent implements OnInit {
       orderType: ['sopo', [Validators.required]], // NUEVO: tipo de orden manual (default: Soporte)
       serviceType: ['out', [Validators.required]], // NUEVO: in (interno) o out (externo), default: in
       tiposerv: [null], // ID del servicio específico (opcional)
+      fechaini: [''],  // Fecha inicio trabajo
       startTime: [''],
+      fechafin: [''],  // Fecha fin trabajo
       endTime: ['']
     });
 
@@ -483,9 +485,25 @@ export class CreateOrderDialogComponent implements OnInit {
         limp: formData.orderType === 'limp' ? 1 : 0
       };
       
-      // Mapear campos de hora: startTime → horaini, endTime → horafin
+      // Mapear campos de fecha y hora: fechaini/startTime → fechaini/horaini, fechafin/endTime → fechafin/horafin
+      if (formData.fechaini) {
+        // Convertir Date a string ISO si es necesario
+        if (formData.fechaini instanceof Date) {
+          orderData.fechaini = formData.fechaini.toISOString().split('T')[0];
+        } else if (formData.fechaini.trim()) {
+          orderData.fechaini = formData.fechaini;
+        }
+      }
       if (formData.startTime) {
         orderData.horaini = formData.startTime;
+      }
+      if (formData.fechafin) {
+        // Convertir Date a string ISO si es necesario
+        if (formData.fechafin instanceof Date) {
+          orderData.fechafin = formData.fechafin.toISOString().split('T')[0];
+        } else if (formData.fechafin.trim()) {
+          orderData.fechafin = formData.fechafin;
+        }
       }
       if (formData.endTime) {
         orderData.horafin = formData.endTime;
