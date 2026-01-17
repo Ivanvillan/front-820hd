@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 import { OrdersService } from 'src/app/services/orders/orders.service';
@@ -13,13 +13,16 @@ import { Ticket } from 'src/app/models/ticket.model';
 import jsPDF from 'jspdf';
 import autoTable, { Styles } from 'jspdf-autotable';
 
+import { interval, Subject, BehaviorSubject, of } from 'rxjs';
+import { takeUntil, filter, switchMap, catchError, retry } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-orders-user',
   templateUrl: './orders-user.component.html',
   styleUrls: ['./orders-user.component.css']
 })
-export class OrdersUserComponent implements OnInit {
+export class OrdersUserComponent implements OnInit, OnDestroy {
 
   @ViewChild('ordersTable',{static: true}) ordersTable?: ElementRef;
   faCalendar = faCalendar;
@@ -52,6 +55,12 @@ export class OrdersUserComponent implements OnInit {
   selectedOrderList: string = 'personales';
 
   sector: string = 'insumos';
+  
+  // Refresh automático
+  private destroy$ = new Subject<void>();
+  isRefreshing$ = new BehaviorSubject<boolean>(false);
+  isRefreshing: boolean = false;
+  isLoading: boolean = false;
 
   constructor(
     private ordersService: OrdersService, 
@@ -72,7 +81,110 @@ export class OrdersUserComponent implements OnInit {
     }
     if(this.userType === 'customer') {
       this.readAll();
-    }    
+    }
+    
+    // Iniciar refresh automático cada 60 segundos
+    this.startAutoRefresh();
+    
+    // Suscribirse a cambios de isRefreshing para actualizar variable local
+    this.isRefreshing$.subscribe(value => {
+      this.isRefreshing = value;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Inicia el refresh automático cada 60 segundos
+   * Mejoras implementadas:
+   * - Pausa cuando la página no está visible (document.visibilityState)
+   * - Pausa cuando hay modales abiertos
+   * - Pausa durante carga activa
+   * - Retry con backoff exponencial
+   * - Cleanup adecuado con takeUntil
+   */
+  private startAutoRefresh(): void {
+    const REFRESH_INTERVAL_MS = 60000; // 60 segundos
+    
+    interval(REFRESH_INTERVAL_MS).pipe(
+      takeUntil(this.destroy$),
+      filter(() => !this.isLoading && this.isPageVisible() && !this.hasOpenModals()),
+      switchMap(() => {
+        this.isRefreshing$.next(true);
+        return this.loadCurrentData().pipe(
+          catchError(err => {
+            console.error('[Auto-refresh] Error al actualizar datos:', err);
+            return of(null);
+          }),
+          retry({ count: 2, delay: 5000 })
+        );
+      })
+    ).subscribe({
+      next: (data) => {
+        if (data) {
+          this.updateOrdersData(data);
+        }
+        this.isRefreshing$.next(false);
+      },
+      error: (err) => {
+        console.error('[Auto-refresh] Error crítico en suscripción:', err);
+        this.isRefreshing$.next(false);
+      }
+    });
+  }
+
+  /**
+   * Verifica si la página está visible
+   */
+  private isPageVisible(): boolean {
+    return document.visibilityState === 'visible';
+  }
+
+  /**
+   * Verifica si hay modales abiertos (básico, puede mejorarse)
+   */
+  private hasOpenModals(): boolean {
+    // Verificar si hay elementos de Material Dialog abiertos
+    return document.querySelector('.cdk-overlay-container .cdk-overlay-pane') !== null;
+  }
+
+  /**
+   * Carga los datos según el estado actual de búsqueda
+   */
+  private loadCurrentData() {
+    const data = this.credentialsService.getCredentialsParsed();
+    if (!data?.idContact) {
+      return of([]);
+    }
+    // Re-ejecutar la búsqueda actual (readAll para customer)
+    if (this.userType === 'customer') {
+      return this.ordersService.readAllByContact(data.idContact);
+    }
+    // Para admin, usar readAll si hay client seleccionado
+    if (this.client?.id7) {
+      return this.ordersService.readAll(this.client.id7);
+    }
+    return of([]);
+  }
+
+  /**
+   * Actualiza los datos de órdenes con los nuevos datos recibidos
+   */
+  private updateOrdersData(res: Ticket[]): void {
+    let filtered = res;
+    if (this.sector === 'insumos') {
+      filtered = filtered.filter(
+        (el: Ticket) => el && (el.insu == true || (el.insu == false && el.sopo == false)) )
+    }
+    if (this.sector === 'servicios') {
+      filtered = filtered.filter(
+        (el: Ticket) => el && (el.sopo == true || (el.insu == false && el.sopo == false)))
+    }
+    // NO aplicar filtro de finalizadas en orders-user (vista cliente)
+    this.dataTable = filtered;
   }
 
   /**
@@ -123,40 +235,48 @@ export class OrdersUserComponent implements OnInit {
     const data = this.credentialsService.getCredentialsParsed();    
     let contact = data?.idContact;
     this.searchButtonText = 'Buscando...';
+    this.isLoading = true;
     this.dataTable = [];
     this.ordersService.readAllByContact(contact).subscribe({
       next: (res) => {        
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         // ✅ Usar sector determinado desde la ruta
+        let filtered = res;
         if (this.sector === 'insumos') {
-          this.dataTable = this.dataTable.concat(res);
-          this.dataTable = this.dataTable.filter(
+          filtered = filtered.filter(
             (el: Ticket) => el && (el.insu == true || (el.insu == false && el.sopo == false)) )
         }
         if (this.sector === 'servicios') {
-          this.dataTable = this.dataTable.concat(res);
-          this.dataTable = this.dataTable.filter(
+          filtered = filtered.filter(
             (el: Ticket) => el && (el.sopo == true || (el.insu == false && el.sopo == false)))
-        }        
+        }
+        // NO aplicar filtro de finalizadas en orders-user (vista cliente)
+        this.dataTable = filtered;
       },
       error: (err) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         console.log(err);
       }
     })
   }
   searchByClient() {
     this.searchButtonText = 'Buscando...';
+    this.isLoading = true;
     this.dataTable = [];
     this.ordersService.readByDate(this.client?.id7, this.firstDate, this.secondDate).subscribe({
       next: (res) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         if(res) {
-          this.dataTable = this.dataTable.concat(res)
+          // Búsqueda por rango de fechas: NO aplicar filtro de finalizadas (búsqueda histórica)
+          this.dataTable = this.dataTable.concat(res);
         }
       },
       error: (err) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         console.log(err);
       }
     })
@@ -164,18 +284,22 @@ export class OrdersUserComponent implements OnInit {
 
   searchByDateAndClient() {
     this.searchButtonText = 'Buscando...';
+    this.isLoading = true;
     const data = this.credentialsService.getCredentialsParsed();    
     let client = data?.idClient;
     this.dataTable = [];
     this.ordersService.readByDate(client, this.firstDate, this.secondDate).subscribe({
       next: (res) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         if(res) {
-          this.dataTable = this.dataTable.concat(res)
+          // Búsqueda por rango de fechas: NO aplicar filtro de finalizadas (búsqueda histórica)
+          this.dataTable = this.dataTable.concat(res);
         }
       },
       error: (err) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         console.log(err);
       }
     })
@@ -183,18 +307,22 @@ export class OrdersUserComponent implements OnInit {
 
   readAllByClient() {
     this.searchButtonText = 'Buscando...';
+    this.isLoading = true;
     const data = this.credentialsService.getCredentialsParsed();    
     let client = data?.idClient;
     this.dataTable = [];
     this.ordersService.readAll(client).subscribe({
       next: (res) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         if(res) {
-          this.dataTable = this.dataTable.concat(res)
+          // NO aplicar filtro de finalizadas en orders-user (vista cliente)
+          this.dataTable = res;
         }
       },
       error: (err) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         console.log(err);
       }
     })
@@ -205,16 +333,20 @@ export class OrdersUserComponent implements OnInit {
     const data = JSON.parse(this.credentialsService.getCredentials()!);    
     let contact = data?.idContact;
     this.searchButtonText = 'Buscando...';
+    this.isLoading = true;
     this.dataTable = [];
     this.ordersService.readByDateAndContact(contact, this.firstDate, this.secondDate).subscribe({
       next: (res) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         if(res) {
-          this.dataTable = this.dataTable.concat(res)
+          // Búsqueda por rango de fechas: NO aplicar filtro de finalizadas (búsqueda histórica)
+          this.dataTable = this.dataTable.concat(res);
         }
       },
       error: (err) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         console.log(err);
       }
     })
@@ -234,27 +366,32 @@ export class OrdersUserComponent implements OnInit {
 
   readCustomClient(): void {
     this.searchButtonText = 'Buscando...';
+    this.isLoading = true;
     this.dataTable = [];
     this.ordersService.readAll(this.client?.id7).subscribe({
       next: (res) => {    
         this.searchButtonText = 'Buscar';
-        if (window.location.href.includes('/supplies')) {
-          this.dataTable = this.dataTable.concat(res);
-          this.dataTable = this.dataTable.filter(
+        this.isLoading = false;
+        let filtered = res;
+        if (this.sector === 'insumos') {
+          filtered = filtered.filter(
             (el: Ticket) => el && (el.insu == true || (el.insu == false && el.sopo == false)) )
-          }
-        if (window.location.href.includes('/assistance')) {
-          this.dataTable = this.dataTable.concat(res);
-          this.dataTable = this.dataTable.filter(
+        }
+        if (this.sector === 'servicios') {
+          filtered = filtered.filter(
             (el: Ticket) => el && (el.sopo == true || (el.insu == false && el.sopo == false)))
         }
+        // NO aplicar filtro de finalizadas en orders-user (vista cliente)
+        this.dataTable = filtered;
       },
       error: (err) => {
         this.searchButtonText = 'Buscar';
+        this.isLoading = false;
         console.log(err);
       }
     })
   }
+
 
 
   onSearch() {

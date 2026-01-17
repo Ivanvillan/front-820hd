@@ -40,6 +40,11 @@
         <button class="xlsx-export" (click)="XLSXExport()" type="button">Excel</button>
       </div>
     </div>
+    <!-- Indicador de refresh -->
+    <div class="refresh-indicator-container" *ngIf="isRefreshing">
+      <mat-spinner diameter="16"></mat-spinner>
+      <span>Actualizando...</span>
+    </div>
     <table id="order-table" class="table mat-elevation-z2" mat-table [dataSource]="dataTable">
       <ng-container matColumnDef="Inicio">
         <th mat-header-cell *matHeaderCellDef class="mat-cell-fi">Inicio</th>

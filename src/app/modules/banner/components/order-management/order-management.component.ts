@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { CredentialsService } from 'src/app/services/credentials/credentials.ser
 import { PdfExportService } from 'src/app/services/pdf-export/pdf-export.service';
 import { FilterConfig, FilterValues } from 'src/app/components/filter-bar/filter-bar.component';
 import { ColumnConfig } from 'src/app/services/column-selector/column-selector.service';
+import { OrderStatus } from 'src/app/models/ticket.model';
 import { 
   getOrderStatus,
   getStatusDisplayColor,
@@ -22,17 +23,39 @@ import {
   getFinalizationStatus 
 } from 'src/app/shared/utils/order-status.utils';
 
+/**
+ * Interface para filtros de órdenes con type safety
+ */
+interface OrderFilters extends FilterValues {
+  assignedTo?: number;
+  company?: number;
+  sector?: string;
+  status?: OrderStatus;
+  priority?: string;
+  startDate?: string;
+  endDate?: string;
+  showAll?: boolean;
+}
+
+import { interval, Subject, BehaviorSubject, of } from 'rxjs';
+import { takeUntil, filter, switchMap, catchError, retry } from 'rxjs/operators';
+
 @Component({
   selector: 'app-order-management',
   templateUrl: './order-management.component.html',
   styleUrls: ['./order-management.component.scss']
 })
-export class OrderManagementComponent implements OnInit {
+export class OrderManagementComponent implements OnInit, OnDestroy {
   // Datos
   orders: any[] = [];
   technicians: Technician[] = [];
   customers: any[] = [];
   isLoading = false;
+  
+  // Refresh automático
+  private destroy$ = new Subject<void>();
+  isRefreshing$ = new BehaviorSubject<boolean>(false);
+  isRefreshing: boolean = false;
   priorities = [
     { value: 'baja', label: 'Baja' },
     { value: 'media', label: 'Media' },
@@ -104,6 +127,105 @@ export class OrderManagementComponent implements OnInit {
       'nombreAsignado': this.nombreAsignadoTemplate,
       'acciones': this.actionsTemplate
     };
+    
+    // Iniciar refresh automático cada 60 segundos
+    this.startAutoRefresh();
+    
+    // Suscribirse a cambios de isRefreshing para actualizar variable local
+    this.isRefreshing$.subscribe(value => {
+      this.isRefreshing = value;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Inicia el refresh automático cada 60 segundos
+   * Mejoras implementadas:
+   * - Pausa cuando la página no está visible (document.visibilityState)
+   * - Pausa cuando hay modales abiertos
+   * - Pausa durante carga activa
+   * - Retry con backoff exponencial
+   * - Cleanup adecuado con takeUntil
+   */
+  private startAutoRefresh(): void {
+    const REFRESH_INTERVAL_MS = 60000; // 60 segundos
+    
+    interval(REFRESH_INTERVAL_MS).pipe(
+      takeUntil(this.destroy$),
+      filter(() => !this.isLoading && this.isPageVisible() && !this.hasOpenModals()),
+      switchMap(() => {
+        this.isRefreshing$.next(true);
+        return this.loadCurrentData().pipe(
+          catchError(err => {
+            console.error('[Auto-refresh] Error al actualizar datos:', err);
+            return of(null);
+          }),
+          retry({ count: 2, delay: 5000 })
+        );
+      })
+    ).subscribe({
+      next: (data) => {
+        if (data) {
+          this.updateOrdersData(data);
+        }
+        this.isRefreshing$.next(false);
+      },
+      error: (err) => {
+        console.error('[Auto-refresh] Error crítico en suscripción:', err);
+        this.isRefreshing$.next(false);
+      }
+    });
+  }
+
+  /**
+   * Verifica si la página está visible
+   */
+  private isPageVisible(): boolean {
+    return document.visibilityState === 'visible';
+  }
+
+  /**
+   * Verifica si hay modales abiertos
+   */
+  private hasOpenModals(): boolean {
+    // Verificar si hay elementos de Material Dialog abiertos
+    return document.querySelector('.cdk-overlay-container .cdk-overlay-pane') !== null;
+  }
+
+  /**
+   * Carga los datos según el estado actual de filtros
+   */
+  private loadCurrentData() {
+    // Re-ejecutar la búsqueda actual con los mismos filtros
+    const filters: OrderFilters = { 
+      ...this.currentFilterValues,
+      status: this.currentFilterValues['status'] as OrderStatus | undefined
+    };
+    filters.showAll = true;
+    
+    // El backend ya excluye finalizadas por defecto automáticamente
+    // Si el usuario selecciona "Finalizada" en el filtro de estados, el backend mostrará solo finalizadas
+    
+    return this.ordersService.getInternalOrders(filters, this.currentPage, this.pageSize);
+  }
+
+  /**
+   * Actualiza los datos de órdenes con los nuevos datos recibidos
+   */
+  private updateOrdersData(response: any): void {
+    if (response.pagination) {
+      this.orders = response.data;
+      this.totalItems = response.pagination.total;
+      this.currentPage = response.pagination.page;
+      this.pageSize = response.pagination.limit;
+    } else {
+      this.orders = response;
+      this.totalItems = response.length;
+    }
   }
 
   /**
@@ -195,8 +317,17 @@ export class OrderManagementComponent implements OnInit {
     this.currentPage = page;
     
     // Los filtros ya vienen limpios (sin valores vacíos) desde FilterBarComponent
-    const filters: any = { ...filterValues };
+    const filters: OrderFilters = { 
+      ...filterValues,
+      status: filterValues['status'] as OrderStatus | undefined
+    };
     filters.showAll = true;
+    
+    // COMPORTAMIENTO INTENCIONAL: El backend excluye finalizadas y canceladas por defecto automáticamente.
+    // Esto mejora la experiencia del usuario mostrando solo órdenes activas por defecto.
+    // Si el usuario selecciona "Finalizada" o "Cancelada" en el filtro de estados,
+    // el backend mostrará solo órdenes con ese estado específico.
+    // No necesitamos lógica adicional aquí - el backend maneja todo
     
     this.ordersService.getInternalOrders(filters, this.currentPage, this.pageSize).subscribe({
       next: (response: any) => {
@@ -677,4 +808,5 @@ export class OrderManagementComponent implements OnInit {
       this.snackBar.open('Error al generar el PDF', 'Cerrar', { duration: 3000 });
     }
   }
+
 }

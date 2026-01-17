@@ -201,4 +201,27 @@ export class OrdersService {
     return this.http.get<Order>(`${this.API_URI}/orders/${id}`);
   }
 
+  /**
+   * Filtra órdenes finalizadas de un array de órdenes
+   * Excluye órdenes con estado = 'Finalizada' O finalizado = true
+   * @param orders - Array de órdenes a filtrar
+   * @param showFinished - Si es true, no filtra (muestra todas). Si es false o undefined, filtra finalizadas
+   * @returns Array de órdenes sin las finalizadas (a menos que showFinished sea true)
+   */
+  filterFinishedOrders(orders: Order[], showFinished: boolean = false): Order[] {
+    if (showFinished) {
+      return orders;
+    }
+    
+    return orders.filter(order => {
+      // Excluir si estado es 'Finalizada' O finalizado es true
+      // El backend puede devolver finalizado como boolean o number (0/1), pero el modelo lo define como boolean
+      // Verificamos el estado primero, luego el campo finalizado
+      const isFinishedByEstado = order.estado === 'Finalizada';
+      const isFinishedByField = order.finalizado === true;
+      const isFinished = isFinishedByEstado || isFinishedByField;
+      return !isFinished;
+    });
+  }
+
 }

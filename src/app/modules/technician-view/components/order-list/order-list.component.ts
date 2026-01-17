@@ -22,7 +22,7 @@ import {
 } from 'src/app/shared/utils/order-status.utils';
 import { FilterConfig, FilterValues } from 'src/app/components/filter-bar/filter-bar.component';
 import { PdfExportService } from 'src/app/services/pdf-export/pdf-export.service';
-import { Ticket } from 'src/app/models/ticket.model';
+import { Ticket, OrderStatus } from 'src/app/models/ticket.model';
 
 /**
  * @deprecated Usar `Ticket` directamente.
@@ -667,10 +667,26 @@ export class OrderListComponent implements OnInit, OnDestroy {
         matches = matches && empresa.includes(filters['empresa'].toLowerCase());
       }
 
-      // Filtro por estado
-      if (filters['estado']) {
+      // Filtro por estado (optimizado: usar enum OrderStatus para type safety)
+      const filterEstado = filters['estado'] as string | undefined;
+      
+      if (filterEstado) {
+        // Usuario seleccionó un estado específico: mostrar solo ese estado
         const status = this.getStatusDisplayName(this.getOrderStatus(order));
-        matches = matches && status === filters['estado'];
+        matches = matches && status === filterEstado;
+      } else {
+        // COMPORTAMIENTO INTENCIONAL: Por defecto excluir órdenes finalizadas y canceladas
+        // Esto mejora la experiencia mostrando solo órdenes activas por defecto.
+        // Si el usuario selecciona "Finalizada" o "Cancelada" en el filtro, se mostrarán solo esas.
+        // NOTA: Si una orden tiene estado='Finalizada' pero finalizado=false, se excluye por seguridad
+        const orderStatus = this.getOrderStatus(order);
+        const statusDisplay = this.getStatusDisplayName(orderStatus);
+        // Usar enum OrderStatus para comparación type-safe
+        const isFinished = orderStatus === OrderStatus.FINALIZADA || order.finalizado === true;
+        const isCancelled = orderStatus === OrderStatus.CANCELADA || order.anulada === true;
+        if (isFinished || isCancelled) {
+          matches = false; // Excluir finalizadas y canceladas por defecto
+        }
       }
 
       // Filtro por prioridad

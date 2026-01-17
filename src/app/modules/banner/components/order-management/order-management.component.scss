@@ -10,6 +10,23 @@
   }
 }
 
+// Indicador de refresh
+.refresh-indicator-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 8px 12px;
+  color: #666;
+  font-size: 12px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  
+  mat-spinner {
+    display: inline-block;
+  }
+}
+
 // Badges de prioridad - estilos elaborados con borders y animación
 .badge {
   display: inline-block;

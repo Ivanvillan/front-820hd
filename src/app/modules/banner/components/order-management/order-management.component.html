@@ -6,6 +6,12 @@
     [showClearButton]="true"
     (filterChange)="onFilterChange($event)">
   </app-filter-bar>
+  
+  <!-- Indicador de refresh -->
+  <div class="refresh-indicator-container" *ngIf="isRefreshing">
+    <mat-spinner diameter="16"></mat-spinner>
+    <span>Actualizando...</span>
+  </div>
 
   <!-- Tabla con ConfigurableTableComponent -->
   <app-configurable-table

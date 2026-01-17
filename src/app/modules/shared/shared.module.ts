@@ -136,6 +136,8 @@ import { ConfigurableTableModule } from 'src/app/components/configurable-table/c
     RemitosSelectorDialogComponent,
     // Re-export Material modules for child components
     MatMenuModule,
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
     // Re-export reusable component modules
     FilterBarModule,
     ConfigurableTableModule
