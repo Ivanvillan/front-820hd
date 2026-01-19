@@ -37,6 +37,12 @@
 
   <!-- Contenido principal -->
   <div class="content-section">
+    <!-- Indicador de refresh automático -->
+    <div class="refresh-indicator-container" *ngIf="isRefreshing">
+      <mat-spinner diameter="16"></mat-spinner>
+      <span>Actualizando...</span>
+    </div>
+    
     <!-- Estado de carga -->
     <div *ngIf="loading" class="loading-container">
       <mat-spinner diameter="50"></mat-spinner>

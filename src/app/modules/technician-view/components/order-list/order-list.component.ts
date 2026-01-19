@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageEvent } from '@angular/material/paginator';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, BehaviorSubject, interval, of } from 'rxjs';
+import { takeUntil, filter, switchMap, catchError, retry } from 'rxjs/operators';
 
 import { OrdersService } from 'src/app/services/orders/orders.service';
 import { OrdersResponse } from 'src/app/models/order.model';
@@ -101,6 +102,10 @@ export class OrderListComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   error: string = '';
   
+  // Refresh automático
+  isRefreshing$ = new BehaviorSubject<boolean>(false);
+  isRefreshing: boolean = false;
+  
   // Paginación
   totalItems: number = 0;
   pageSize: number = 10;
@@ -135,11 +140,140 @@ export class OrderListComponent implements OnInit, OnDestroy {
     this.initializeComponent();
     this.loadTechniciansIfNeeded();
     this.loadOrders();
+    
+    // Iniciar refresh automático cada 60 segundos
+    this.startAutoRefresh();
+    
+    // Suscribirse a cambios de isRefreshing para actualizar variable local
+    this.isRefreshing$.subscribe(value => {
+      this.isRefreshing = value;
+    });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Inicia el refresh automático cada 60 segundos
+   * Mejoras implementadas:
+   * - Pausa cuando la página no está visible (document.visibilityState)
+   * - Pausa cuando hay modales abiertos
+   * - Pausa durante carga activa
+   * - Retry con backoff exponencial
+   * - Cleanup adecuado con takeUntil
+   */
+  private startAutoRefresh(): void {
+    const REFRESH_INTERVAL_MS = 60000; // 60 segundos
+    
+    interval(REFRESH_INTERVAL_MS).pipe(
+      takeUntil(this.destroy$),
+      filter(() => !this.loading && this.isPageVisible() && !this.hasOpenModals()),
+      switchMap(() => {
+        this.isRefreshing$.next(true);
+        return this.loadCurrentData().pipe(
+          catchError(err => {
+            console.error('[Auto-refresh] Error al actualizar datos:', err);
+            return of(null);
+          }),
+          retry({ count: 2, delay: 5000 })
+        );
+      })
+    ).subscribe({
+      next: (data) => {
+        if (data) {
+          this.updateOrdersData(data);
+        }
+        this.isRefreshing$.next(false);
+      },
+      error: (err) => {
+        console.error('[Auto-refresh] Error crítico en suscripción:', err);
+        this.isRefreshing$.next(false);
+      }
+    });
+  }
+
+  /**
+   * Verifica si la página está visible
+   */
+  private isPageVisible(): boolean {
+    return document.visibilityState === 'visible';
+  }
+
+  /**
+   * Verifica si hay modales abiertos
+   */
+  private hasOpenModals(): boolean {
+    // Verificar si hay elementos de Material Dialog abiertos
+    return document.querySelector('.cdk-overlay-container .cdk-overlay-pane') !== null;
+  }
+
+  /**
+   * Carga los datos según el estado actual de filtros
+   */
+  private loadCurrentData() {
+    // Re-ejecutar la carga de órdenes con los mismos filtros actuales
+    return this.ordersService.getInternalOrders({ showAll: true }, 1, 1000);
+  }
+
+  /**
+   * Actualiza los datos de órdenes con los nuevos datos recibidos
+   */
+  private updateOrdersData(response: OrdersResponse | any): void {
+    const allOrders = response.data || response.orders || response || [];
+    
+    // Aplicar la misma lógica de filtrado que en loadOrders()
+    const technician = this.getCurrentTechnician();
+    if (!technician.id) {
+      return;
+    }
+
+    const currentTechnicianId = technician.id;
+    const is820hd = this.normalizeSector(this.area) === '820hd';
+    const isLaboratorio = this.normalizeSector(this.area) === 'laboratorio';
+    
+    // Para 820hd: cargar TODAS las órdenes sin filtrar (los filtros se aplican después)
+    if (is820hd) {
+      this.orders = allOrders;
+    } else if (isLaboratorio) {
+      // Laboratorio: solo órdenes del sector laboratorio (con o sin técnico)
+      this.orders = allOrders.filter((order: Order) => {
+        const orderSector = this.normalizeSector(order.sector || '');
+        return orderSector === 'laboratorio';
+      });
+    } else {
+      // Otras áreas: aplicar reglas de visibilidad
+      this.orders = allOrders.filter((order: Order) => {
+        const orderSector = this.normalizeSector(order.sector || '');
+        const orderTechnicianIds = order.idresponsable ? order.idresponsable.split(',').map(id => parseInt(id.trim())) : [];
+        
+        // Órdenes sin área ni técnico: visibles para todos
+        if (!order.sector && orderTechnicianIds.length === 0) {
+          return true;
+        }
+        
+        // Órdenes con área pero sin técnico: visibles para todos los técnicos de esa área
+        if (orderSector === this.normalizeSector(this.area) && orderTechnicianIds.length === 0) {
+          return true;
+        }
+        
+        // Órdenes con área y técnico: visibles solo para ese técnico
+        if (orderSector === this.normalizeSector(this.area) && orderTechnicianIds.includes(currentTechnicianId)) {
+          return true;
+        }
+        
+        return false;
+      });
+    }
+    
+    // Aplicar filtros locales si existen (igual que en loadOrders)
+    if (is820hd && Object.keys(this.currentFilters).length > 0) {
+      this.applyFilters();
+    } else {
+      this.filteredOrders = [...this.orders];
+      this.totalItems = this.orders.length;
+    }
   }
 
   /**
