@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 
 import { OrdersService } from 'src/app/services/orders/orders.service';
@@ -24,6 +25,8 @@ import {
 } from 'src/app/shared/utils/order-notes.utils';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 import { PdfExportService } from 'src/app/services/pdf-export/pdf-export.service';
+import { TimezoneService } from 'src/app/services/timezone/timezone.service';
+import { PdfExportConfirmationDialogComponent, PdfExportConfirmationDialogData } from 'src/app/modules/shared/components/pdf-export-confirmation-dialog/pdf-export-confirmation-dialog.component';
 
 interface OrderStatusOption {
   value: OrderStatus;
@@ -83,7 +86,9 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private snackBar: MatSnackBar,
     private credentialsService: CredentialsService,
-    private pdfExportService: PdfExportService
+    private pdfExportService: PdfExportService,
+    private dialog: MatDialog,
+    private timezoneService: TimezoneService
   ) {
     // Formulario para campos de trabajo del técnico
     this.workForm = this.formBuilder.group({
@@ -439,8 +444,6 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.saving = true;
-
     // Obtener datos del formulario de trabajo
     const workData = this.workForm.value;
     
@@ -475,6 +478,83 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       txtmateriales: workData.txtmateriales || '', // Campo para materiales utilizados (texto descriptivo)
       materials: materialsDTO // Array de materiales para guardar en 21movmat
     };
+
+    // Si el estado cambia a "Finalizada" (solo si el estado anterior NO era "Finalizada")
+    const previousStatus = this.getOrderStatus(this.order);
+    const isChangingToFinalized = this.currentStatus === OrderStatus.FINALIZADA && previousStatus !== OrderStatus.FINALIZADA;
+    
+    if (isChangingToFinalized) {
+      this.askForPdfExportBeforeFinalizing(updateData);
+      return; // No guardar todavía, esperar respuesta del usuario
+    }
+
+    // Si no es finalizada, proceder con el guardado normal
+    this.performSave(updateData, workData, serializedNotes);
+  }
+
+  /**
+   * Pregunta al usuario si quiere exportar la orden a PDF antes de finalizarla
+   * @param updateData - Datos de actualización que se enviarán al backend
+   */
+  private askForPdfExportBeforeFinalizing(updateData: any): void {
+    if (!this.order) {
+      // Si no hay orden, proceder directamente con el guardado
+      const workData = this.workForm.value;
+      const serializedNotes = serializeOrderNotes(this.existingNotes);
+      this.performSave(updateData, workData, serializedNotes);
+      return;
+    }
+
+    // Crear una orden temporal con los datos actualizados para el PDF
+    const orderForPdf: Ticket = {
+      ...this.order,
+      ...updateData,
+      estado: OrderStatus.FINALIZADA
+    };
+
+    const orderNumber = this.order.numero || this.order.id1 || 'N/A';
+    
+    // Mostrar diálogo de confirmación específico para PDF
+    const dialogData: PdfExportConfirmationDialogData = {
+      orderNumber: orderNumber
+    };
+
+    const confirmDialog = this.dialog.open(PdfExportConfirmationDialogComponent, {
+      width: '90%',
+      maxWidth: '500px',
+      autoFocus: false,
+      data: dialogData,
+      disableClose: false
+    });
+
+    confirmDialog.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result: boolean | undefined) => {
+        if (result === true) {
+          // Usuario quiere exportar PDF
+          try {
+            this.pdfExportService.exportOrderToPdf(orderForPdf);
+            this.showSnackBar('PDF exportado exitosamente', 'success');
+          } catch (error) {
+            console.error('Error al exportar PDF:', error);
+            this.showSnackBar('Error al exportar el PDF', 'error');
+          }
+        }
+        // En cualquier caso, proceder con el guardado
+        const workData = this.workForm.value;
+        const serializedNotes = serializeOrderNotes(this.existingNotes);
+        this.performSave(updateData, workData, serializedNotes);
+      });
+  }
+
+  /**
+   * Realiza el guardado de los cambios de la orden
+   * @param updateData - Datos de actualización
+   * @param workData - Datos del formulario de trabajo
+   * @param serializedNotes - Notas serializadas
+   */
+  private performSave(updateData: any, workData: any, serializedNotes: string): void {
+    this.saving = true;
 
     this.ordersService.updateOrder(this.orderId, updateData)
       .pipe(takeUntil(this.destroy$))
@@ -636,7 +716,7 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
 
     // Auto-completar fecha/hora de inicio
     const now = new Date();
-    const fechaini = now.toISOString().split('T')[0];
+    const fechaini = this.timezoneService.formatDate(now);
     const horaini = now.toTimeString().slice(0, 5);
 
     // Actualizar orden con técnico asignado y fecha de inicio
@@ -741,5 +821,6 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
     }
     return tiposerv === 1 ? 'primary' : 'accent';
   }
+
 }
 

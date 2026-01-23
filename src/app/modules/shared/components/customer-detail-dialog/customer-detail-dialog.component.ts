@@ -73,7 +73,24 @@ export class CustomerDetailDialogComponent implements OnInit {
 
   getFormattedDate(dateString: string): string {
     if (!dateString) return '--';
+    
+    // Parsear fecha correctamente para evitar problemas de timezone
+    // Si es formato YYYY-MM-DD, usar componentes
+    if (/^\d{4}-\d{2}-\d{2}/.test(dateString)) {
+      const dateStr = dateString.split(' ')[0].split('T')[0];
+      const [year, month, day] = dateStr.split('-').map(Number);
+      if (year && month && day) {
+        const date = new Date(year, month - 1, day);
+        return date.toLocaleDateString('es-AR');
+      }
+    }
+    
+    // Fallback: intentar parsear como Date
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-AR');
+    if (!isNaN(date.getTime())) {
+      return date.toLocaleDateString('es-AR');
+    }
+    
+    return '--';
   }
 }

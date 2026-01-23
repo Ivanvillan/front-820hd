@@ -410,11 +410,28 @@ export class OrdersUserComponent implements OnInit, OnDestroy {
   }
 
   formatDate(date: string): string {
-    let formattedDate = new Date(date);
-    let year = formattedDate.getFullYear();
-    let month = formattedDate.getMonth() + 1;
-    let day = formattedDate.getDate();
-    return `${day}-${month}-${year}`;
+    if (!date) return '--';
+    
+    // Parsear fecha correctamente para evitar problemas de timezone
+    // Si es formato YYYY-MM-DD, usar componentes
+    if (/^\d{4}-\d{2}-\d{2}/.test(date)) {
+      const dateStr = date.split(' ')[0].split('T')[0];
+      const [year, month, day] = dateStr.split('-').map(Number);
+      if (year && month && day) {
+        return `${day}-${month}-${year}`;
+      }
+    }
+    
+    // Fallback: intentar parsear como Date
+    const formattedDate = new Date(date);
+    if (!isNaN(formattedDate.getTime())) {
+      const year = formattedDate.getFullYear();
+      const month = formattedDate.getMonth() + 1;
+      const day = formattedDate.getDate();
+      return `${day}-${month}-${year}`;
+    }
+    
+    return '--';
   }
 
   PDFExport() { 

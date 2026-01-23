@@ -36,6 +36,7 @@ import { DashboardAuthComponent } from './components/dashboard-auth/dashboard-au
 import { TicketDetailModalComponent } from './components/ticket-detail-modal/ticket-detail-modal.component';
 import { UpdateOrderDialogComponent } from './components/update-order-dialog/update-order-dialog.component';
 import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
+import { PdfExportConfirmationDialogComponent } from './components/pdf-export-confirmation-dialog/pdf-export-confirmation-dialog.component';
 import { CreateOrderDialogComponent } from './components/create-order-dialog/create-order-dialog.component';
 import { CreateCustomerDialogComponent } from './components/create-customer-dialog/create-customer-dialog.component';
 import { UpdateCustomerDialogComponent } from './components/update-customer-dialog/update-customer-dialog.component';
@@ -67,6 +68,7 @@ import { ConfigurableTableModule } from 'src/app/components/configurable-table/c
     TicketDetailModalComponent,
     UpdateOrderDialogComponent,
     ConfirmationDialogComponent,
+    PdfExportConfirmationDialogComponent,
     CreateOrderDialogComponent,
     CreateCustomerDialogComponent,
     UpdateCustomerDialogComponent,
@@ -121,6 +123,7 @@ import { ConfigurableTableModule } from 'src/app/components/configurable-table/c
     TicketDetailModalComponent,
     UpdateOrderDialogComponent,
     ConfirmationDialogComponent,
+    PdfExportConfirmationDialogComponent,
     CreateOrderDialogComponent,
     CreateCustomerDialogComponent,
     UpdateCustomerDialogComponent,

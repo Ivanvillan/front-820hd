@@ -5,6 +5,7 @@ import { Ticket } from 'src/app/models/ticket.model';
 import { formatNotesForDisplay } from 'src/app/shared/utils/order-notes.utils';
 import { OrdersService } from 'src/app/services/orders/orders.service';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
+import { TimezoneService } from 'src/app/services/timezone/timezone.service';
 import { PdfExportService } from 'src/app/services/pdf-export/pdf-export.service';
 import { 
   getOrderStatus,
@@ -24,7 +25,8 @@ export class TicketDetailModalComponent {
     private ordersService: OrdersService,
     private credentialsService: CredentialsService,
     private snackBar: MatSnackBar,
-    private pdfExportService: PdfExportService
+    private pdfExportService: PdfExportService,
+    private timezoneService: TimezoneService
   ) {}
 
   closeDialog(): void {
@@ -223,7 +225,7 @@ export class TicketDetailModalComponent {
 
     // Auto-completar fecha/hora de inicio
     const now = new Date();
-    const fechaini = now.toISOString().split('T')[0];
+    const fechaini = this.timezoneService.formatDate(now);
     const horaini = now.toTimeString().slice(0, 5);
 
     // Actualizar orden con técnico asignado y fecha de inicio
@@ -314,4 +316,5 @@ export class TicketDetailModalComponent {
     }
     return tiposerv === 1 ? 'primary' : 'accent';
   }
+
 } 

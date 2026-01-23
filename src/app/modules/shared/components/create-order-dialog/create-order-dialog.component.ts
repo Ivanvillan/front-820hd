@@ -7,6 +7,8 @@ import { CustomersService } from '../../../../services/customers/customers.servi
 import { PersonnelService } from '../../../../services/personnel/personnel.service';
 import { ServicesService } from '../../../../services/services/services.service';
 import { MaterialsService } from '../../../../services/materials/materials.service';
+import { TimezoneService } from '../../../../services/timezone/timezone.service';
+import { validateDateRange, getDateRangeErrorMessage } from '../../../../shared/utils/date.utils';
 import { Service } from '../../../../models/service.model';
 import { OrderSector, OrderStatus } from '../../../../models/ticket.model';
 import { Material, SelectedMaterial, MaterialDTO } from '../../../../models/material.model';
@@ -51,7 +53,8 @@ export class CreateOrderDialogComponent implements OnInit {
     private customersService: CustomersService,
     private personnelService: PersonnelService,
     private servicesService: ServicesService,
-    private materialsService: MaterialsService
+    private materialsService: MaterialsService,
+    private timezoneService: TimezoneService
   ) {
     // Configurar valores por defecto basados en autoasignación
     const defaultSector = data?.autoAssign?.sector ? 
@@ -94,6 +97,24 @@ export class CreateOrderDialogComponent implements OnInit {
       }
       // txtmateriales se parseará después de cargar los materiales en ngOnInit
       // No establecerlo aquí para evitar conflictos con el parseo automático
+      
+      // Establecer fechas desde remito si están disponibles
+      if (pre.fechaini) {
+        // Parsear fecha correctamente para el datepicker
+        const fechaIni = this.timezoneService.parseDateForDatepicker(pre.fechaini);
+        if (fechaIni) {
+          this.createForm.get('fechaini')?.setValue(fechaIni);
+        }
+      }
+      if (pre.fechafin) {
+        // Parsear fecha correctamente para el datepicker
+        const fechaFin = this.timezoneService.parseDateForDatepicker(pre.fechafin);
+        if (fechaFin) {
+          this.createForm.get('fechafin')?.setValue(fechaFin);
+        }
+      }
+      
+      // Establecer horas desde remito
       if (pre.horaEntrada) {
         this.createForm.get('startTime')?.setValue(pre.horaEntrada);
       }
@@ -149,6 +170,20 @@ export class CreateOrderDialogComponent implements OnInit {
         this.contactos = [];
         this.createForm.get('contactId')?.setValue(null);
       }
+    });
+
+    // Validación cruzada: fechafin >= fechaini
+    this.createForm.get('fechaini')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+    });
+    this.createForm.get('fechafin')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+    });
+    this.createForm.get('startTime')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+    });
+    this.createForm.get('endTime')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
     });
   }
 
@@ -487,9 +522,9 @@ export class CreateOrderDialogComponent implements OnInit {
       
       // Mapear campos de fecha y hora: fechaini/startTime → fechaini/horaini, fechafin/endTime → fechafin/horafin
       if (formData.fechaini) {
-        // Convertir Date a string ISO si es necesario
+        // Convertir Date a string YYYY-MM-DD usando zona horaria local (no UTC)
         if (formData.fechaini instanceof Date) {
-          orderData.fechaini = formData.fechaini.toISOString().split('T')[0];
+          orderData.fechaini = this.timezoneService.formatDate(formData.fechaini);
         } else if (formData.fechaini.trim()) {
           orderData.fechaini = formData.fechaini;
         }
@@ -498,9 +533,9 @@ export class CreateOrderDialogComponent implements OnInit {
         orderData.horaini = formData.startTime;
       }
       if (formData.fechafin) {
-        // Convertir Date a string ISO si es necesario
+        // Convertir Date a string YYYY-MM-DD usando zona horaria local (no UTC)
         if (formData.fechafin instanceof Date) {
-          orderData.fechafin = formData.fechafin.toISOString().split('T')[0];
+          orderData.fechafin = this.timezoneService.formatDate(formData.fechafin);
         } else if (formData.fechafin.trim()) {
           orderData.fechafin = formData.fechafin;
         }
@@ -531,6 +566,40 @@ export class CreateOrderDialogComponent implements OnInit {
       const control = this.createForm.get(key);
       control?.markAsTouched();
     });
+  }
+
+  /**
+   * Valida que la fecha de fin sea mayor o igual a la fecha de inicio
+   */
+  private validateDateRange(): void {
+    const fechaini = this.createForm.get('fechaini')?.value;
+    const fechafin = this.createForm.get('fechafin')?.value;
+    const horaini = this.createForm.get('startTime')?.value;
+    const horafin = this.createForm.get('endTime')?.value;
+
+    if (!fechaini || !fechafin) {
+      // Limpiar errores si no hay ambas fechas
+      this.createForm.get('fechafin')?.setErrors(null);
+      return;
+    }
+
+    const isValid = validateDateRange(fechaini, fechafin, horaini, horafin);
+    
+    if (!isValid) {
+      this.createForm.get('fechafin')?.setErrors({ 
+        dateRange: { message: getDateRangeErrorMessage() }
+      });
+    } else {
+      const errors = this.createForm.get('fechafin')?.errors;
+      if (errors && errors['dateRange']) {
+        delete errors['dateRange'];
+        if (Object.keys(errors).length === 0) {
+          this.createForm.get('fechafin')?.setErrors(null);
+        } else {
+          this.createForm.get('fechafin')?.setErrors(errors);
+        }
+      }
+    }
   }
 
 } 

@@ -1,0 +1,123 @@
+@use 'src/styles/variables' as vars;
+
+.pdf-export-confirmation-dialog {
+  min-width: 400px;
+  max-width: 500px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: vars.$spacing-md;
+  border-bottom: 1px solid vars.$border-color;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-sm;
+    margin: 0;
+    font-size: vars.$font-size-lg;
+    font-weight: vars.$font-weight-semibold;
+    color: vars.$text-primary;
+
+    .pdf-icon {
+      color: vars.$warn;
+    }
+  }
+
+  .close-button {
+    color: vars.$text-secondary;
+    
+    &:hover {
+      color: vars.$text-primary;
+    }
+  }
+}
+
+.dialog-content {
+  padding: vars.$spacing-md;
+  min-height: 100px;
+
+  .message {
+    margin: 0 0 vars.$spacing-md 0;
+    font-size: vars.$font-size-base;
+    color: vars.$text-primary;
+    line-height: 1.5;
+  }
+
+  .info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: vars.$spacing-sm;
+    padding: vars.$spacing-sm;
+    background-color: vars.$gray-50;
+    border-radius: vars.$border-radius-lg;
+    border-left: 3px solid vars.$primary;
+
+    mat-icon {
+      color: vars.$primary;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+    }
+
+    span {
+      font-size: vars.$font-size-sm;
+      color: vars.$text-secondary;
+      line-height: 1.4;
+    }
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-md;
+  border-top: 1px solid vars.$border-color;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: vars.$spacing-xs;
+    min-width: 140px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .dismiss-btn {
+    color: vars.$text-secondary;
+    
+    &:hover {
+      background-color: vars.$gray-100;
+    }
+  }
+
+  .confirm-btn {
+    mat-icon {
+      color: vars.$text-white;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: vars.$breakpoint-sm) {
+  .pdf-export-confirmation-dialog {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}

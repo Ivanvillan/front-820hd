@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { OrderStatus, OrderSector } from 'src/app/models/ticket.model';
@@ -15,6 +15,10 @@ import { PersonnelService } from 'src/app/services/personnel/personnel.service';
 import { CustomersService } from 'src/app/services/customers/customers.service';
 import { ServicesService } from 'src/app/services/services/services.service';
 import { MaterialsService } from 'src/app/services/materials/materials.service';
+import { PdfExportService } from 'src/app/services/pdf-export/pdf-export.service';
+import { PdfExportConfirmationDialogComponent, PdfExportConfirmationDialogData } from 'src/app/modules/shared/components/pdf-export-confirmation-dialog/pdf-export-confirmation-dialog.component';
+import { TimezoneService } from 'src/app/services/timezone/timezone.service';
+import { validateDateRange, getDateRangeErrorMessage } from 'src/app/shared/utils/date.utils';
 import { Service } from 'src/app/models/service.model';
 import { Material, SelectedMaterial, MaterialDTO } from 'src/app/models/material.model';
 
@@ -70,7 +74,10 @@ export class UpdateOrderDialogComponent implements OnInit {
     private customersService: CustomersService,
     private servicesService: ServicesService,
     private materialsService: MaterialsService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private pdfExportService: PdfExportService,
+    private timezoneService: TimezoneService,
+    private dialog: MatDialog
   ) {
     this.updateForm = this.fb.group({
       // Información básica
@@ -158,9 +165,9 @@ export class UpdateOrderDialogComponent implements OnInit {
         prioridad: this.data.prioridad || '',
         
         // Trabajo - Parsear fechas correctamente
-        fechaini: this.parseDateForDatepicker(this.data.fechaini),
+        fechaini: this.timezoneService.parseDateForDatepicker(this.data.fechaini),
         horaini: this.data.horaini || '',
-        fechafin: this.parseDateForDatepicker(this.data.fechafin),
+        fechafin: this.timezoneService.parseDateForDatepicker(this.data.fechafin),
         horafin: this.data.horafin || '',
         
         // Observaciones
@@ -179,6 +186,20 @@ export class UpdateOrderDialogComponent implements OnInit {
         this.contactos = [];
         this.updateForm.get('contactId')?.setValue(null);
       }
+    });
+
+    // Validación cruzada: fechafin >= fechaini
+    this.updateForm.get('fechaini')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+    });
+    this.updateForm.get('fechafin')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+    });
+    this.updateForm.get('horaini')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
+    });
+    this.updateForm.get('horafin')?.valueChanges.subscribe(() => {
+      this.validateDateRange();
     });
   }
 
@@ -550,17 +571,17 @@ export class UpdateOrderDialogComponent implements OnInit {
       
       // Trabajo - Fechas
       if (formData.fechaini) {
-        // Convertir Date a string ISO si es necesario
+        // Convertir Date a string YYYY-MM-DD usando zona horaria local (no UTC)
         if (formData.fechaini instanceof Date) {
-          updateData.fechaini = formData.fechaini.toISOString().split('T')[0];
+          updateData.fechaini = this.timezoneService.formatDate(formData.fechaini);
         } else if (formData.fechaini.trim()) {
           updateData.fechaini = formData.fechaini;
         }
       }
       if (formData.fechafin) {
-        // Convertir Date a string ISO si es necesario
+        // Convertir Date a string YYYY-MM-DD usando zona horaria local (no UTC)
         if (formData.fechafin instanceof Date) {
-          updateData.fechafin = formData.fechafin.toISOString().split('T')[0];
+          updateData.fechafin = this.timezoneService.formatDate(formData.fechafin);
         } else if (formData.fechafin.trim()) {
           updateData.fechafin = formData.fechafin;
         }
@@ -579,16 +600,19 @@ export class UpdateOrderDialogComponent implements OnInit {
       
       // Si cambia a "En Progreso" y no tiene fecha de inicio
       if (formData.estado === 'En Progreso' && !this.data.fechaini) {
-        updateData.fechaini = now.toISOString().split('T')[0];
+        updateData.fechaini = this.timezoneService.formatDate(now);
         if (!updateData.horaini) {
           updateData.horaini = now.toTimeString().slice(0, 5);
         }
       }
       
-      // Si cambia a "Finalizada"
-      if (formData.estado === 'Finalizada') {
+      // Si cambia a "Finalizada" (solo si el estado anterior NO era "Finalizada")
+      const previousStatus = this.data.estado || 'Pendiente';
+      const isChangingToFinalized = formData.estado === 'Finalizada' && previousStatus !== 'Finalizada';
+      
+      if (isChangingToFinalized) {
         if (!this.data.fechafin) {
-          updateData.fechafin = now.toISOString().split('T')[0];
+          updateData.fechafin = this.timezoneService.formatDate(now);
         }
         if (!updateData.horafin) {
           updateData.horafin = now.toTimeString().slice(0, 5);
@@ -596,12 +620,19 @@ export class UpdateOrderDialogComponent implements OnInit {
         
         // Si no tiene fecha de inicio, usar la fecha de la orden
         if (!this.data.fechaini && this.data.fecha) {
-          const orderDate = new Date(this.data.fecha);
-          updateData.fechaini = orderDate.toISOString().split('T')[0];
+          // Parsear fecha correctamente para evitar problemas de timezone
+          const orderDate = this.timezoneService.parseDateForDatepicker(this.data.fecha);
+          if (orderDate) {
+            updateData.fechaini = this.timezoneService.formatDate(orderDate);
+          }
           if (!updateData.horaini) {
             updateData.horaini = this.data.hora || '09:00';
           }
         }
+        
+        // Preguntar si quiere exportar a PDF antes de finalizar
+        this.askForPdfExportBeforeFinalizing(updateData);
+        return; // No cerrar el diálogo todavía, esperar respuesta del usuario
       }
       
       this.dialogRef.close(updateData);
@@ -609,33 +640,80 @@ export class UpdateOrderDialogComponent implements OnInit {
   }
 
   /**
-   * Parsea una fecha desde la BD para el datepicker
-   * Maneja formatos: "2026-01-14 00:00:00", "2026-01-14", Date object, o null/undefined
+   * Pregunta al usuario si quiere exportar la orden a PDF antes de finalizarla
+   * @param updateData - Datos de actualización que se enviarán al backend
    */
-  private parseDateForDatepicker(dateValue: any): Date | null {
-    if (!dateValue) {
-      return null;
-    }
+  private askForPdfExportBeforeFinalizing(updateData: any): void {
+    // Crear una orden temporal con los datos actualizados para el PDF
+    const orderForPdf = {
+      ...this.data,
+      ...updateData,
+      estado: 'Finalizada'
+    };
+
+    const orderNumber = this.data.numero || this.data.id1 || 'N/A';
     
-    // Si ya es un Date object
-    if (dateValue instanceof Date) {
-      return dateValue;
+    // Mostrar diálogo de confirmación específico para PDF
+    const dialogData: PdfExportConfirmationDialogData = {
+      orderNumber: orderNumber
+    };
+
+    const confirmDialog = this.dialog.open(PdfExportConfirmationDialogComponent, {
+      width: '90%',
+      maxWidth: '500px',
+      autoFocus: false,
+      data: dialogData,
+      disableClose: false
+    });
+
+    confirmDialog.afterClosed().subscribe((result: boolean | undefined) => {
+      if (result === true) {
+        // Usuario quiere exportar PDF
+        try {
+          this.pdfExportService.exportOrderToPdf(orderForPdf);
+          this.snackBar.open('PDF exportado exitosamente', 'Cerrar', { duration: 3000 });
+        } catch (error) {
+          console.error('Error al exportar PDF:', error);
+          this.snackBar.open('Error al exportar el PDF', 'Cerrar', { duration: 3000 });
+        }
+      }
+      // En cualquier caso, proceder con la finalización
+      this.dialogRef.close(updateData);
+    });
+  }
+
+  /**
+   * Valida que la fecha de fin sea mayor o igual a la fecha de inicio
+   */
+  private validateDateRange(): void {
+    const fechaini = this.updateForm.get('fechaini')?.value;
+    const fechafin = this.updateForm.get('fechafin')?.value;
+    const horaini = this.updateForm.get('horaini')?.value;
+    const horafin = this.updateForm.get('horafin')?.value;
+
+    if (!fechaini || !fechafin) {
+      // Limpiar errores si no hay ambas fechas
+      this.updateForm.get('fechafin')?.setErrors(null);
+      return;
     }
+
+    const isValid = validateDateRange(fechaini, fechafin, horaini, horafin);
     
-    // Si es un string, parsearlo
-    if (typeof dateValue === 'string') {
-      // Extraer solo la parte de fecha (antes del espacio o T)
-      const dateStr = dateValue.split(' ')[0].split('T')[0];
-      if (dateStr) {
-        const parsed = new Date(dateStr);
-        // Verificar que la fecha es válida
-        if (!isNaN(parsed.getTime())) {
-          return parsed;
+    if (!isValid) {
+      this.updateForm.get('fechafin')?.setErrors({ 
+        dateRange: { message: getDateRangeErrorMessage() }
+      });
+    } else {
+      const errors = this.updateForm.get('fechafin')?.errors;
+      if (errors && errors['dateRange']) {
+        delete errors['dateRange'];
+        if (Object.keys(errors).length === 0) {
+          this.updateForm.get('fechafin')?.setErrors(null);
+        } else {
+          this.updateForm.get('fechafin')?.setErrors(errors);
         }
       }
     }
-    
-    return null;
   }
 }
 

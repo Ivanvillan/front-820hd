@@ -10,6 +10,7 @@ import { TicketDetailModalComponent } from 'src/app/modules/shared/components/ti
 import { UpdateOrderDialogComponent } from 'src/app/modules/shared/components/update-order-dialog/update-order-dialog.component';
 import { OrdersService } from 'src/app/services/orders/orders.service';
 import { PersonnelService, Technician } from 'src/app/services/personnel/personnel.service';
+import { TimezoneService } from 'src/app/services/timezone/timezone.service';
 import { CredentialsService } from 'src/app/services/credentials/credentials.service';
 import { PdfExportService } from 'src/app/services/pdf-export/pdf-export.service';
 import { FilterConfig, FilterValues } from 'src/app/components/filter-bar/filter-bar.component';
@@ -107,7 +108,8 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private router: Router,
     private credentialsService: CredentialsService,
-    private pdfExportService: PdfExportService
+    private pdfExportService: PdfExportService,
+    private timezoneService: TimezoneService
   ) {}
 
   ngOnInit(): void {
@@ -526,6 +528,11 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
             description: description,
             txtmateriales: txtmateriales, // Campo separado para materiales (texto)
             materiales: r?.materiales || [], // Array estructurado de materiales del remito
+            // Usar fecha del remito para fechaini y fechafin si está disponible
+            // Pasar el string directamente para que parseDateForDatepicker lo maneje correctamente
+            // sin problemas de timezone
+            fechaini: r?.fecha || undefined,
+            fechafin: r?.fecha || undefined,
             horaEntrada: r?.horaEntrada,
             horaSalida: r?.horaSalida,
             assignedTechnicianId: r?.tecnico?.id
@@ -753,7 +760,7 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
 
     // Auto-completar fecha/hora de inicio
     const now = new Date();
-    const fechaini = now.toISOString().split('T')[0];
+    const fechaini = this.timezoneService.formatDate(now);
     const horaini = now.toTimeString().slice(0, 5);
 
     // Actualizar orden con técnico asignado y fecha de inicio

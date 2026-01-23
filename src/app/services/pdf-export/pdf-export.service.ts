@@ -3,6 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Ticket } from 'src/app/models/ticket.model';
 import { getOrderTypeCategory } from 'src/app/shared/utils/order-status.utils';
+import { TimezoneService } from '../timezone/timezone.service';
 
 /**
  * Servicio para exportar órdenes de trabajo a PDF
@@ -26,7 +27,9 @@ export class PdfExportService {
   private logoBase64: string = '';
   private logoLoaded: boolean = false;
 
-  constructor() {
+  constructor(
+    private timezoneService: TimezoneService
+  ) {
     this.loadLogo();
   }
 
@@ -350,19 +353,14 @@ export class PdfExportService {
 
   /**
    * Formatea solo la fecha (sin hora) al formato DD/MM/YYYY
+   * Usa TimezoneService para formatear correctamente según la zona horaria configurada
    */
   private formatDateOnly(dateString: string | undefined): string {
     if (!dateString) return 'N/A';
     
     try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return 'N/A';
-      
-      const day = String(date.getUTCDate()).padStart(2, '0');
-      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-      const year = date.getUTCFullYear();
-      
-      return `${day}/${month}/${year}`;
+      // Usar TimezoneService para formatear la fecha correctamente
+      return this.timezoneService.formatDateTime(dateString, 'DD/MM/YYYY');
     } catch {
       return 'N/A';
     }

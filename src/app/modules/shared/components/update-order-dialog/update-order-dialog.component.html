@@ -139,6 +139,9 @@
           <input matInput [matDatepicker]="pickerFin" formControlName="fechafin">
           <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
           <mat-datepicker #pickerFin></mat-datepicker>
+          <mat-error *ngIf="updateForm.get('fechafin')?.hasError('dateRange')">
+            {{ updateForm.get('fechafin')?.getError('dateRange')?.message }}
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">

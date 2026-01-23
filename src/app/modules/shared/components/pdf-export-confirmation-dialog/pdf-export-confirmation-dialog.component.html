@@ -1,0 +1,38 @@
+<div class="pdf-export-confirmation-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="pdf-icon">picture_as_pdf</mat-icon>
+      Exportar Orden a PDF
+    </h2>
+    <button mat-icon-button (click)="onDismiss()" class="close-button" aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <p class="message">{{ message }}</p>
+    <div class="info-box">
+      <mat-icon>info</mat-icon>
+      <span>Una vez finalizada, la orden desaparecerá del listado principal. Puedes exportar el PDF ahora para tenerlo disponible.</span>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button 
+      mat-flat-button 
+      (click)="onDismiss()" 
+      class="dismiss-btn">
+      <mat-icon>close</mat-icon>
+      No, solo finalizar
+    </button>
+    <button 
+      mat-flat-button 
+      color="primary" 
+      (click)="onConfirm()" 
+      cdkFocusInitial 
+      class="confirm-btn">
+      <mat-icon>picture_as_pdf</mat-icon>
+      Sí, exportar PDF
+    </button>
+  </mat-dialog-actions>
+</div>

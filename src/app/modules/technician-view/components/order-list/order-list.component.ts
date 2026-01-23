@@ -8,6 +8,7 @@ import { takeUntil, filter, switchMap, catchError, retry } from 'rxjs/operators'
 import { OrdersService } from 'src/app/services/orders/orders.service';
 import { OrdersResponse } from 'src/app/models/order.model';
 import { AuthService } from 'src/app/services/auth/auth.service';
+import { TimezoneService } from 'src/app/services/timezone/timezone.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreateOrderDialogComponent } from 'src/app/modules/shared/components/create-order-dialog/create-order-dialog.component';
 import { RemitosSelectorDialogComponent } from 'src/app/modules/shared/components/remitos-selector-dialog/remitos-selector-dialog.component';
@@ -131,7 +132,8 @@ export class OrderListComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private credentialsService: CredentialsService,
     private personnelService: PersonnelService,
-    private pdfExportService: PdfExportService
+    private pdfExportService: PdfExportService,
+    private timezoneService: TimezoneService
   ) { 
     this.initializeFilterConfig();
   }
@@ -724,7 +726,7 @@ export class OrderListComponent implements OnInit, OnDestroy {
 
     // Auto-completar fecha/hora de inicio
     const now = new Date();
-    const fechaini = now.toISOString().split('T')[0];
+    const fechaini = this.timezoneService.formatDate(now);
     const horaini = now.toTimeString().slice(0, 5);
 
     // Actualizar orden con técnico asignado y fecha de inicio
@@ -1007,6 +1009,11 @@ export class OrderListComponent implements OnInit, OnDestroy {
             clientId: r?.cliente?.id,
             description: description,
             txtmateriales: txtmateriales, // Campo separado para materiales
+            // Usar fecha del remito para fechaini y fechafin si está disponible
+            // Pasar el string directamente para que parseDateForDatepicker lo maneje correctamente
+            // sin problemas de timezone
+            fechaini: r?.fecha || undefined,
+            fechafin: r?.fecha || undefined,
             horaEntrada: r?.horaEntrada,
             horaSalida: r?.horaSalida,
             // Auto-asignar al técnico del remito si está disponible
@@ -1036,4 +1043,5 @@ export class OrderListComponent implements OnInit, OnDestroy {
       });
     });
   }
+
 }
