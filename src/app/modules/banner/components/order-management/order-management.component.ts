@@ -207,10 +207,9 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
       ...this.currentFilterValues,
       status: this.currentFilterValues['status'] as OrderStatus | undefined
     };
-    filters.showAll = true;
-    
-    // El backend ya excluye finalizadas por defecto automáticamente
-    // Si el usuario selecciona "Finalizada" en el filtro de estados, el backend mostrará solo finalizadas
+    // NO enviar showAll - Admin usa filtrado server-side
+    // El backend aplicará exclusión por defecto de finalizadas/canceladas
+    // Solo cuando el usuario selecciona "Todas" o un estado específico, el backend ajusta el filtrado
     
     return this.ordersService.getInternalOrders(filters, this.currentPage, this.pageSize);
   }
@@ -270,8 +269,9 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
         type: 'ng-select',
         name: 'status',
         label: 'Estado',
-        placeholder: 'Todos los estados',
+        placeholder: 'Filtrar por estado',
         options: [
+          { label: 'Todas', value: 'Todas' },
           { label: 'Pendiente', value: 'Pendiente' },
           { label: 'En Progreso', value: 'En Progreso' },
           { label: 'En Diagnóstico', value: 'En Diagnóstico' },
@@ -318,18 +318,19 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.currentPage = page;
     
-    // Los filtros ya vienen limpios (sin valores vacíos) desde FilterBarComponent
+    // FIX: Mapear 'estado' (español) a 'status' (inglés) para el backend
+    // Crear una copia sin 'estado' para evitar enviar ambos parámetros
+    const { estado, ...otherFilters } = filterValues;
     const filters: OrderFilters = { 
-      ...filterValues,
-      status: filterValues['status'] as OrderStatus | undefined
+      ...otherFilters,
+      status: (estado || filterValues['status']) as OrderStatus | undefined
     };
-    filters.showAll = true;
     
-    // COMPORTAMIENTO INTENCIONAL: El backend excluye finalizadas y canceladas por defecto automáticamente.
-    // Esto mejora la experiencia del usuario mostrando solo órdenes activas por defecto.
-    // Si el usuario selecciona "Finalizada" o "Cancelada" en el filtro de estados,
-    // el backend mostrará solo órdenes con ese estado específico.
-    // No necesitamos lógica adicional aquí - el backend maneja todo
+    // IMPORTANTE: NO enviar showAll - Admin usa filtrado SERVER-SIDE
+    // El backend excluye finalizadas/canceladas por defecto (comportamiento deseado).
+    // Si el usuario selecciona "Todas", el backend mostrará todas las órdenes.
+    // Si selecciona "Finalizada" o "Cancelada", el backend filtrará por ese estado específico.
+    // Esta es la diferencia con vistas de técnicos que usan showAll=true para filtrado CLIENT-SIDE.
     
     this.ordersService.getInternalOrders(filters, this.currentPage, this.pageSize).subscribe({
       next: (response: any) => {

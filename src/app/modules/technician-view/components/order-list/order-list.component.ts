@@ -269,13 +269,9 @@ export class OrderListComponent implements OnInit, OnDestroy {
       });
     }
     
-    // Aplicar filtros locales si existen (igual que en loadOrders)
-    if (is820hd && Object.keys(this.currentFilters).length > 0) {
-      this.applyFilters();
-    } else {
-      this.filteredOrders = [...this.orders];
-      this.totalItems = this.orders.length;
-    }
+    // FIX: Siempre aplicar filtros como en loadOrders() para mantener consistencia
+    // applyFilters() ya maneja correctamente el caso de filtros vacíos (excluye finalizadas por defecto)
+    this.applyFilters();
   }
 
   /**
@@ -296,7 +292,7 @@ export class OrderListComponent implements OnInit, OnDestroy {
         type: 'ng-select',
         name: 'estado',
         label: 'Estado Operativo',
-        placeholder: 'Todos los estados',
+        placeholder: 'Filtrar por estado',
         options: this.getEstadoOptions().map(estado => ({ label: estado, value: estado })),
         optionLabel: 'label',
         optionValue: 'value'
@@ -417,14 +413,9 @@ export class OrderListComponent implements OnInit, OnDestroy {
             });
           }
           
-          // Para 820HD, aplicar filtros por defecto (técnico actual)
-          // Para otras áreas, mostrar todas las órdenes ya filtradas
-          if (is820hd && Object.keys(this.currentFilters).length > 0) {
-            this.applyFilters();
-          } else {
-            this.filteredOrders = [...this.orders];
-            this.totalItems = this.orders.length;
-          }
+          // FIX: Siempre aplicar filtros para excluir finalizadas/canceladas por defecto
+          // Esto asegura comportamiento consistente en todas las áreas
+          this.applyFilters();
         },
         error: (err) => {
           this.loading = false;
@@ -807,16 +798,20 @@ export class OrderListComponent implements OnInit, OnDestroy {
       const filterEstado = filters['estado'] as string | undefined;
       
       if (filterEstado) {
-        // Usuario seleccionó un estado específico: mostrar solo ese estado
-        const status = this.getStatusDisplayName(this.getOrderStatus(order));
-        matches = matches && status === filterEstado;
+        // Si el usuario seleccionó "Todas": mostrar todos los estados sin exclusiones
+        if (filterEstado === 'Todas') {
+          // No aplicar ningún filtro de estado, mantener matches como está
+        } else {
+          // Usuario seleccionó un estado específico: mostrar solo ese estado
+          const status = this.getStatusDisplayName(this.getOrderStatus(order));
+          matches = matches && status === filterEstado;
+        }
       } else {
-        // COMPORTAMIENTO INTENCIONAL: Por defecto excluir órdenes finalizadas y canceladas
+        // COMPORTAMIENTO POR DEFECTO: Excluir órdenes finalizadas y canceladas
         // Esto mejora la experiencia mostrando solo órdenes activas por defecto.
-        // Si el usuario selecciona "Finalizada" o "Cancelada" en el filtro, se mostrarán solo esas.
+        // Para ver todas las órdenes (incluidas finalizadas/canceladas), seleccionar "Todas" en el filtro.
         // NOTA: Si una orden tiene estado='Finalizada' pero finalizado=false, se excluye por seguridad
         const orderStatus = this.getOrderStatus(order);
-        const statusDisplay = this.getStatusDisplayName(orderStatus);
         // Usar enum OrderStatus para comparación type-safe
         const isFinished = orderStatus === OrderStatus.FINALIZADA || order.finalizado === true;
         const isCancelled = orderStatus === OrderStatus.CANCELADA || order.anulada === true;
@@ -849,9 +844,10 @@ export class OrderListComponent implements OnInit, OnDestroy {
   /**
    * Obtiene las opciones de estado para el filtro
    * Utiliza la configuración de estados operativos
+   * Incluye opción "Todas" para mostrar todos los estados sin exclusiones
    */
   getEstadoOptions(): string[] {
-    return ORDER_STATUS_CONFIG.map(config => config.label);
+    return ['Todas', ...ORDER_STATUS_CONFIG.map(config => config.label)];
   }
 
   /**
