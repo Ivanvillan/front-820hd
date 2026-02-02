@@ -68,6 +68,20 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   cantidadToAdd: number = 1;
   isLoadingMaterials = false;
   
+  /**
+   * Función de búsqueda personalizada para materiales
+   * Busca tanto en nombre como en marca del material
+   */
+  materialSearchFn = (term: string, item: Material): boolean => {
+    if (!term) return true;
+    
+    const searchTerm = term.toLowerCase();
+    const nombre = (item.nombre || '').toLowerCase();
+    const marca = (item.marca || '').toLowerCase();
+    
+    return nombre.includes(searchTerm) || marca.includes(searchTerm);
+  };
+  
   // Estados disponibles para la orden (usando configuración compartida)
   availableStatuses: OrderStatusOption[] = ORDER_STATUS_CONFIG.map(config => ({
     value: config.value,

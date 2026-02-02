@@ -65,6 +65,20 @@ export class UpdateOrderDialogComponent implements OnInit {
     { value: 'limp', label: 'Limpieza' }
   ];
 
+  /**
+   * Función de búsqueda personalizada para materiales
+   * Busca tanto en nombre como en marca del material
+   */
+  materialSearchFn = (term: string, item: Material): boolean => {
+    if (!term) return true;
+    
+    const searchTerm = term.toLowerCase();
+    const nombre = (item.nombre || '').toLowerCase();
+    const marca = (item.marca || '').toLowerCase();
+    
+    return nombre.includes(searchTerm) || marca.includes(searchTerm);
+  };
+
   constructor(
     public dialogRef: MatDialogRef<UpdateOrderDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -110,16 +124,20 @@ export class UpdateOrderDialogComponent implements OnInit {
 
   ngOnInit(): void {
     // Cargar todos los datos necesarios
-    this.loadClients();
     this.loadTechnicians();
     this.loadServices();
     
-    if (this.data) {
-      // Cargar contactos si hay cliente
-      if (this.data.idcliente) {
-        this.loadContacts(this.data.idcliente);
+    // Cargar contactos cuando se seleccione un cliente (configurar ANTES de patchValue)
+    this.updateForm.get('clientId')?.valueChanges.subscribe(clientId => {
+      if (clientId) {
+        this.loadContacts(clientId);
+      } else {
+        this.contactos = [];
+        this.updateForm.get('contactId')?.setValue(null);
       }
-      
+    });
+    
+    if (this.data) {
       // Determinar tipo de orden
       let orderType = 'sopo'; // default
       if (this.data.insu) orderType = 'insu';
@@ -149,44 +167,38 @@ export class UpdateOrderDialogComponent implements OnInit {
       // Convertir servicios a number para compatibilidad con ng-select
       const servicioId = this.data.servicios ? Number(this.data.servicios) : null;
       
-      this.updateForm.patchValue({
-        // Información básica
-        clientId: this.data.idcliente || null,
-        contactId: this.data.idcontacto || null,
-        description: this.data.descripcion || '',
-        orderType: orderType,
-        serviceType: serviceType,
-        tiposerv: servicioId, // Usar servicios convertido a number
-        
-        // Asignación
-        estado: this.data.estado || 'Pendiente',
-        sector: this.data.sector || '',
-        assignedToIds: this.data.responsables?.map((r: any) => r.id) || [],
-        prioridad: this.data.prioridad || '',
-        
-        // Trabajo - Parsear fechas correctamente
-        fechaini: this.timezoneService.parseDateForDatepicker(this.data.fechaini),
-        horaini: this.data.horaini || '',
-        fechafin: this.timezoneService.parseDateForDatepicker(this.data.fechafin),
-        horafin: this.data.horafin || '',
-        
-        // Observaciones
-        notes: notesText
+      // Cargar clientes PRIMERO, luego establecer valores
+      this.loadClients().then(() => {
+        // Una vez cargados los clientes, establecer todos los valores
+        this.updateForm.patchValue({
+          // Información básica
+          clientId: this.data.idcliente || null,
+          // contactId se establece dentro de loadContacts() (disparado por valueChanges)
+          description: this.data.descripcion || '',
+          orderType: orderType,
+          serviceType: serviceType,
+          tiposerv: servicioId,
+          
+          // Asignación
+          estado: this.data.estado || 'Pendiente',
+          sector: this.data.sector || '',
+          assignedToIds: this.data.responsables?.map((r: any) => r.id) || [],
+          prioridad: this.data.prioridad || '',
+          
+          // Trabajo - Parsear fechas correctamente
+          fechaini: this.timezoneService.parseDateForDatepicker(this.data.fechaini),
+          horaini: this.data.horaini || '',
+          fechafin: this.timezoneService.parseDateForDatepicker(this.data.fechafin),
+          horafin: this.data.horafin || '',
+          
+          // Observaciones
+          notes: notesText
+        });
       });
       
       // Cargar notas existentes para mostrar el historial
       this.loadExistingNotes();
     }
-    
-    // Cargar contactos cuando se seleccione un cliente
-    this.updateForm.get('clientId')?.valueChanges.subscribe(clientId => {
-      if (clientId) {
-        this.loadContacts(clientId);
-      } else {
-        this.contactos = [];
-        this.updateForm.get('contactId')?.setValue(null);
-      }
-    });
 
     // Validación cruzada: fechafin >= fechaini
     this.updateForm.get('fechaini')?.valueChanges.subscribe(() => {
@@ -205,15 +217,20 @@ export class UpdateOrderDialogComponent implements OnInit {
 
   /**
    * Carga los clientes disponibles
+   * Retorna una Promise para poder esperar a que se carguen
    */
-  private loadClients(): void {
-    this.customersService.find().subscribe({
-      next: (clients) => {
-        this.clientes = clients;
-      },
-      error: (error) => {
-        console.error('Error loading clients:', error);
-      }
+  private loadClients(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.customersService.find().subscribe({
+        next: (clients) => {
+          this.clientes = clients;
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error loading clients:', error);
+          reject(error);
+        }
+      });
     });
   }
 
@@ -227,6 +244,14 @@ export class UpdateOrderDialogComponent implements OnInit {
           ...contact,
           displayName: this.createContactDisplayName(contact)
         }));
+        
+        // Re-establecer contactId después de cargar la lista para evitar race condition
+        if (this.data?.idcontacto) {
+          // Usar setTimeout para asegurar que ng-select procese la lista primero
+          setTimeout(() => {
+            this.updateForm.get('contactId')?.setValue(this.data.idcontacto, { emitEvent: false });
+          }, 0);
+        }
       },
       error: (error: any) => {
         console.error('Error loading contacts:', error);

@@ -230,24 +230,27 @@
                       [(ngModel)]="selectedMaterialForAdd"
                       [items]="materials"
                       bindLabel="nombre"
+                      [searchFn]="materialSearchFn"
                       [ngModelOptions]="{standalone: true}"
-                      placeholder="Buscar material por código o descripción..."
+                      placeholder="Buscar material por nombre o marca..."
                       [searchable]="true"
                       [clearable]="true"
                       [loading]="isLoadingMaterials"
                       loadingText="Cargando materiales..."
                       notFoundText="No se encontraron materiales"
                       class="ng-select-custom">
-                      <ng-option *ngFor="let material of materials" [value]="material">
+                      <ng-template ng-label-tmp let-item="item">
+                        <span>{{item.nombre}} - Marca: {{item.marca}}</span>
+                      </ng-template>
+                      <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
                         <div class="material-option">
-                          <div class="material-code">{{material.id}}</div>
-                          <div class="material-description">{{material.nombre}}</div>
+                          <div class="material-code">{{item.id}}</div>
+                          <div class="material-description">{{item.nombre}}</div>
                           <div class="material-details">
-                            <span class="material-unit">{{material.marca}}</span>
-                            <span class="material-price" *ngIf="material.id">${{material.id | number:'1.2-2'}}</span>
+                            <span class="material-unit">Marca: {{item.marca}}</span>
                           </div>
                         </div>
-                      </ng-option>
+                      </ng-template>
                     </ng-select>
                   </div>
                   

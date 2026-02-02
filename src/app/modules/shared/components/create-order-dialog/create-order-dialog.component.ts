@@ -45,6 +45,20 @@ export class CreateOrderDialogComponent implements OnInit {
     { value: 'limp', label: 'Limpieza' }
   ];
 
+  /**
+   * Función de búsqueda personalizada para materiales
+   * Busca tanto en nombre como en marca del material
+   */
+  materialSearchFn = (term: string, item: Material): boolean => {
+    if (!term) return true;
+    
+    const searchTerm = term.toLowerCase();
+    const nombre = (item.nombre || '').toLowerCase();
+    const marca = (item.marca || '').toLowerCase();
+    
+    return nombre.includes(searchTerm) || marca.includes(searchTerm);
+  };
+
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<CreateOrderDialogComponent>,
