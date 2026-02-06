@@ -503,11 +503,12 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
     }
 
     // Si no es finalizada, proceder con el guardado normal
-    this.performSave(updateData, workData, serializedNotes);
+    this.performSave(updateData, workData, serializedNotes, false);
   }
 
   /**
-   * Pregunta al usuario si quiere exportar la orden a PDF antes de finalizarla
+   * Pregunta al usuario si quiere exportar la orden a PDF al finalizarla
+   * IMPORTANTE: El PDF se genera DESPUÉS de guardar exitosamente, no antes
    * @param updateData - Datos de actualización que se enviarán al backend
    */
   private askForPdfExportBeforeFinalizing(updateData: any): void {
@@ -515,16 +516,9 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
       // Si no hay orden, proceder directamente con el guardado
       const workData = this.workForm.value;
       const serializedNotes = serializeOrderNotes(this.existingNotes);
-      this.performSave(updateData, workData, serializedNotes);
+      this.performSave(updateData, workData, serializedNotes, false);
       return;
     }
-
-    // Crear una orden temporal con los datos actualizados para el PDF
-    const orderForPdf: Ticket = {
-      ...this.order,
-      ...updateData,
-      estado: OrderStatus.FINALIZADA
-    };
 
     const orderNumber = this.order.numero || this.order.id1 || 'N/A';
     
@@ -544,30 +538,23 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
     confirmDialog.afterClosed()
       .pipe(takeUntil(this.destroy$))
       .subscribe((result: boolean | undefined) => {
-        if (result === true) {
-          // Usuario quiere exportar PDF
-          try {
-            this.pdfExportService.exportOrderToPdf(orderForPdf);
-            this.showSnackBar('PDF exportado exitosamente', 'success');
-          } catch (error) {
-            console.error('Error al exportar PDF:', error);
-            this.showSnackBar('Error al exportar el PDF', 'error');
-          }
-        }
-        // En cualquier caso, proceder con el guardado
+        // Guardar con flag de si usuario quiere exportar PDF
         const workData = this.workForm.value;
         const serializedNotes = serializeOrderNotes(this.existingNotes);
-        this.performSave(updateData, workData, serializedNotes);
+        const shouldExportPdf = result === true;
+        this.performSave(updateData, workData, serializedNotes, shouldExportPdf);
       });
   }
 
   /**
    * Realiza el guardado de los cambios de la orden
+   * Si se solicita exportar PDF, recarga la orden desde BD después del guardado exitoso
    * @param updateData - Datos de actualización
    * @param workData - Datos del formulario de trabajo
    * @param serializedNotes - Notas serializadas
+   * @param shouldExportPdf - Si se debe exportar PDF después de guardar
    */
-  private performSave(updateData: any, workData: any, serializedNotes: string): void {
+  private performSave(updateData: any, workData: any, serializedNotes: string, shouldExportPdf: boolean = false): void {
     this.saving = true;
 
     this.ordersService.updateOrder(this.orderId, updateData)
@@ -577,17 +564,49 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
           this.saving = false;
           this.showSnackBar('Cambios guardados exitosamente', 'success');
           
-          // Actualizar la orden local con los nuevos datos
-          if (this.order) {
-            this.order.estado = this.currentStatus;
-            this.order.observaciones = serializedNotes;
-            this.order.txtmateriales = workData.txtmateriales;
+          // Si se debe exportar PDF, recargar orden desde BD y exportar
+          if (shouldExportPdf) {
+            this.exportPdfAfterSave();
+          } else {
+            // Actualizar la orden local con los nuevos datos solo si no se exporta PDF
+            if (this.order) {
+              this.order.estado = this.currentStatus;
+              this.order.observaciones = serializedNotes;
+              this.order.txtmateriales = workData.txtmateriales;
+            }
           }
         },
         error: (err) => {
           this.saving = false;
           this.showSnackBar('Error al guardar los cambios', 'error');
           console.error('Error updating order:', err);
+        }
+      });
+  }
+
+  /**
+   * Exporta la orden a PDF después de guardar exitosamente
+   * Recarga la orden desde BD para garantizar datos actualizados y sincronizados
+   */
+  private exportPdfAfterSave(): void {
+    this.ordersService.getOrderById(this.orderId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          const updatedOrder = response.order || response;
+          try {
+            this.pdfExportService.exportOrderToPdf(updatedOrder);
+            this.showSnackBar('PDF exportado exitosamente', 'success');
+            // Actualizar la orden local con los datos recargados
+            this.order = updatedOrder;
+          } catch (error) {
+            console.error('Error al exportar PDF:', error);
+            this.showSnackBar('Error al exportar el PDF', 'error');
+          }
+        },
+        error: (err) => {
+          console.error('Error recargando orden para PDF:', err);
+          this.showSnackBar('Error al recargar orden para exportar PDF', 'error');
         }
       });
   }

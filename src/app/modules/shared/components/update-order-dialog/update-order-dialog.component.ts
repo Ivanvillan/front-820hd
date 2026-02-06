@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
+import { forkJoin, of, Observable } from 'rxjs';
+import { catchError, timeout, tap } from 'rxjs/operators';
 import { OrderStatus, OrderSector } from 'src/app/models/ticket.model';
 import { 
   parseOrderNotes,
@@ -18,9 +20,11 @@ import { MaterialsService } from 'src/app/services/materials/materials.service';
 import { PdfExportService } from 'src/app/services/pdf-export/pdf-export.service';
 import { PdfExportConfirmationDialogComponent, PdfExportConfirmationDialogData } from 'src/app/modules/shared/components/pdf-export-confirmation-dialog/pdf-export-confirmation-dialog.component';
 import { TimezoneService } from 'src/app/services/timezone/timezone.service';
+import { AnalyticsService } from 'src/app/services/analytics/analytics.service';
 import { validateDateRange, getDateRangeErrorMessage } from 'src/app/shared/utils/date.utils';
 import { Service } from 'src/app/models/service.model';
 import { Material, SelectedMaterial, MaterialDTO } from 'src/app/models/material.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-update-order-dialog',
@@ -56,6 +60,7 @@ export class UpdateOrderDialogComponent implements OnInit {
   selectedMaterialForAdd: Material | null = null;
   cantidadToAdd: number = 1;
   isLoadingMaterials = false;
+  materialsModified = false; // Flag para rastrear si el usuario modificó materiales
   
   // Opciones de tipo de orden
   orderTypes = [
@@ -91,7 +96,8 @@ export class UpdateOrderDialogComponent implements OnInit {
     private snackBar: MatSnackBar,
     private pdfExportService: PdfExportService,
     private timezoneService: TimezoneService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private analyticsService: AnalyticsService
   ) {
     this.updateForm = this.fb.group({
       // Información básica
@@ -123,6 +129,22 @@ export class UpdateOrderDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // FEATURE FLAG: Usar carga paralela con forkJoin (Fase 3) o flujo legacy (actual)
+    if (environment.features.enableParallelLoading) {
+      this.initializeWithParallelLoading();
+    } else {
+      this.initializeWithLegacyLoading();
+    }
+
+    // Configurar validación cruzada de fechas (común a ambos flujos)
+    this.setupDateValidation();
+  }
+
+  /**
+   * LEGACY: Flujo de carga secuencial (actual)
+   * Mantiene el comportamiento existente como fallback
+   */
+  private initializeWithLegacyLoading(): void {
     // Cargar todos los datos necesarios
     this.loadTechnicians();
     this.loadServices();
@@ -138,69 +160,142 @@ export class UpdateOrderDialogComponent implements OnInit {
     });
     
     if (this.data) {
-      // Determinar tipo de orden
-      let orderType = 'sopo'; // default
-      if (this.data.insu) orderType = 'insu';
-      else if (this.data.mant) orderType = 'mant';
-      else if (this.data.sopo) orderType = 'sopo';
-      else if (this.data.limp) orderType = 'limp';
-      
-      // Determinar serviceType (in/out) basado en tiposerv
-      // tiposerv: 1 = in (interno), 0 = out (externo)
-      const serviceType = this.data.tiposerv === 1 ? 'in' : 'out';
-      
-      // Convertir notes de array a string si es necesario
-      let notesText = '';
-      if (this.data.notes) {
-        if (Array.isArray(this.data.notes) && this.data.notes.length > 0) {
-          notesText = this.data.notes.map((note: any) => note.content).join('\n');
-        } else if (typeof this.data.notes === 'string') {
-          notesText = this.data.notes;
-        }
-      }
-      
       // Cargar materiales existentes después de cargar la lista de materiales
       this.loadMaterials().then(() => {
         this.loadExistingMaterials();
       });
       
-      // Convertir servicios a number para compatibilidad con ng-select
-      const servicioId = this.data.servicios ? Number(this.data.servicios) : null;
-      
       // Cargar clientes PRIMERO, luego establecer valores
       this.loadClients().then(() => {
-        // Una vez cargados los clientes, establecer todos los valores
-        this.updateForm.patchValue({
-          // Información básica
-          clientId: this.data.idcliente || null,
-          // contactId se establece dentro de loadContacts() (disparado por valueChanges)
-          description: this.data.descripcion || '',
-          orderType: orderType,
-          serviceType: serviceType,
-          tiposerv: servicioId,
-          
-          // Asignación
-          estado: this.data.estado || 'Pendiente',
-          sector: this.data.sector || '',
-          assignedToIds: this.data.responsables?.map((r: any) => r.id) || [],
-          prioridad: this.data.prioridad || '',
-          
-          // Trabajo - Parsear fechas correctamente
-          fechaini: this.timezoneService.parseDateForDatepicker(this.data.fechaini),
-          horaini: this.data.horaini || '',
-          fechafin: this.timezoneService.parseDateForDatepicker(this.data.fechafin),
-          horafin: this.data.horafin || '',
-          
-          // Observaciones
-          notes: notesText
-        });
+        this.initializeFormValues();
       });
       
       // Cargar notas existentes para mostrar el historial
       this.loadExistingNotes();
     }
+  }
 
-    // Validación cruzada: fechafin >= fechaini
+  /**
+   * NUEVO: Flujo de carga paralela con forkJoin (Fase 3)
+   * Elimina race conditions y mejora consistencia
+   */
+  private initializeWithParallelLoading(): void {
+    // Configurar listener de contactos ANTES de cargar datos
+    this.updateForm.get('clientId')?.valueChanges.subscribe(clientId => {
+      if (clientId) {
+        this.loadContacts(clientId);
+      } else {
+        this.contactos = [];
+        this.updateForm.get('contactId')?.setValue(null);
+      }
+    });
+
+    if (!this.data) return;
+
+    const loadStartTime = performance.now();
+
+    // Cargar todos los datos en paralelo con timeout y fallbacks
+    forkJoin({
+      clients: this.loadClientsObservable(),
+      materials: this.loadMaterialsObservable(),
+      services: this.loadServicesObservable(),
+      technicians: this.loadTechniciansObservable()
+    }).pipe(
+      timeout(10000), // Timeout de 10 segundos
+      catchError(error => {
+        console.error('Error loading dialog data:', error);
+        this.snackBar.open('Error al cargar algunos datos. Por favor, intente nuevamente.', 'Cerrar', { duration: 5000 });
+        this.analyticsService.trackError('Dialog data loading failed', {
+          order_number: this.data.numero,
+          error_message: error.message || error
+        });
+        this.dialogRef.close();
+        return of(null);
+      })
+    ).subscribe(result => {
+      if (!result) return;
+
+      // Todas las cargas completadas exitosamente
+      const loadTimeMs = performance.now() - loadStartTime;
+      
+      // Track dialog opened with metrics
+      this.analyticsService.trackOrderUpdateDialogOpened(
+        this.data.numero,
+        loadTimeMs,
+        {
+          clientsLoaded: this.clientes.length,
+          materialsLoaded: this.materials.length,
+          servicesLoaded: this.services.length,
+          techniciansLoaded: this.technicians.length,
+          raceConditionDetected: false // No hay race condition con forkJoin
+        }
+      );
+
+      this.loadExistingMaterials();
+      this.loadExistingNotes();
+      this.initializeFormValues();
+    });
+  }
+
+  /**
+   * Inicializa los valores del formulario con los datos de la orden
+   * Centraliza la lógica de patchValue para evitar duplicación
+   */
+  private initializeFormValues(): void {
+    if (!this.data) return;
+
+    // Determinar tipo de orden
+    let orderType = 'sopo'; // default
+    if (this.data.insu) orderType = 'insu';
+    else if (this.data.mant) orderType = 'mant';
+    else if (this.data.sopo) orderType = 'sopo';
+    else if (this.data.limp) orderType = 'limp';
+    
+    // Determinar serviceType (in/out) basado en tiposerv
+    const serviceType = this.data.tiposerv === 1 ? 'in' : 'out';
+    
+    // Convertir notes de array a string si es necesario
+    let notesText = '';
+    if (this.data.notes) {
+      if (Array.isArray(this.data.notes) && this.data.notes.length > 0) {
+        notesText = this.data.notes.map((note: any) => note.content).join('\n');
+      } else if (typeof this.data.notes === 'string') {
+        notesText = this.data.notes;
+      }
+    }
+    
+    // Convertir servicios a number para compatibilidad con ng-select
+    const servicioId = this.data.servicios ? Number(this.data.servicios) : null;
+
+    this.updateForm.patchValue({
+      // Información básica
+      clientId: this.data.idcliente || null,
+      description: this.data.descripcion || '',
+      orderType: orderType,
+      serviceType: serviceType,
+      tiposerv: servicioId,
+      
+      // Asignación
+      estado: this.data.estado || 'Pendiente',
+      sector: this.data.sector || '',
+      assignedToIds: this.data.responsables?.map((r: any) => r.id) || [],
+      prioridad: this.data.prioridad || '',
+      
+      // Trabajo - Parsear fechas correctamente
+      fechaini: this.timezoneService.parseDateForDatepicker(this.data.fechaini),
+      horaini: this.data.horaini || '',
+      fechafin: this.timezoneService.parseDateForDatepicker(this.data.fechafin),
+      horafin: this.data.horafin || '',
+      
+      // Observaciones
+      notes: notesText
+    });
+  }
+
+  /**
+   * Configura la validación cruzada de fechas
+   */
+  private setupDateValidation(): void {
     this.updateForm.get('fechaini')?.valueChanges.subscribe(() => {
       this.validateDateRange();
     });
@@ -216,7 +311,7 @@ export class UpdateOrderDialogComponent implements OnInit {
   }
 
   /**
-   * Carga los clientes disponibles
+   * Carga los clientes disponibles (versión Promise - legacy)
    * Retorna una Promise para poder esperar a que se carguen
    */
   private loadClients(): Promise<void> {
@@ -232,6 +327,23 @@ export class UpdateOrderDialogComponent implements OnInit {
         }
       });
     });
+  }
+
+  /**
+   * Carga los clientes disponibles (versión Observable - nuevo flujo forkJoin)
+   * Retorna Observable con fallback para evitar bloqueo total
+   */
+  private loadClientsObservable(): Observable<any[]> {
+    return this.customersService.find().pipe(
+      tap(clients => {
+        this.clientes = clients;
+      }),
+      catchError(error => {
+        console.error('Error loading clients:', error);
+        this.clientes = [];
+        return of([]); // Fallback a array vacío para no bloquear el diálogo
+      })
+    );
   }
 
   /**
@@ -276,7 +388,7 @@ export class UpdateOrderDialogComponent implements OnInit {
   }
 
   /**
-   * Carga los servicios disponibles
+   * Carga los servicios disponibles (versión void - legacy)
    */
   private loadServices(): void {
     this.isLoadingServices = true;
@@ -294,7 +406,26 @@ export class UpdateOrderDialogComponent implements OnInit {
   }
 
   /**
-   * Carga los materiales disponibles desde el servicio
+   * Carga los servicios disponibles (versión Observable - nuevo flujo forkJoin)
+   */
+  private loadServicesObservable(): Observable<Service[]> {
+    this.isLoadingServices = true;
+    return this.servicesService.getServices().pipe(
+      tap(services => {
+        this.services = services;
+        this.isLoadingServices = false;
+      }),
+      catchError(error => {
+        console.error('Error loading services:', error);
+        this.isLoadingServices = false;
+        this.services = [];
+        return of([]); // Fallback
+      })
+    );
+  }
+
+  /**
+   * Carga los materiales disponibles desde el servicio (versión Promise - legacy)
    */
   private loadMaterials(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -312,6 +443,25 @@ export class UpdateOrderDialogComponent implements OnInit {
         }
       });
     });
+  }
+
+  /**
+   * Carga los materiales disponibles (versión Observable - nuevo flujo forkJoin)
+   */
+  private loadMaterialsObservable(): Observable<Material[]> {
+    this.isLoadingMaterials = true;
+    return this.materialsService.getMaterials().pipe(
+      tap(materials => {
+        this.materials = materials;
+        this.isLoadingMaterials = false;
+      }),
+      catchError(error => {
+        console.error('Error loading materials:', error);
+        this.isLoadingMaterials = false;
+        this.materials = [];
+        return of([]); // Fallback para no bloquear el diálogo
+      })
+    );
   }
 
   /**
@@ -384,7 +534,7 @@ export class UpdateOrderDialogComponent implements OnInit {
   }
 
   /**
-   * Carga los técnicos activos desde el servicio
+   * Carga los técnicos activos desde el servicio (versión void - legacy)
    */
   private loadTechnicians(): void {
     this.personnelService.getTechnicians(true).subscribe({
@@ -398,6 +548,24 @@ export class UpdateOrderDialogComponent implements OnInit {
         this.technicians = (this.data.technicians || []).filter((t: any) => t.activo !== false);
       }
     });
+  }
+
+  /**
+   * Carga los técnicos activos (versión Observable - nuevo flujo forkJoin)
+   */
+  private loadTechniciansObservable(): Observable<any[]> {
+    return this.personnelService.getTechnicians(true).pipe(
+      tap(technicians => {
+        this.technicians = technicians.filter(t => t.activo !== false);
+      }),
+      catchError(error => {
+        console.error('Error loading technicians:', error);
+        // Fallback a técnicos del data si hay error
+        const fallbackTechnicians = (this.data?.technicians || []).filter((t: any) => t.activo !== false);
+        this.technicians = fallbackTechnicians;
+        return of(fallbackTechnicians);
+      })
+    );
   }
 
   /**
@@ -434,6 +602,9 @@ export class UpdateOrderDialogComponent implements OnInit {
     // Actualizar el dataSource de la tabla
     this.materialsDataSource.data = [...this.selectedMaterials];
 
+    // Marcar que el usuario modificó materiales
+    this.materialsModified = true;
+
     // Limpiar selección
     this.selectedMaterialForAdd = null;
     this.cantidadToAdd = 1;
@@ -446,6 +617,7 @@ export class UpdateOrderDialogComponent implements OnInit {
   removeMaterial(index: number): void {
     this.selectedMaterials.splice(index, 1);
     this.materialsDataSource.data = [...this.selectedMaterials];
+    this.materialsModified = true;
     this.updateTxtMateriales();
   }
 
@@ -459,6 +631,7 @@ export class UpdateOrderDialogComponent implements OnInit {
     }
     this.selectedMaterials[index].cantidad = newQuantity;
     this.materialsDataSource.data = [...this.selectedMaterials];
+    this.materialsModified = true;
     this.updateTxtMateriales();
   }
 
@@ -534,6 +707,29 @@ export class UpdateOrderDialogComponent implements OnInit {
         allNotes.push(newNote);
       }
       
+      // BUGFIX: Validar que materiales se cargaron antes de filtrar
+      // Evitar pérdida silenciosa de datos si la API falló
+      if (this.isLoadingMaterials) {
+        this.snackBar.open('Por favor, espere a que carguen los materiales', 'Cerrar', { duration: 3000 });
+        return;
+      }
+      
+      if (this.materialsModified && this.materials.length === 0 && this.selectedMaterials.length > 0) {
+        // Usuario intentó agregar materiales pero la lista de materiales disponibles está vacía
+        // Esto indica un error de carga - NO permitir guardar para evitar pérdida de datos
+        this.analyticsService.trackMaterialsLoadError(
+          this.data.numero,
+          this.materialsModified,
+          this.selectedMaterials.length
+        );
+        this.snackBar.open(
+          'Error: Los materiales no se pudieron cargar. Por favor, cierre el diálogo e intente nuevamente.',
+          'Cerrar',
+          { duration: 5000 }
+        );
+        return;
+      }
+      
       /**
        * Convertir materiales seleccionados a formato DTO para el backend
        * Solo incluir materiales que existen en la API externa
@@ -595,22 +791,56 @@ export class UpdateOrderDialogComponent implements OnInit {
       }
       
       // Trabajo - Fechas
-      if (formData.fechaini) {
-        // Convertir Date a string YYYY-MM-DD usando zona horaria local (no UTC)
+      // BUGFIX: Manejo explícito de null/undefined para permitir limpiar fechas
+      if (formData.fechaini === null || formData.fechaini === '') {
+        // Usuario borró el campo → limpiar fecha en BD
+        updateData.fechaini = null;
+        console.log('[Fecha Debug] Limpiando fechaini en BD (valor null enviado al backend)');
+      } else if (formData.fechaini !== undefined) {
+        // Usuario estableció una fecha
         if (formData.fechaini instanceof Date) {
           updateData.fechaini = this.timezoneService.formatDate(formData.fechaini);
-        } else if (formData.fechaini.trim()) {
+          console.log('[Fecha Debug] Enviando fechaini al backend:', {
+            original: formData.fechaini,
+            originalISO: formData.fechaini.toISOString(),
+            formatted: updateData.fechaini,
+            timezone: this.timezoneService.getTimezone(),
+            horaini: formData.horaini || 'no especificada'
+          });
+        } else if (typeof formData.fechaini === 'string' && formData.fechaini.trim()) {
           updateData.fechaini = formData.fechaini;
+          console.log('[Fecha Debug] Enviando fechaini (string) al backend:', {
+            value: updateData.fechaini,
+            horaini: formData.horaini || 'no especificada'
+          });
         }
       }
-      if (formData.fechafin) {
-        // Convertir Date a string YYYY-MM-DD usando zona horaria local (no UTC)
+      // Si formData.fechaini === undefined → no se modificó, no enviar al backend
+      
+      if (formData.fechafin === null || formData.fechafin === '') {
+        // Usuario borró el campo → limpiar fecha en BD
+        updateData.fechafin = null;
+        console.log('[Fecha Debug] Limpiando fechafin en BD (valor null enviado al backend)');
+      } else if (formData.fechafin !== undefined) {
+        // Usuario estableció una fecha
         if (formData.fechafin instanceof Date) {
           updateData.fechafin = this.timezoneService.formatDate(formData.fechafin);
-        } else if (formData.fechafin.trim()) {
+          console.log('[Fecha Debug] Enviando fechafin al backend:', {
+            original: formData.fechafin,
+            originalISO: formData.fechafin.toISOString(),
+            formatted: updateData.fechafin,
+            timezone: this.timezoneService.getTimezone(),
+            horafin: formData.horafin || 'no especificada'
+          });
+        } else if (typeof formData.fechafin === 'string' && formData.fechafin.trim()) {
           updateData.fechafin = formData.fechafin;
+          console.log('[Fecha Debug] Enviando fechafin (string) al backend:', {
+            value: updateData.fechafin,
+            horafin: formData.horafin || 'no especificada'
+          });
         }
       }
+      // Si formData.fechafin === undefined → no se modificó, no enviar al backend
       
       // Trabajo - Horas
       if (formData.horaini && formData.horaini.trim()) {
@@ -659,6 +889,12 @@ export class UpdateOrderDialogComponent implements OnInit {
         this.askForPdfExportBeforeFinalizing(updateData);
         return; // No cerrar el diálogo todavía, esperar respuesta del usuario
       }
+      
+      // Track actualización exitosa
+      this.analyticsService.trackOrderUpdateSucceeded(
+        this.data.numero,
+        Object.keys(updateData)
+      );
       
       this.dialogRef.close(updateData);
     }

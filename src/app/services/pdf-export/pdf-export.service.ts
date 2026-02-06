@@ -308,8 +308,16 @@ export class PdfExportService {
    * Formatea las horas totales de manera legible
    * Si es menos de 1 hora, muestra en minutos
    * Si es 1 hora o más, muestra en horas con formato legible
+   * Valida y loguea valores negativos o inválidos
    */
   private formatHorasTotales(htotal: number | undefined | null): string {
+    // Validación explícita para valores negativos (error de cálculo)
+    if (htotal !== undefined && htotal !== null && htotal < 0) {
+      console.error('[PDF Export] ERROR: htotal es negativo:', htotal, 
+        '- Esto indica un error de cálculo (fechafin < fechaini)');
+      return 'ERROR: Horas negativas';
+    }
+    
     if (!htotal || htotal === 0) return 'N/A';
     
     // Si es menos de 1 hora, mostrar en minutos
@@ -367,8 +375,9 @@ export class PdfExportService {
   }
 
   /**
-   * Obtiene los materiales utilizados
+   * Obtiene los materiales utilizados con deduplicación de fuentes legacy
    * Prioriza txtmateriales, luego intenta extraer de descripción legacy
+   * Si hay materiales en múltiples fuentes legacy, los deduplica
    */
   private getMateriales(order: Ticket): string | null {
     // Prioridad 1: Campo txtmateriales (nuevo y correcto)
@@ -376,15 +385,42 @@ export class PdfExportService {
       return order.txtmateriales.trim();
     }
     
-    // Prioridad 2: Extraer de descripción legacy (compatibilidad hacia atrás)
-    const { materiales } = this.parseDescripcionYMateriales(order.descripcion);
-    if (materiales) {
-      return materiales;
+    // Para datos legacy: recolectar de ambas fuentes y deduplicate
+    const { materiales: materialesFromDesc } = this.parseDescripcionYMateriales(order.descripcion);
+    const { materiales: materialesFromObs } = this.parseObservaciones(order.observaciones);
+    
+    // Si solo una fuente tiene materiales, retornarla directamente
+    if (materialesFromDesc && !materialesFromObs) {
+      return materialesFromDesc;
+    }
+    if (materialesFromObs && !materialesFromDesc) {
+      return materialesFromObs;
     }
     
-    // Prioridad 3: Extraer de observaciones legacy (compatibilidad hacia atrás)
-    const { materiales: materialesFromObs } = this.parseObservaciones(order.observaciones);
-    return materialesFromObs;
+    // Si ambas fuentes tienen materiales, deduplica
+    if (materialesFromDesc && materialesFromObs) {
+      const materialesSet = new Set<string>();
+      
+      // Agregar materiales de descripción
+      materialesFromDesc.split('\n').forEach(line => {
+        const trimmed = line.trim().toLowerCase();
+        if (trimmed) materialesSet.add(trimmed);
+      });
+      
+      // Agregar materiales de observaciones solo si no están duplicados
+      materialesFromObs.split('\n').forEach(line => {
+        const trimmed = line.trim().toLowerCase();
+        if (trimmed) materialesSet.add(trimmed);
+      });
+      
+      // Retornar materiales deduplicados
+      const deduplicatedMateriales = Array.from(materialesSet).join('\n');
+      console.warn('[PDF Export] Materiales legacy encontrados en múltiples fuentes - deduplicados:', 
+        { original: materialesFromDesc.length + materialesFromObs.length, deduplicated: deduplicatedMateriales.length });
+      return deduplicatedMateriales;
+    }
+    
+    return null;
   }
 
   /**
@@ -446,53 +482,24 @@ export class PdfExportService {
   }
 
   /**
-   * Genera el nombre del archivo PDF
+   * Genera el nombre del archivo PDF usando la zona horaria configurada
+   * Garantiza consistencia en nombres de archivo independientemente de la zona horaria del browser
    */
   private generateFileName(order: Ticket): string {
-    const date = new Date();
-    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const dateStr = this.timezoneService.formatDateTime(new Date(), 'YYYY-MM-DD');
     return `Orden_${order.numero}_${dateStr}.pdf`;
   }
 
   /**
-   * Formatea una fecha al formato DD/MM/YYYY HH:mm (UTC)
+   * Formatea una fecha al formato DD/MM/YYYY HH:mm usando la zona horaria configurada
+   * Usa TimezoneService para garantizar consistencia con el resto del sistema
    */
   private formatDate(dateString: string | undefined): string {
     if (!dateString) return 'N/A';
     
     try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return 'N/A';
-      
-      const day = String(date.getUTCDate()).padStart(2, '0');
-      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-      const year = date.getUTCFullYear();
-      const hours = String(date.getUTCHours()).padStart(2, '0');
-      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-      
-      return `${day}/${month}/${year} ${hours}:${minutes}`;
-    } catch (error) {
-      return 'N/A';
-    }
-  }
-
-  /**
-   * Formatea una fecha con hora al formato DD/MM/YYYY HH:mm (UTC)
-   */
-  private formatDateTime(dateString: string | undefined): string {
-    if (!dateString) return 'N/A';
-    
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return 'N/A';
-      
-      const day = String(date.getUTCDate()).padStart(2, '0');
-      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-      const year = date.getUTCFullYear();
-      const hours = String(date.getUTCHours()).padStart(2, '0');
-      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-      
-      return `${day}/${month}/${year} ${hours}:${minutes}`;
+      // Usar TimezoneService para formatear con la zona horaria correcta
+      return this.timezoneService.formatDateTime(dateString, 'DD/MM/YYYY HH:mm');
     } catch (error) {
       return 'N/A';
     }

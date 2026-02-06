@@ -28,23 +28,50 @@ export interface CreateOrderDTO {
 
 /**
  * DTO para actualizar una orden existente
+ * Sincronizado con los campos que realmente se envían desde update-order-dialog.component.ts
  */
 export interface UpdateOrderDTO {
+  // Estado y finalización
   status?: OrderStatus;
-  observaciones?: string; // Resumen del trabajo realizado (texto plano)
+  estado?: OrderStatus;
+  finalizado?: boolean;
+  anulada?: boolean;
+  
+  // Información del cliente
+  clientId?: number; // ID del cliente
+  contactId?: number; // ID del contacto
+  description?: string; // Descripción del problema
+  
+  // Tipo de orden
+  orderType?: 'insu' | 'mant' | 'sopo' | 'limp'; // Tipo de orden (se convierte a flags insu/mant/sopo/limp)
+  insu?: number; // Flag tipo orden: Insumos (0 o 1)
+  mant?: number; // Flag tipo orden: Mantenimiento (0 o 1)
+  sopo?: number; // Flag tipo orden: Soporte (0 o 1)
+  limp?: number; // Flag tipo orden: Limpieza (0 o 1)
+  
+  // Servicio
+  serviceType?: 'in' | 'out'; // Tipo de servicio: 'in' (interno) o 'out' (externo)
+  servicioId?: number; // ID del servicio específico (va al campo "servicios" en BD)
+  tiposerv?: number; // Tipo de servicio como número (0 = out, 1 = in)
+  
+  // Asignación
+  assignedToIds?: number[]; // Array de IDs de técnicos responsables
+  sector?: OrderSector;
+  prioridad?: 'baja' | 'media' | 'alta' | 'urgente';
+  
+  // Materiales
   txtmateriales?: string; // Materiales utilizados (texto libre para visualización)
   materials?: MaterialDTO[]; // Array de materiales para guardar en 21movmat
+  
+  // Fechas y horas de trabajo
   fechaini?: string; // Fecha inicio del trabajo
   horaini?: string; // Hora inicio del trabajo
   fechafin?: string; // Fecha fin del trabajo
   horafin?: string; // Hora fin del trabajo
   htotal?: number; // Horas totales de trabajo
-  finalizado?: boolean;
-  anulada?: boolean;
-  assignedToIds?: number[]; // Array de IDs de técnicos responsables
-  sector?: OrderSector;
-  estado?: OrderStatus;
-  prioridad?: 'baja' | 'media' | 'alta' | 'urgente';
+  
+  // Observaciones
+  observaciones?: string; // Resumen del trabajo realizado (texto plano)
 }
 
 /**
