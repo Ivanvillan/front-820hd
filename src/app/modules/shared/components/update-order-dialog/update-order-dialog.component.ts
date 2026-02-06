@@ -3,8 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
-import { forkJoin, of, Observable } from 'rxjs';
-import { catchError, timeout, tap } from 'rxjs/operators';
 import { OrderStatus, OrderSector } from 'src/app/models/ticket.model';
 import { 
   parseOrderNotes,
@@ -20,11 +18,9 @@ import { MaterialsService } from 'src/app/services/materials/materials.service';
 import { PdfExportService } from 'src/app/services/pdf-export/pdf-export.service';
 import { PdfExportConfirmationDialogComponent, PdfExportConfirmationDialogData } from 'src/app/modules/shared/components/pdf-export-confirmation-dialog/pdf-export-confirmation-dialog.component';
 import { TimezoneService } from 'src/app/services/timezone/timezone.service';
-import { AnalyticsService } from 'src/app/services/analytics/analytics.service';
 import { validateDateRange, getDateRangeErrorMessage } from 'src/app/shared/utils/date.utils';
 import { Service } from 'src/app/models/service.model';
 import { Material, SelectedMaterial, MaterialDTO } from 'src/app/models/material.model';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-update-order-dialog',
@@ -96,8 +92,7 @@ export class UpdateOrderDialogComponent implements OnInit {
     private snackBar: MatSnackBar,
     private pdfExportService: PdfExportService,
     private timezoneService: TimezoneService,
-    private dialog: MatDialog,
-    private analyticsService: AnalyticsService
+    private dialog: MatDialog
   ) {
     this.updateForm = this.fb.group({
       // Información básica
@@ -129,14 +124,7 @@ export class UpdateOrderDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // FEATURE FLAG: Usar carga paralela con forkJoin (Fase 3) o flujo legacy (actual)
-    if (environment.features.enableParallelLoading) {
-      this.initializeWithParallelLoading();
-    } else {
-      this.initializeWithLegacyLoading();
-    }
-
-    // Configurar validación cruzada de fechas (común a ambos flujos)
+    this.initializeWithLegacyLoading();
     this.setupDateValidation();
   }
 
@@ -173,68 +161,6 @@ export class UpdateOrderDialogComponent implements OnInit {
       // Cargar notas existentes para mostrar el historial
       this.loadExistingNotes();
     }
-  }
-
-  /**
-   * NUEVO: Flujo de carga paralela con forkJoin (Fase 3)
-   * Elimina race conditions y mejora consistencia
-   */
-  private initializeWithParallelLoading(): void {
-    // Configurar listener de contactos ANTES de cargar datos
-    this.updateForm.get('clientId')?.valueChanges.subscribe(clientId => {
-      if (clientId) {
-        this.loadContacts(clientId);
-      } else {
-        this.contactos = [];
-        this.updateForm.get('contactId')?.setValue(null);
-      }
-    });
-
-    if (!this.data) return;
-
-    const loadStartTime = performance.now();
-
-    // Cargar todos los datos en paralelo con timeout y fallbacks
-    forkJoin({
-      clients: this.loadClientsObservable(),
-      materials: this.loadMaterialsObservable(),
-      services: this.loadServicesObservable(),
-      technicians: this.loadTechniciansObservable()
-    }).pipe(
-      timeout(10000), // Timeout de 10 segundos
-      catchError(error => {
-        console.error('Error loading dialog data:', error);
-        this.snackBar.open('Error al cargar algunos datos. Por favor, intente nuevamente.', 'Cerrar', { duration: 5000 });
-        this.analyticsService.trackError('Dialog data loading failed', {
-          order_number: this.data.numero,
-          error_message: error.message || error
-        });
-        this.dialogRef.close();
-        return of(null);
-      })
-    ).subscribe(result => {
-      if (!result) return;
-
-      // Todas las cargas completadas exitosamente
-      const loadTimeMs = performance.now() - loadStartTime;
-      
-      // Track dialog opened with metrics
-      this.analyticsService.trackOrderUpdateDialogOpened(
-        this.data.numero,
-        loadTimeMs,
-        {
-          clientsLoaded: this.clientes.length,
-          materialsLoaded: this.materials.length,
-          servicesLoaded: this.services.length,
-          techniciansLoaded: this.technicians.length,
-          raceConditionDetected: false // No hay race condition con forkJoin
-        }
-      );
-
-      this.loadExistingMaterials();
-      this.loadExistingNotes();
-      this.initializeFormValues();
-    });
   }
 
   /**
@@ -329,22 +255,6 @@ export class UpdateOrderDialogComponent implements OnInit {
     });
   }
 
-  /**
-   * Carga los clientes disponibles (versión Observable - nuevo flujo forkJoin)
-   * Retorna Observable con fallback para evitar bloqueo total
-   */
-  private loadClientsObservable(): Observable<any[]> {
-    return this.customersService.find().pipe(
-      tap(clients => {
-        this.clientes = clients;
-      }),
-      catchError(error => {
-        console.error('Error loading clients:', error);
-        this.clientes = [];
-        return of([]); // Fallback a array vacío para no bloquear el diálogo
-      })
-    );
-  }
 
   /**
    * Carga los contactos de un cliente
@@ -405,24 +315,6 @@ export class UpdateOrderDialogComponent implements OnInit {
     });
   }
 
-  /**
-   * Carga los servicios disponibles (versión Observable - nuevo flujo forkJoin)
-   */
-  private loadServicesObservable(): Observable<Service[]> {
-    this.isLoadingServices = true;
-    return this.servicesService.getServices().pipe(
-      tap(services => {
-        this.services = services;
-        this.isLoadingServices = false;
-      }),
-      catchError(error => {
-        console.error('Error loading services:', error);
-        this.isLoadingServices = false;
-        this.services = [];
-        return of([]); // Fallback
-      })
-    );
-  }
 
   /**
    * Carga los materiales disponibles desde el servicio (versión Promise - legacy)
@@ -445,24 +337,6 @@ export class UpdateOrderDialogComponent implements OnInit {
     });
   }
 
-  /**
-   * Carga los materiales disponibles (versión Observable - nuevo flujo forkJoin)
-   */
-  private loadMaterialsObservable(): Observable<Material[]> {
-    this.isLoadingMaterials = true;
-    return this.materialsService.getMaterials().pipe(
-      tap(materials => {
-        this.materials = materials;
-        this.isLoadingMaterials = false;
-      }),
-      catchError(error => {
-        console.error('Error loading materials:', error);
-        this.isLoadingMaterials = false;
-        this.materials = [];
-        return of([]); // Fallback para no bloquear el diálogo
-      })
-    );
-  }
 
   /**
    * Carga los rubros disponibles
@@ -550,23 +424,6 @@ export class UpdateOrderDialogComponent implements OnInit {
     });
   }
 
-  /**
-   * Carga los técnicos activos (versión Observable - nuevo flujo forkJoin)
-   */
-  private loadTechniciansObservable(): Observable<any[]> {
-    return this.personnelService.getTechnicians(true).pipe(
-      tap(technicians => {
-        this.technicians = technicians.filter(t => t.activo !== false);
-      }),
-      catchError(error => {
-        console.error('Error loading technicians:', error);
-        // Fallback a técnicos del data si hay error
-        const fallbackTechnicians = (this.data?.technicians || []).filter((t: any) => t.activo !== false);
-        this.technicians = fallbackTechnicians;
-        return of(fallbackTechnicians);
-      })
-    );
-  }
 
   /**
    * Agrega un material seleccionado a la lista de materiales de la orden
@@ -717,11 +574,6 @@ export class UpdateOrderDialogComponent implements OnInit {
       if (this.materialsModified && this.materials.length === 0 && this.selectedMaterials.length > 0) {
         // Usuario intentó agregar materiales pero la lista de materiales disponibles está vacía
         // Esto indica un error de carga - NO permitir guardar para evitar pérdida de datos
-        this.analyticsService.trackMaterialsLoadError(
-          this.data.numero,
-          this.materialsModified,
-          this.selectedMaterials.length
-        );
         this.snackBar.open(
           'Error: Los materiales no se pudieron cargar. Por favor, cierre el diálogo e intente nuevamente.',
           'Cerrar',
@@ -889,12 +741,6 @@ export class UpdateOrderDialogComponent implements OnInit {
         this.askForPdfExportBeforeFinalizing(updateData);
         return; // No cerrar el diálogo todavía, esperar respuesta del usuario
       }
-      
-      // Track actualización exitosa
-      this.analyticsService.trackOrderUpdateSucceeded(
-        this.data.numero,
-        Object.keys(updateData)
-      );
       
       this.dialogRef.close(updateData);
     }
