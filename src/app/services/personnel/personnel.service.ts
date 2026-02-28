@@ -7,6 +7,7 @@ export interface Technician {
   id: number;
   name: string;
   apellido?: string;
+  usuario?: string;
   area: string;
   email?: string;
   telefono?: string;
@@ -25,6 +26,7 @@ export interface UpdateAreaResponse {
 export interface CreateTechnicianRequest {
   name: string;
   apellido?: string;
+  usuario: string;
   area: string;
   email?: string;
   telefono?: string;
@@ -35,6 +37,7 @@ export interface CreateTechnicianRequest {
 export interface UpdateTechnicianRequest {
   name?: string;
   apellido?: string;
+  usuario?: string;
   area?: string;
   email?: string;
   telefono?: string;

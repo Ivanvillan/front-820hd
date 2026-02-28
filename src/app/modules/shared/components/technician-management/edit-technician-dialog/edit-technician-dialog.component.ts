@@ -33,6 +33,7 @@ export class EditTechnicianDialogComponent implements OnInit {
     this.technicianForm = this.fb.group({
       name: [data.technician.name || '', [Validators.required, Validators.minLength(2)]],
       apellido: [data.technician.apellido || ''],
+      usuario: [data.technician.usuario || '', [Validators.required, Validators.minLength(3), Validators.pattern(/^\S+$/)]],
       area: [data.technician.area || '', Validators.required],
       email: [data.technician.email || '', [Validators.email]],
       telefono: [data.technician.telefono || ''],
@@ -89,6 +90,7 @@ export class EditTechnicianDialogComponent implements OnInit {
     const labels: { [key: string]: string } = {
       name: 'Nombre',
       apellido: 'Apellido',
+      usuario: 'Usuario',
       area: 'Área',
       email: 'Email',
       telefono: 'Teléfono',
@@ -113,6 +115,7 @@ export class EditTechnicianDialogComponent implements OnInit {
       const technicianData: UpdateTechnicianRequest = {
         name: this.technicianForm.value.name.trim(),
         apellido: this.technicianForm.value.apellido?.trim() || undefined,
+        usuario: this.technicianForm.value.usuario.trim(),
         area: this.technicianForm.value.area,
         email: this.technicianForm.value.email?.trim() || undefined,
         telefono: this.technicianForm.value.telefono?.trim() || undefined,

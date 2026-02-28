@@ -47,6 +47,12 @@ export const ORDER_STATUS_CONFIG: StatusDisplayConfig[] = [
     materialColor: '#2196f3'
   },
   { 
+    value: OrderStatus.PENDIENTE_ENTREGA, 
+    label: 'Pendiente de Entrega', 
+    color: 'accent',
+    materialColor: '#ff9800'
+  },
+  { 
     value: OrderStatus.FINALIZADA, 
     label: 'Finalizada', 
     color: 'primary',
@@ -113,6 +119,8 @@ export function mapBackendStatusToEnum(backendStatus: string): OrderStatus {
       return OrderStatus.ESPERANDO_APROBACION;
     case 'Esperando Repuesto':
       return OrderStatus.ESPERANDO_REPUESTO;
+    case 'Pendiente de Entrega':
+      return OrderStatus.PENDIENTE_ENTREGA;
     case 'Finalizada':
       return OrderStatus.FINALIZADA;
     case 'Cancelada':

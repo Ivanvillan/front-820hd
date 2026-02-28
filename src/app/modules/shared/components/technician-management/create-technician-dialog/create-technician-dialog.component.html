@@ -16,7 +16,7 @@
         <div class="form-column">
           <!-- Nombre -->
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nombre *</mat-label>
+            <mat-label>Nombre</mat-label>
             <input matInput 
                    formControlName="name" 
                    placeholder="Ingrese el nombre del técnico">
@@ -27,7 +27,7 @@
 
           <!-- Área -->
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Área de trabajo *</mat-label>
+            <mat-label>Área de trabajo</mat-label>
             <mat-select formControlName="area">
               <mat-option *ngFor="let area of areaOptions" [value]="area.value">
                 {{ area.label }}
@@ -48,7 +48,7 @@
 
           <!-- Contraseña -->
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Contraseña *</mat-label>
+            <mat-label>Contraseña</mat-label>
             <input matInput 
                    type="password" 
                    formControlName="password" 
@@ -67,6 +67,18 @@
             <input matInput 
                    formControlName="apellido" 
                    placeholder="Ingrese el apellido del técnico">
+          </mat-form-field>
+
+          <!-- Usuario -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Usuario</mat-label>
+            <input matInput
+                   formControlName="usuario"
+                   placeholder="ej: juan.perez">
+            <mat-hint>Nombre de usuario para acceder al sistema (sin espacios)</mat-hint>
+            <mat-error *ngIf="getFieldError('usuario')">
+              {{ getFieldError('usuario') }}
+            </mat-error>
           </mat-form-field>
 
           <!-- Email -->

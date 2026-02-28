@@ -79,6 +79,7 @@ export enum OrderStatus {
   EN_DIAGNOSTICO = 'En Diagnóstico',
   ESPERANDO_APROBACION = 'Esperando Aprobación',
   ESPERANDO_REPUESTO = 'Esperando Repuesto',
+  PENDIENTE_ENTREGA = 'Pendiente de Entrega',
   FINALIZADA = 'Finalizada',
   CANCELADA = 'Cancelada'
 }

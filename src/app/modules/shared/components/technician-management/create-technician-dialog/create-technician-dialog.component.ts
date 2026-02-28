@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CreateTechnicianRequest } from 'src/app/services/personnel/personnel.service';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 export interface CreateTechnicianDialogData {
   areaOptions: Array<{ value: string; label: string }>;
@@ -29,6 +30,7 @@ export class CreateTechnicianDialogComponent implements OnInit {
     this.technicianForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       apellido: [''],
+      usuario: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^\S+$/)]],
       area: ['', Validators.required],
       email: ['', [Validators.email]],
       telefono: [''],
@@ -77,6 +79,7 @@ export class CreateTechnicianDialogComponent implements OnInit {
     const labels: { [key: string]: string } = {
       name: 'Nombre',
       apellido: 'Apellido',
+      usuario: 'Usuario',
       area: 'Área',
       email: 'Email',
       telefono: 'Teléfono',
@@ -101,6 +104,7 @@ export class CreateTechnicianDialogComponent implements OnInit {
       const technicianData: CreateTechnicianRequest = {
         name: this.technicianForm.value.name.trim(),
         apellido: this.technicianForm.value.apellido?.trim() || undefined,
+        usuario: this.technicianForm.value.usuario.trim(),
         area: this.technicianForm.value.area,
         email: this.technicianForm.value.email?.trim() || undefined,
         telefono: this.technicianForm.value.telefono?.trim() || undefined,

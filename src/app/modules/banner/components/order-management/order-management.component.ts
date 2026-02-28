@@ -277,6 +277,7 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
           { label: 'En Diagnóstico', value: 'En Diagnóstico' },
           { label: 'Esperando Aprobación', value: 'Esperando Aprobación' },
           { label: 'Esperando Repuesto', value: 'Esperando Repuesto' },
+          { label: 'Pendiente de Entrega', value: 'Pendiente de Entrega' },
           { label: 'Finalizada', value: 'Finalizada' },
           { label: 'Cancelada', value: 'Cancelada' }
         ],

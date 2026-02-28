@@ -117,7 +117,7 @@ export class OrderListComponent implements OnInit, OnDestroy {
   priorities = PRIORITY_OPTIONS;
   currentFilters: FilterValues = {};
   
-  // Datos para filtros de 820HD
+  // Datos para filtros de técnico (820HD y Laboratorio)
   technicians: Technician[] = [];
   currentTechnicianId: number | null = null;
   currentTechnicianName: string = '';
@@ -492,10 +492,11 @@ export class OrderListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los técnicos si el área actual es 820hd
+   * Carga los técnicos si el área actual es 820hd o laboratorio
    */
   private loadTechniciansIfNeeded(): void {
-    if (this.area !== '820hd') return;
+    const normalizedArea = this.normalizeSector(this.area);
+    if (normalizedArea !== '820hd' && normalizedArea !== 'laboratorio') return;
     
     // Obtener datos del técnico actual
     const technician = this.getCurrentTechnician();
@@ -509,7 +510,12 @@ export class OrderListComponent implements OnInit, OnDestroy {
         next: (data: Technician[]) => {
           // Filtrar solo técnicos activos como medida de seguridad adicional
           this.technicians = data.filter(t => t.activo !== false);
-          this.updateFilterConfigFor820HD();
+          
+          if (normalizedArea === '820hd') {
+            this.updateFilterConfigFor820HD();
+          } else if (normalizedArea === 'laboratorio') {
+            this.updateFilterConfigForLaboratorio();
+          }
         },
         error: (err) => {
           console.error('Error loading technicians:', err);
@@ -556,6 +562,37 @@ export class OrderListComponent implements OnInit, OnDestroy {
     if (technician.id) {
       this.currentFilters['assignedTo'] = technician.id;
       // Los filtros se aplicarán cuando se carguen las órdenes
+    }
+  }
+
+  /**
+   * Actualiza la configuración de filtros para área Laboratorio.
+   * Agrega un filtro por técnico asignado preseleccionado con el usuario de la sesión actual.
+   */
+  private updateFilterConfigForLaboratorio(): void {
+    // Agregar filtro de técnico al inicio del array con el técnico actual como valor por defecto
+    this.filterConfig = [
+      {
+        type: 'ng-select',
+        name: 'assignedTo',
+        label: 'Técnico Asignado',
+        placeholder: 'Todos los técnicos',
+        options: this.technicians,
+        optionLabel: 'name',
+        optionValue: 'id',
+        defaultValue: this.currentTechnicianId
+      },
+      ...this.filterConfig // Mantener filtros existentes (tipo, estado, prioridad, empresa)
+    ];
+
+    // Pre-establecer el filtro al técnico de la sesión actual
+    if (this.currentTechnicianId) {
+      this.currentFilters['assignedTo'] = this.currentTechnicianId;
+      // Si las órdenes ya cargaron antes que los técnicos (race condition),
+      // re-aplicar filtros inmediatamente para que el filtro de técnico surta efecto.
+      if (this.orders.length > 0) {
+        this.applyFilters();
+      }
     }
   }
 
@@ -763,14 +800,20 @@ export class OrderListComponent implements OnInit, OnDestroy {
     this.filteredOrders = this.orders.filter(order => {
       let matches = true;
 
-      // Filtro por técnico asignado (solo para área 820hd)
-      // Incluye órdenes sin técnico asignado (disponibles para tomar)
+      // Filtro por técnico asignado (para áreas 820hd y laboratorio)
       if (filters['assignedTo']) {
         const techId = filters['assignedTo'];
-        const hasNoTechnician = (!order.responsables || order.responsables.length === 0) && !order.idresponsable;
         const isAssignedToFilteredTech = this.isTechnicianAssigned(order, techId);
-        // Mostrar si: coincide con el técnico filtrado O no tiene técnico asignado
-        matches = matches && (isAssignedToFilteredTech || hasNoTechnician);
+        const isLaboratorio = this.normalizeSector(this.area) === 'laboratorio';
+        
+        if (isLaboratorio) {
+          // En laboratorio: filtro estricto → solo órdenes asignadas al técnico seleccionado
+          matches = matches && isAssignedToFilteredTech;
+        } else {
+          // En 820hd: también incluir órdenes sin técnico asignado (disponibles para tomar)
+          const hasNoTechnician = (!order.responsables || order.responsables.length === 0) && !order.idresponsable;
+          matches = matches && (isAssignedToFilteredTech || hasNoTechnician);
+        }
       }
 
       // Filtro por sector (solo para área 820hd)
