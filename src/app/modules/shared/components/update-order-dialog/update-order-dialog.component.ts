@@ -647,24 +647,12 @@ export class UpdateOrderDialogComponent implements OnInit {
       if (formData.fechaini === null || formData.fechaini === '') {
         // Usuario borró el campo → limpiar fecha en BD
         updateData.fechaini = null;
-        console.log('[Fecha Debug] Limpiando fechaini en BD (valor null enviado al backend)');
       } else if (formData.fechaini !== undefined) {
         // Usuario estableció una fecha
         if (formData.fechaini instanceof Date) {
           updateData.fechaini = this.timezoneService.formatDate(formData.fechaini);
-          console.log('[Fecha Debug] Enviando fechaini al backend:', {
-            original: formData.fechaini,
-            originalISO: formData.fechaini.toISOString(),
-            formatted: updateData.fechaini,
-            timezone: this.timezoneService.getTimezone(),
-            horaini: formData.horaini || 'no especificada'
-          });
         } else if (typeof formData.fechaini === 'string' && formData.fechaini.trim()) {
           updateData.fechaini = formData.fechaini;
-          console.log('[Fecha Debug] Enviando fechaini (string) al backend:', {
-            value: updateData.fechaini,
-            horaini: formData.horaini || 'no especificada'
-          });
         }
       }
       // Si formData.fechaini === undefined → no se modificó, no enviar al backend
@@ -672,24 +660,12 @@ export class UpdateOrderDialogComponent implements OnInit {
       if (formData.fechafin === null || formData.fechafin === '') {
         // Usuario borró el campo → limpiar fecha en BD
         updateData.fechafin = null;
-        console.log('[Fecha Debug] Limpiando fechafin en BD (valor null enviado al backend)');
       } else if (formData.fechafin !== undefined) {
         // Usuario estableció una fecha
         if (formData.fechafin instanceof Date) {
           updateData.fechafin = this.timezoneService.formatDate(formData.fechafin);
-          console.log('[Fecha Debug] Enviando fechafin al backend:', {
-            original: formData.fechafin,
-            originalISO: formData.fechafin.toISOString(),
-            formatted: updateData.fechafin,
-            timezone: this.timezoneService.getTimezone(),
-            horafin: formData.horafin || 'no especificada'
-          });
         } else if (typeof formData.fechafin === 'string' && formData.fechafin.trim()) {
           updateData.fechafin = formData.fechafin;
-          console.log('[Fecha Debug] Enviando fechafin (string) al backend:', {
-            value: updateData.fechafin,
-            horafin: formData.horafin || 'no especificada'
-          });
         }
       }
       // Si formData.fechafin === undefined → no se modificó, no enviar al backend
