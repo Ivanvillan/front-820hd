@@ -58,9 +58,13 @@
         </div>
         <div class="info-item">
           <span class="label">Responsables:</span>
-          <div class="value" *ngIf="ticket.responsables && ticket.responsables.length > 0; else soloReferente">
-            <mat-chip-list>
-              <mat-chip *ngFor="let resp of ticket.responsables" color="accent" selected>
+          <div class="value responsables-value" *ngIf="ticket.responsables && ticket.responsables.length > 0; else soloReferente">
+            <mat-chip-list class="responsables-chip-list">
+              <mat-chip *ngFor="let resp of ticket.responsables"
+                        color="accent"
+                        selected
+                        [matTooltip]="resp.nombre"
+                        matTooltipPosition="above">
                 {{resp.nombre}}
               </mat-chip>
             </mat-chip-list>

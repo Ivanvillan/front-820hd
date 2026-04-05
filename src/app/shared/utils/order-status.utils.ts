@@ -53,6 +53,12 @@ export const ORDER_STATUS_CONFIG: StatusDisplayConfig[] = [
     materialColor: '#ff9800'
   },
   { 
+    value: OrderStatus.APROBADO, 
+    label: 'Aprobado', 
+    color: 'primary',
+    materialColor: '#8bc34a'
+  },
+  { 
     value: OrderStatus.FINALIZADA, 
     label: 'Finalizada', 
     color: 'primary',
@@ -121,6 +127,8 @@ export function mapBackendStatusToEnum(backendStatus: string): OrderStatus {
       return OrderStatus.ESPERANDO_REPUESTO;
     case 'Pendiente de Entrega':
       return OrderStatus.PENDIENTE_ENTREGA;
+    case 'Aprobado':
+      return OrderStatus.APROBADO;
     case 'Finalizada':
       return OrderStatus.FINALIZADA;
     case 'Cancelada':
@@ -196,4 +204,30 @@ export function getOrderTypeCategory(order: any): string {
   if (order.limp) return 'Limpieza';
   if (order.mda) return 'Mantenimiento'; // Legacy fallback
   return 'General';
+}
+
+/**
+ * Retorna un array con los nombres de todos los técnicos asignados a una orden.
+ * Prioridad de fuentes:
+ *  1. `responsables[]` — array moderno con objetos { id, nombre }
+ *  2. `nombreAsignado`  — string concatenado separado por "/"
+ *  3. `referente`       — campo legacy con nombre único
+ */
+export function getAssignedNames(order: any): string[] {
+  if (order?.responsables?.length) {
+    return (order.responsables as Array<{ id: number; nombre: string }>)
+      .map(r => r.nombre)
+      .filter(Boolean);
+  }
+  if (order?.nombreAsignado?.trim()) {
+    return (order.nombreAsignado as string)
+      .split('/')
+      .map((s: string) => s.trim())
+      .filter((s: string) => s.length > 0);
+  }
+  const ref: string | undefined = order?.referente?.trim();
+  if (ref && ref.toLowerCase() !== 'sin asignar') {
+    return [ref];
+  }
+  return [];
 }

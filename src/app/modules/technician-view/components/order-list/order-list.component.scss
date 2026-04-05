@@ -326,6 +326,22 @@
   color: vars.$text-muted;
 }
 
+// Texto compacto de asignados con elipsis y badge "+N"
+.assigned-text {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  cursor: default;
+}
+
+.assigned-extra {
+  font-weight: vars.$font-weight-bold;
+  color: vars.$text-white;
+  opacity: 0.85;
+}
+
 .action-button-take .mat-icon {
   color: vars.$accent;
 }

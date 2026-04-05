@@ -92,7 +92,22 @@
                 </div>
                 <div class="info-item">
                   <span class="info-label">Técnico Asignado:</span>
-                  <span class="info-value">{{ getAssignedTechnician() }}</span>
+                  <div class="info-value">
+                    <ng-container *ngIf="order.responsables && order.responsables.length > 0; else techFallback">
+                      <mat-chip-list class="assigned-chip-list">
+                        <mat-chip *ngFor="let r of order.responsables"
+                                  color="accent"
+                                  selected
+                                  [matTooltip]="r.nombre"
+                                  matTooltipPosition="above">
+                          {{ r.nombre }}
+                        </mat-chip>
+                      </mat-chip-list>
+                    </ng-container>
+                    <ng-template #techFallback>
+                      <span>{{ getAssignedTechnician() }}</span>
+                    </ng-template>
+                  </div>
                 </div>
               </div>
             </mat-card-content>

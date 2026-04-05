@@ -21,6 +21,7 @@ import {
   getStatusDisplayName,
   getOrderType,
   ORDER_STATUS_CONFIG,
+  getAssignedNames,
 } from 'src/app/shared/utils/order-status.utils';
 import { FilterConfig, FilterValues } from 'src/app/components/filter-bar/filter-bar.component';
 import { PdfExportService } from 'src/app/services/pdf-export/pdf-export.service';
@@ -621,6 +622,12 @@ export class OrderListComponent implements OnInit, OnDestroy {
    * Utiliza funciones utilitarias compartidas para consistencia
    */
   getOrderStatus = getOrderStatus;
+
+  /**
+   * Retorna el array de nombres de técnicos asignados a una orden.
+   * Delega en la utilidad compartida para consistencia en todo el sistema.
+   */
+  getAssignedNames = getAssignedNames;
 
   /**
    * Obtiene el color del estado de la orden

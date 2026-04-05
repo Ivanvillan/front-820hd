@@ -80,6 +80,7 @@ export enum OrderStatus {
   ESPERANDO_APROBACION = 'Esperando Aprobación',
   ESPERANDO_REPUESTO = 'Esperando Repuesto',
   PENDIENTE_ENTREGA = 'Pendiente de Entrega',
+  APROBADO = 'Aprobado',
   FINALIZADA = 'Finalizada',
   CANCELADA = 'Cancelada'
 }

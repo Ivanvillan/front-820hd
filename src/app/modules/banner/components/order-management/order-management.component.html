@@ -82,7 +82,15 @@
 </ng-template>
 
 <ng-template #nombreAsignadoTemplate let-row>
-  <span *ngIf="row" [ngClass]="getNombreAsignadoClass(row)" class="nombre-asignado">{{ getNombreAsignado(row) }}</span>
+  <ng-container *ngIf="getAssignedNames(row) as names">
+    <span *ngIf="names.length === 0" class="assigned-na">Sin asignar</span>
+    <span *ngIf="names.length > 0"
+          class="assigned-text"
+          [matTooltip]="names.join(' / ')"
+          matTooltipPosition="above">
+      {{ names.slice(0, 2).join(' / ') }}<span *ngIf="names.length > 2" class="assigned-extra"> +{{ names.length - 2 }}</span>
+    </span>
+  </ng-container>
 </ng-template>
 
 <ng-template #actionsTemplate let-row>

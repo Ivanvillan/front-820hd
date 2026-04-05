@@ -71,6 +71,18 @@
   }
 }
 
+// Responsables chip list — permite que los chips se envuelvan en varias filas
+.responsables-value {
+  overflow: visible;
+}
+
+.responsables-chip-list {
+  ::ng-deep .mat-chip-list-wrapper {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
+
 // Status chip - reutiliza estilos de order-management
 .status-chip {
   font-size: 12px !important;

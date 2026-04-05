@@ -168,8 +168,15 @@
           <ng-container matColumnDef="nombreAsignado">
             <th mat-header-cell *matHeaderCellDef>Técnico Asignado</th>
             <td mat-cell *matCellDef="let order">
-              <span *ngIf="order.referente != ' ' && order.nombreAsignado != ' '" class="technician-badge">{{ order.nombreAsignado || order.referente}}</span>
-              <span *ngIf="order.referente == ' '" class="technician-badge-na">N/A</span>
+              <ng-container *ngIf="getAssignedNames(order) as names">
+                <span *ngIf="names.length === 0" class="technician-badge-na">N/A</span>
+                <span *ngIf="names.length > 0"
+                      class="technician-badge assigned-text"
+                      [matTooltip]="names.join(' / ')"
+                      matTooltipPosition="above">
+                  {{ names.slice(0, 2).join(' / ') }}<span *ngIf="names.length > 2" class="assigned-extra"> +{{ names.length - 2 }}</span>
+                </span>
+              </ng-container>
             </td>
           </ng-container>
 

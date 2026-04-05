@@ -188,6 +188,15 @@
   word-break: break-word;
 }
 
+// Chips de técnicos asignados en el detalle de orden
+.assigned-chip-list {
+  ::ng-deep .mat-chip-list-wrapper {
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+  }
+}
+
 .description-text {
   line-height: 1.5;
 }

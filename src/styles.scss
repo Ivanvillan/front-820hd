@@ -299,3 +299,7 @@ body {
   font-family: 'Poppins', sans-serif !important;
 }
 
+/* ===== TOOLTIP MULTI-LÍNEA (matTooltipClass="multiline-tooltip") ===== */
+.multiline-tooltip {
+  white-space: pre-line !important;
+}

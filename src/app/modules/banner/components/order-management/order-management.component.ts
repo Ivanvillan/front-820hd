@@ -21,7 +21,8 @@ import {
   getStatusDisplayColor,
   getStatusText, 
   getFinalizationColor, 
-  getFinalizationStatus 
+  getFinalizationStatus,
+  getAssignedNames
 } from 'src/app/shared/utils/order-status.utils';
 
 /**
@@ -278,6 +279,7 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
           { label: 'Esperando Aprobación', value: 'Esperando Aprobación' },
           { label: 'Esperando Repuesto', value: 'Esperando Repuesto' },
           { label: 'Pendiente de Entrega', value: 'Pendiente de Entrega' },
+          { label: 'Aprobado', value: 'Aprobado' },
           { label: 'Finalizada', value: 'Finalizada' },
           { label: 'Cancelada', value: 'Cancelada' }
         ],
@@ -645,6 +647,12 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
   getFinalizationColor = getFinalizationColor;
   getFinalizationStatus = getFinalizationStatus;
   getStatusText = getStatusText;
+
+  /**
+   * Retorna el array de nombres de técnicos asignados a una orden.
+   * Delega en la utilidad compartida para consistencia en todo el sistema.
+   */
+  getAssignedNames = getAssignedNames;
   
   /**
    * Obtiene el color de fondo para el chip de estado

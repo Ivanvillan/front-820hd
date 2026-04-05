@@ -77,7 +77,7 @@ export class CustomersService {
   }
 
   updateCustomer(id: number, customer: Partial<Omit<Customer, 'id'>>): Observable<Customer> {
-    return this.http.put<Customer>(`${this.apiUrl}/${id}`, customer);
+    return this.http.patch<Customer>(`${this.apiUrl}/${id}`, customer);
   }
 
   deleteCustomer(id: number): Observable<any> {
