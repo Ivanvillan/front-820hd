@@ -23,15 +23,15 @@ export class UpdateCustomerDialogComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       nombre: [data.nombre || '', [Validators.required, Validators.minLength(2), Validators.maxLength(255)]],
-      cuit: [data.cuit || '', [Validators.required, Validators.minLength(11), Validators.maxLength(20)]],
-      direccion: [data.direccion || '', [Validators.required, Validators.minLength(5), Validators.maxLength(500)]],
+      cuit: [data.cuit || '', [Validators.minLength(11), Validators.maxLength(20)]],
+      direccion: [data.direccion || '', [Validators.minLength(5), Validators.maxLength(500)]],
       localidad: [data.localidad || '', [Validators.maxLength(100)]],
       cp: [data.cp || '', [Validators.pattern(/^\d+$/), Validators.maxLength(10)]],
       idprov: [data.idprov || null],
       telefono: [data.telefono || '', [Validators.required, Validators.minLength(7), Validators.maxLength(50)]],
       email: [data.email || '', [Validators.required, Validators.email, Validators.maxLength(255)]],
-      condicion_iva: [data.condicion_iva || '', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      tipocli: [data.tipocli || '', [Validators.maxLength(50)]]
+      condicion_iva: [data.condicion_iva || '', [Validators.minLength(2), Validators.maxLength(100)]],
+      tipocli: [data.tipocli || 'C', [Validators.maxLength(50)]]
     });
   }
 

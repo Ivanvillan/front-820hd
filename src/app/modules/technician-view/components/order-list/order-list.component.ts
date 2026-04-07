@@ -233,20 +233,30 @@ export class OrderListComponent implements OnInit, OnDestroy {
     }
 
     const currentTechnicianId = technician.id;
-    const is820hd = this.normalizeSector(this.area) === '820hd';
-    const isLaboratorio = this.normalizeSector(this.area) === 'laboratorio';
+    const normalizedArea = this.normalizeSector(this.area);
+    const is820hd = normalizedArea === '820hd';
+    const isLaboratorio = normalizedArea === 'laboratorio';
+    const isCampo = normalizedArea === 'campo';
     
     // Para 820hd: cargar TODAS las órdenes sin filtrar (los filtros se aplican después)
     if (is820hd) {
       this.orders = allOrders;
     } else if (isLaboratorio) {
       // Laboratorio: solo órdenes del sector laboratorio (con o sin técnico)
+      // El filtrado por técnico lo hace applyFilters()
       this.orders = allOrders.filter((order: Order) => {
         const orderSector = this.normalizeSector(order.sector || '');
         return orderSector === 'laboratorio';
       });
+    } else if (isCampo) {
+      // Campo: igual que laboratorio — cargar TODAS las órdenes del sector campo
+      // El filtrado por técnico lo hace applyFilters() con el filtro estricto
+      this.orders = allOrders.filter((order: Order) => {
+        const orderSector = this.normalizeSector(order.sector || '');
+        return orderSector === 'campo';
+      });
     } else {
-      // Otras áreas: aplicar reglas de visibilidad
+      // Otras áreas: aplicar reglas de visibilidad legacy
       this.orders = allOrders.filter((order: Order) => {
         const orderSector = this.normalizeSector(order.sector || '');
         const orderTechnicianIds = order.idresponsable ? order.idresponsable.split(',').map(id => parseInt(id.trim())) : [];
@@ -373,19 +383,29 @@ export class OrderListComponent implements OnInit, OnDestroy {
           this.loading = false;
           const allOrders = response.data || response.orders || response || [];
           
-          const isLaboratorio = this.normalizeSector(this.area) === 'laboratorio';
+          const normalizedArea = this.normalizeSector(this.area);
+          const isLaboratorio = normalizedArea === 'laboratorio';
+          const isCampo = normalizedArea === 'campo';
           
           // Para 820hd: cargar TODAS las órdenes sin filtrar (los filtros se aplican después)
           if (is820hd) {
             this.orders = allOrders;
           } else if (isLaboratorio) {
             // Laboratorio: solo órdenes del sector laboratorio (con o sin técnico)
+            // El filtrado por técnico lo hace applyFilters()
             this.orders = allOrders.filter((order: Order) => {
               const orderSector = this.normalizeSector(order.sector);
               return orderSector === 'laboratorio';
             });
+          } else if (isCampo) {
+            // Campo: igual que laboratorio — cargar TODAS las órdenes del sector campo
+            // El filtrado por técnico lo hace applyFilters() con el filtro estricto
+            this.orders = allOrders.filter((order: Order) => {
+              const orderSector = this.normalizeSector(order.sector);
+              return orderSector === 'campo';
+            });
           } else {
-            // Para otras áreas (Campo, etc): aplicar reglas de visibilidad
+            // Para otras áreas: aplicar reglas de visibilidad legacy
             this.orders = allOrders.filter((order: Order) => {
               // Normalizar valores de sector
               const orderSector = this.normalizeSector(order.sector);
@@ -497,7 +517,7 @@ export class OrderListComponent implements OnInit, OnDestroy {
    */
   private loadTechniciansIfNeeded(): void {
     const normalizedArea = this.normalizeSector(this.area);
-    if (normalizedArea !== '820hd' && normalizedArea !== 'laboratorio') return;
+    if (normalizedArea !== '820hd' && normalizedArea !== 'laboratorio' && normalizedArea !== 'campo') return;
     
     // Obtener datos del técnico actual
     const technician = this.getCurrentTechnician();
@@ -516,6 +536,8 @@ export class OrderListComponent implements OnInit, OnDestroy {
             this.updateFilterConfigFor820HD();
           } else if (normalizedArea === 'laboratorio') {
             this.updateFilterConfigForLaboratorio();
+          } else if (normalizedArea === 'campo') {
+            this.updateFilterConfigForCampo();
           }
         },
         error: (err) => {
@@ -571,6 +593,38 @@ export class OrderListComponent implements OnInit, OnDestroy {
    * Agrega un filtro por técnico asignado preseleccionado con el usuario de la sesión actual.
    */
   private updateFilterConfigForLaboratorio(): void {
+    // Agregar filtro de técnico al inicio del array con el técnico actual como valor por defecto
+    this.filterConfig = [
+      {
+        type: 'ng-select',
+        name: 'assignedTo',
+        label: 'Técnico Asignado',
+        placeholder: 'Todos los técnicos',
+        options: this.technicians,
+        optionLabel: 'name',
+        optionValue: 'id',
+        defaultValue: this.currentTechnicianId
+      },
+      ...this.filterConfig // Mantener filtros existentes (tipo, estado, prioridad, empresa)
+    ];
+
+    // Pre-establecer el filtro al técnico de la sesión actual
+    if (this.currentTechnicianId) {
+      this.currentFilters['assignedTo'] = this.currentTechnicianId;
+      // Si las órdenes ya cargaron antes que los técnicos (race condition),
+      // re-aplicar filtros inmediatamente para que el filtro de técnico surta efecto.
+      if (this.orders.length > 0) {
+        this.applyFilters();
+      }
+    }
+  }
+
+  /**
+   * Actualiza la configuración de filtros para área Campo.
+   * Comportamiento idéntico a Laboratorio: filtro estricto por técnico asignado
+   * preseleccionado con el usuario de la sesión actual.
+   */
+  private updateFilterConfigForCampo(): void {
     // Agregar filtro de técnico al inicio del array con el técnico actual como valor por defecto
     this.filterConfig = [
       {
@@ -807,14 +861,14 @@ export class OrderListComponent implements OnInit, OnDestroy {
     this.filteredOrders = this.orders.filter(order => {
       let matches = true;
 
-      // Filtro por técnico asignado (para áreas 820hd y laboratorio)
+      // Filtro por técnico asignado (para áreas 820hd, laboratorio y campo)
       if (filters['assignedTo']) {
         const techId = filters['assignedTo'];
         const isAssignedToFilteredTech = this.isTechnicianAssigned(order, techId);
-        const isLaboratorio = this.normalizeSector(this.area) === 'laboratorio';
+        const normalizedArea = this.normalizeSector(this.area);
         
-        if (isLaboratorio) {
-          // En laboratorio: filtro estricto → solo órdenes asignadas al técnico seleccionado
+        if (normalizedArea === 'laboratorio' || normalizedArea === 'campo') {
+          // En laboratorio y campo: filtro estricto → solo órdenes asignadas al técnico seleccionado
           matches = matches && isAssignedToFilteredTech;
         } else {
           // En 820hd: también incluir órdenes sin técnico asignado (disponibles para tomar)

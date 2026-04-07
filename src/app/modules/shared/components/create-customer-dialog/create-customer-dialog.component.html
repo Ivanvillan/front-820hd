@@ -31,9 +31,6 @@
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Dirección</mat-label>
             <input matInput formControlName="direccion" placeholder="Ingrese la dirección completa">
-            <mat-error *ngIf="form.get('direccion')?.hasError('required')">
-              La dirección es requerida
-            </mat-error>
             <mat-error *ngIf="form.get('direccion')?.hasError('minlength')">
               La dirección debe tener al menos 5 caracteres
             </mat-error>
@@ -81,9 +78,6 @@
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>CUIT</mat-label>
             <input matInput formControlName="cuit" placeholder="XX-XXXXXXXX-X" mask="00-00000000-0">
-            <mat-error *ngIf="form.get('cuit')?.hasError('required')">
-              El CUIT es requerido
-            </mat-error>
             <mat-error *ngIf="form.get('cuit')?.hasError('minlength')">
               El CUIT debe tener al menos 11 caracteres
             </mat-error>
@@ -126,23 +120,15 @@
               <mat-option value="Consumidor Final">Consumidor Final</mat-option>
               <mat-option value="No Categorizado">No Categorizado</mat-option>
             </mat-select>
-            <mat-error *ngIf="form.get('condicion_iva')?.hasError('required')">
-              La condición IVA es requerida
-            </mat-error>
-            <mat-error *ngIf="form.get('condicion_iva')?.hasError('minlength')">
-              La condición IVA debe tener al menos 2 caracteres
-            </mat-error>
-            <mat-error *ngIf="form.get('condicion_iva')?.hasError('maxlength')">
-              La condición IVA no puede exceder 100 caracteres
-            </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Tipo de Cliente</mat-label>
-            <input matInput formControlName="tipocli" placeholder="Ingrese el tipo de cliente">
-            <mat-error *ngIf="form.get('tipocli')?.hasError('maxlength')">
-              El tipo de cliente no puede exceder 50 caracteres
-            </mat-error>
+            <mat-select formControlName="tipocli">
+              <mat-option value="A">A</mat-option>
+              <mat-option value="B">B</mat-option>
+              <mat-option value="C">C</mat-option>
+            </mat-select>
           </mat-form-field>
         </div>
       </div>

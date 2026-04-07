@@ -40,7 +40,7 @@ export class UpdateContactDialogComponent implements OnInit {
     this.contactForm = this.fb.group({
       nombre: [this.contact.nombre, [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       email: [this.contact.email, [Validators.required, Validators.email, Validators.maxLength(100)]],
-      telefono: [this.contact.telefono || '', [Validators.maxLength(20)]],
+      telefono: [this.contact.telefono || '', [Validators.required, Validators.maxLength(20)]],
       pass: [this.contact.pass || '', [Validators.maxLength(255)]]
     });
   }

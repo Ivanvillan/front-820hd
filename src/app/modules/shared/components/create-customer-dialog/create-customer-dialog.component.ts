@@ -22,15 +22,15 @@ export class CreateCustomerDialogComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(255)]],
-      cuit: ['', [Validators.required, Validators.minLength(11), Validators.maxLength(20)]],
-      direccion: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(500)]],
+      cuit: ['', [Validators.minLength(11), Validators.maxLength(20)]],
+      direccion: ['', [Validators.minLength(5), Validators.maxLength(500)]],
       localidad: ['', [Validators.maxLength(100)]],
       cp: ['', [Validators.pattern(/^\d+$/), Validators.maxLength(10)]],
       idprov: [null],
       telefono: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
-      condicion_iva: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      tipocli: ['', [Validators.maxLength(50)]]
+      condicion_iva: ['', [Validators.minLength(2), Validators.maxLength(100)]],
+      tipocli: ['C', [Validators.maxLength(50)]]
     });
   }
 
