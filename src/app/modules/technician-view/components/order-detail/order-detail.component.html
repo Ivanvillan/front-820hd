@@ -80,15 +80,21 @@
                 </div>
                 <div class="info-item">
                   <span class="info-label">Email:</span>
-                  <span class="info-value">{{ order.email || 'N/A' }}</span>
+                  <span class="info-value">
+                    <a *ngIf="order.email" href="mailto:{{order.email}}" class="contact-link">{{order.email}}</a>
+                    <span *ngIf="!order.email">N/A</span>
+                  </span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">N° Orden:</span>
                   <span class="info-value">{{ order.numero || 'N/A' }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label">Contacto:</span>
-                  <span class="info-value">{{ order.contacto || 'N/A' }}</span>
+                  <span class="info-label">Teléfono:</span>
+                  <span class="info-value">
+                    <a *ngIf="order.telefono" href="tel:{{order.telefono}}" class="contact-link">{{order.telefono}}</a>
+                    <span *ngIf="!order.telefono">N/A</span>
+                  </span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">Técnico Asignado:</span>

@@ -27,8 +27,8 @@ export class CreateCustomerDialogComponent implements OnInit {
       localidad: ['', [Validators.maxLength(100)]],
       cp: ['', [Validators.pattern(/^\d+$/), Validators.maxLength(10)]],
       idprov: [null],
-      telefono: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(50)]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      telefono: ['', [Validators.minLength(7), Validators.maxLength(50)]],
+      email: ['', [Validators.email, Validators.maxLength(255)]],
       condicion_iva: ['', [Validators.minLength(2), Validators.maxLength(100)]],
       tipocli: ['C', [Validators.maxLength(50)]]
     });

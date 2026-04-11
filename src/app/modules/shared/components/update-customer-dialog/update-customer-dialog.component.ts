@@ -28,8 +28,8 @@ export class UpdateCustomerDialogComponent implements OnInit {
       localidad: [data.localidad || '', [Validators.maxLength(100)]],
       cp: [data.cp || '', [Validators.pattern(/^\d+$/), Validators.maxLength(10)]],
       idprov: [data.idprov || null],
-      telefono: [data.telefono || '', [Validators.required, Validators.minLength(7), Validators.maxLength(50)]],
-      email: [data.email || '', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      telefono: [data.telefono || '', [Validators.minLength(7), Validators.maxLength(50)]],
+      email: [data.email || '', [Validators.email, Validators.maxLength(255)]],
       condicion_iva: [data.condicion_iva || '', [Validators.minLength(2), Validators.maxLength(100)]],
       tipocli: [data.tipocli || 'C', [Validators.maxLength(50)]]
     });

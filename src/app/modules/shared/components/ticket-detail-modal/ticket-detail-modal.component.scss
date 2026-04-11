@@ -71,6 +71,15 @@
   }
 }
 
+.contact-link {
+  color: vars.$primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 // Responsables chip list — permite que los chips se envuelvan en varias filas
 .responsables-value {
   overflow: visible;

@@ -38,8 +38,8 @@ export class CreateContactDialogComponent implements OnInit {
   private initForm(): void {
     this.contactForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
-      telefono: ['', [Validators.required, Validators.maxLength(20)]],
+      email: ['', [Validators.email, Validators.maxLength(100)]],
+      telefono: ['', [Validators.maxLength(20)]],
       pass: ['', [Validators.maxLength(255)]]
     });
   }

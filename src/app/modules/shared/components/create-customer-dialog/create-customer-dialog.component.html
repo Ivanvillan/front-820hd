@@ -12,7 +12,7 @@
   <form [formGroup]="form" (ngSubmit)="onSaveClick()">
     <mat-dialog-content class="dialog-content">
       <div class="form-grid">
-        <!-- Columna 1 -->
+        <!-- Columna 1: nombre, telefono, direccion, localidad, cp -->
         <div class="form-column">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Nombre</mat-label>
@@ -25,6 +25,17 @@
             </mat-error>
             <mat-error *ngIf="form.get('nombre')?.hasError('maxlength')">
               El nombre no puede exceder 255 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono" placeholder="+54 9 XXX XXX-XXXX">
+            <mat-error *ngIf="form.get('telefono')?.hasError('minlength')">
+              El teléfono debe tener al menos 7 caracteres
+            </mat-error>
+            <mat-error *ngIf="form.get('telefono')?.hasError('maxlength')">
+              El teléfono no puede exceder 50 caracteres
             </mat-error>
           </mat-form-field>
 
@@ -57,13 +68,13 @@
               El código postal no puede exceder 10 caracteres
             </mat-error>
           </mat-form-field>
+        </div>
 
+        <!-- Columna 2: email, CUIT, provincia, condicion_iva, tipocli -->
+        <div class="form-column">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Email</mat-label>
             <input matInput formControlName="email" placeholder="cliente@empresa.com" type="email">
-            <mat-error *ngIf="form.get('email')?.hasError('required')">
-              El email es requerido
-            </mat-error>
             <mat-error *ngIf="form.get('email')?.hasError('email')">
               Formato de email inválido
             </mat-error>
@@ -71,10 +82,7 @@
               El email no puede exceder 255 caracteres
             </mat-error>
           </mat-form-field>
-        </div>
 
-        <!-- Columna 2 -->
-        <div class="form-column">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>CUIT</mat-label>
             <input matInput formControlName="cuit" placeholder="XX-XXXXXXXX-X" mask="00-00000000-0">
@@ -98,20 +106,6 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Teléfono</mat-label>
-            <input matInput formControlName="telefono" placeholder="+54 9 XXX XXX-XXXX">
-            <mat-error *ngIf="form.get('telefono')?.hasError('required')">
-              El teléfono es requerido
-            </mat-error>
-            <mat-error *ngIf="form.get('telefono')?.hasError('minlength')">
-              El teléfono debe tener al menos 7 caracteres
-            </mat-error>
-            <mat-error *ngIf="form.get('telefono')?.hasError('maxlength')">
-              El teléfono no puede exceder 50 caracteres
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Condición IVA</mat-label>
             <mat-select formControlName="condicion_iva" placeholder="Seleccione la condición fiscal">
               <mat-option value="Responsable Inscripto">Responsable Inscripto</mat-option>
@@ -131,6 +125,11 @@
             </mat-select>
           </mat-form-field>
         </div>
+      </div>
+
+      <div class="form-note">
+        <mat-icon class="note-icon">info</mat-icon>
+        <span>Los campos marcados con * son obligatorios</span>
       </div>
     </mat-dialog-content>
 

@@ -120,10 +120,10 @@
   align-items: center;
   gap: vars.$spacing-sm;
   padding: vars.$spacing-sm vars.$spacing-md;
-  background: lighten(vars.$info, 40%);
-  border-radius: vars.$border-radius-lg;
-  border: vars.$border-width solid lighten(vars.$info, 20%);
-  color: vars.$info;
+  background: #e3f2fd;
+  border-radius: vars.$border-radius;
+  border: vars.$border-width solid #bbdefb;
+  color: vars.$primary;
   font-size: vars.$font-size-sm;
   margin-top: vars.$spacing-md;
   

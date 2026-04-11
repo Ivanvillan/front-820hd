@@ -68,6 +68,26 @@
   width: 100%;
 }
 
+// ========== FORM NOTE ==========
+.form-note {
+  display: flex;
+  align-items: center;
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  background: #e3f2fd;
+  border-radius: vars.$border-radius;
+  border: vars.$border-width solid #bbdefb;
+  color: vars.$primary;
+  font-size: vars.$font-size-sm;
+  margin-top: vars.$spacing-md;
+
+  .note-icon {
+    font-size: vars.$font-size-md;
+    width: vars.$font-size-md;
+    height: vars.$font-size-md;
+  }
+}
+
 // ========== ACTIONS ==========
 .dialog-actions {
   display: flex;

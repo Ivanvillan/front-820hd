@@ -57,6 +57,20 @@
           <span class="value">{{ticket.contacto || '--'}}</span>
         </div>
         <div class="info-item">
+          <span class="label">Email Contacto:</span>
+          <span class="value">
+            <a *ngIf="ticket.email" href="mailto:{{ticket.email}}" class="contact-link">{{ticket.email}}</a>
+            <span *ngIf="!ticket.email">--</span>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="label">Tel. Contacto:</span>
+          <span class="value">
+            <a *ngIf="ticket.telefono" href="tel:{{ticket.telefono}}" class="contact-link">{{ticket.telefono}}</a>
+            <span *ngIf="!ticket.telefono">--</span>
+          </span>
+        </div>
+        <div class="info-item">
           <span class="label">Responsables:</span>
           <div class="value responsables-value" *ngIf="ticket.responsables && ticket.responsables.length > 0; else soloReferente">
             <mat-chip-list class="responsables-chip-list">
