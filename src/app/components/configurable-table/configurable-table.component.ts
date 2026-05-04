@@ -67,13 +67,8 @@ export class ConfigurableTableComponent implements OnInit, OnChanges, OnDestroy,
   ngAfterViewInit(): void {
     if (this.showPaginator && this.paginator) {
       if (this.serverSidePagination) {
-        // Para paginación del servidor, NO conectar dataSource.paginator
-        // En su lugar, suscribirse a eventos del paginator
-        this.paginator.page
-          .pipe(takeUntil(this.destroy$))
-          .subscribe((event: PageEvent) => {
-            this.pageChange.emit(event);
-          });
+        // No conectar dataSource.paginator para paginacion server-side
+        // El evento (page) del template emite pageChange al padre
       } else {
         // Para paginación del cliente, conectar dataSource.paginator
         this.dataSource.paginator = this.paginator;

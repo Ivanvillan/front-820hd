@@ -80,7 +80,7 @@
 
       <!-- Tabla de órdenes -->
       <div *ngIf="orders.length > 0" class="table-container">
-        <table mat-table [dataSource]="filteredOrders" class="orders-table">
+        <table mat-table [dataSource]="paginatedOrders" class="orders-table">
           
           <!-- Columna Fecha -->
           <ng-container matColumnDef="fecha">

@@ -113,6 +113,11 @@ export class OrderListComponent implements OnInit, OnDestroy {
   pageSize: number = 10;
   currentPage: number = 0;
 
+  get paginatedOrders(): any[] {
+    const start = this.currentPage * this.pageSize;
+    return this.filteredOrders.slice(start, start + this.pageSize);
+  }
+
   // Filtros
   filterConfig: FilterConfig[] = [];
   priorities = PRIORITY_OPTIONS;
@@ -242,18 +247,18 @@ export class OrderListComponent implements OnInit, OnDestroy {
     if (is820hd) {
       this.orders = allOrders;
     } else if (isLaboratorio) {
-      // Laboratorio: solo órdenes del sector laboratorio (con o sin técnico)
-      // El filtrado por técnico lo hace applyFilters()
+      // Laboratorio: órdenes del sector laboratorio + órdenes sin sector ni técnico (disponibles para tomar)
       this.orders = allOrders.filter((order: Order) => {
         const orderSector = this.normalizeSector(order.sector || '');
-        return orderSector === 'laboratorio';
+        const hasTechnicians = (order.responsables && order.responsables.length > 0) || order.idresponsable;
+        return orderSector === 'laboratorio' || (!orderSector && !hasTechnicians);
       });
     } else if (isCampo) {
-      // Campo: igual que laboratorio — cargar TODAS las órdenes del sector campo
-      // El filtrado por técnico lo hace applyFilters() con el filtro estricto
+      // Campo: órdenes del sector campo + órdenes sin sector ni técnico (disponibles para tomar)
       this.orders = allOrders.filter((order: Order) => {
         const orderSector = this.normalizeSector(order.sector || '');
-        return orderSector === 'campo';
+        const hasTechnicians = (order.responsables && order.responsables.length > 0) || order.idresponsable;
+        return orderSector === 'campo' || (!orderSector && !hasTechnicians);
       });
     } else {
       // Otras áreas: aplicar reglas de visibilidad legacy
@@ -391,18 +396,18 @@ export class OrderListComponent implements OnInit, OnDestroy {
           if (is820hd) {
             this.orders = allOrders;
           } else if (isLaboratorio) {
-            // Laboratorio: solo órdenes del sector laboratorio (con o sin técnico)
-            // El filtrado por técnico lo hace applyFilters()
+            // Laboratorio: órdenes del sector laboratorio + órdenes sin sector ni técnico (disponibles para tomar)
             this.orders = allOrders.filter((order: Order) => {
               const orderSector = this.normalizeSector(order.sector);
-              return orderSector === 'laboratorio';
+              const hasTechnicians = (order.responsables && order.responsables.length > 0) || order.idresponsable;
+              return orderSector === 'laboratorio' || (!orderSector && !hasTechnicians);
             });
           } else if (isCampo) {
-            // Campo: igual que laboratorio — cargar TODAS las órdenes del sector campo
-            // El filtrado por técnico lo hace applyFilters() con el filtro estricto
+            // Campo: órdenes del sector campo + órdenes sin sector ni técnico (disponibles para tomar)
             this.orders = allOrders.filter((order: Order) => {
               const orderSector = this.normalizeSector(order.sector);
-              return orderSector === 'campo';
+              const hasTechnicians = (order.responsables && order.responsables.length > 0) || order.idresponsable;
+              return orderSector === 'campo' || (!orderSector && !hasTechnicians);
             });
           } else {
             // Para otras áreas: aplicar reglas de visibilidad legacy
@@ -621,34 +626,26 @@ export class OrderListComponent implements OnInit, OnDestroy {
 
   /**
    * Actualiza la configuración de filtros para área Campo.
-   * Comportamiento idéntico a Laboratorio: filtro estricto por técnico asignado
-   * preseleccionado con el usuario de la sesión actual.
+   * Sin auto-selección de técnico: muestra todas las órdenes de campo por defecto.
+   * El técnico logueado aparece como primera opción del dropdown para fácil acceso.
    */
   private updateFilterConfigForCampo(): void {
-    // Agregar filtro de técnico al inicio del array con el técnico actual como valor por defecto
+    const currentTech = this.technicians.find(t => t.id === this.currentTechnicianId);
+    const otherTechs = this.technicians.filter(t => t.id !== this.currentTechnicianId);
+    const sortedTechnicians = currentTech ? [currentTech, ...otherTechs] : this.technicians;
+
     this.filterConfig = [
       {
         type: 'ng-select',
         name: 'assignedTo',
         label: 'Técnico Asignado',
         placeholder: 'Todos los técnicos',
-        options: this.technicians,
+        options: sortedTechnicians,
         optionLabel: 'name',
-        optionValue: 'id',
-        defaultValue: this.currentTechnicianId
+        optionValue: 'id'
       },
-      ...this.filterConfig // Mantener filtros existentes (tipo, estado, prioridad, empresa)
+      ...this.filterConfig
     ];
-
-    // Pre-establecer el filtro al técnico de la sesión actual
-    if (this.currentTechnicianId) {
-      this.currentFilters['assignedTo'] = this.currentTechnicianId;
-      // Si las órdenes ya cargaron antes que los técnicos (race condition),
-      // re-aplicar filtros inmediatamente para que el filtro de técnico surta efecto.
-      if (this.orders.length > 0) {
-        this.applyFilters();
-      }
-    }
   }
 
   /**
@@ -868,8 +865,9 @@ export class OrderListComponent implements OnInit, OnDestroy {
         const normalizedArea = this.normalizeSector(this.area);
         
         if (normalizedArea === 'laboratorio' || normalizedArea === 'campo') {
-          // En laboratorio y campo: filtro estricto → solo órdenes asignadas al técnico seleccionado
-          matches = matches && isAssignedToFilteredTech;
+          // En laboratorio y campo: órdenes del técnico seleccionado + órdenes sin técnico (disponibles para tomar)
+          const hasNoTechnician = (!order.responsables || order.responsables.length === 0) && !order.idresponsable;
+          matches = matches && (isAssignedToFilteredTech || hasNoTechnician);
         } else {
           // En 820hd: también incluir órdenes sin técnico asignado (disponibles para tomar)
           const hasNoTechnician = (!order.responsables || order.responsables.length === 0) && !order.idresponsable;
