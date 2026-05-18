@@ -35,6 +35,8 @@
           <!-- <div class="status-container"> -->
             <div class="indicator-status" [ngClass]="getTicketStatus(ticket).class">
               {{getTicketStatus(ticket).text}}
+              <mat-icon *ngIf="ticket.estado === 'Pendiente de Entrega' && ticket.chequeoActivoITResponsables?.length"
+                        class="status-check-icon">check_circle</mat-icon>
             </div>
             <!-- <div class="mobile-datetime">
               <span>{{ticket.fecha | date:'d/M/yy'}}</span>

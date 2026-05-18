@@ -109,6 +109,17 @@
           </mat-error>
         </mat-form-field>
 
+        <!-- Chequeo de activo IT — visible solo para clientes tipo A en estado "Pendiente de Entrega" -->
+        <div class="form-field" *ngIf="showChequeoActivoIT">
+          <ng-select formControlName="chequeoActivoITIds"
+            [items]="technicians" bindLabel="name" bindValue="id"
+            placeholder="Seleccionar técnicos responsables del chequeo..."
+            [searchable]="true" [clearable]="true" [multiple]="true"
+            class="ng-select-custom">
+          </ng-select>
+          <div class="form-help">Técnicos que realizaron el chequeo del activo IT</div>
+        </div>
+
         <!-- Prioridad -->
         <mat-form-field appearance="outline">
           <mat-label>Prioridad</mat-label>

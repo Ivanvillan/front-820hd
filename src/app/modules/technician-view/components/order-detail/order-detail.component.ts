@@ -92,6 +92,9 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   // Estado actual de la orden
   currentStatus: OrderStatus = OrderStatus.PENDIENTE;
 
+  // Exponer enum al template
+  readonly orderStatus = OrderStatus;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,

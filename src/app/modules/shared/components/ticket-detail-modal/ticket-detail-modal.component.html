@@ -35,6 +35,8 @@
               [selected]="true"
               class="status-chip">
               {{ getStatusText(ticket) }}
+              <mat-icon *ngIf="ticket.estado === 'Pendiente de Entrega' && ticket.chequeoActivoITResponsables?.length"
+                        class="status-check-icon">check_circle</mat-icon>
             </mat-chip>
           </mat-chip-list>
         </div>
@@ -86,6 +88,21 @@
           <ng-template #soloReferente>
             <span class="value">{{ticket.referente || 'Sin asignar'}}</span>
           </ng-template>
+        </div>
+        <div class="info-item"
+             *ngIf="ticket.chequeoActivoITResponsables && ticket.chequeoActivoITResponsables.length > 0">
+          <span class="label">Chequeo activo IT:</span>
+          <div class="value responsables-value">
+            <mat-chip-list class="responsables-chip-list">
+              <mat-chip *ngFor="let resp of ticket.chequeoActivoITResponsables"
+                        color="accent"
+                        selected
+                        [matTooltip]="resp.nombre"
+                        matTooltipPosition="above">
+                {{resp.nombre}}
+              </mat-chip>
+            </mat-chip-list>
+          </div>
         </div>
         <div class="info-item">
           <span class="label">Sector:</span>

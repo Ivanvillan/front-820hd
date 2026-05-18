@@ -102,6 +102,15 @@
   white-space: nowrap;
 }
 
+.status-check-icon {
+  font-size: 14px;
+  height: 14px;
+  width: 14px;
+  vertical-align: middle;
+  margin-left: 4px;
+  line-height: 14px;
+}
+
 // Legacy status indicator badges (deprecated)
 .status-indicator {
   padding: 2px 6px;

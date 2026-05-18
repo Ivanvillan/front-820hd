@@ -115,6 +115,21 @@
                     </ng-template>
                   </div>
                 </div>
+                <div class="info-item"
+                     *ngIf="order.chequeoActivoITResponsables && order.chequeoActivoITResponsables.length > 0">
+                  <span class="info-label">Chequeo activo IT:</span>
+                  <div class="info-value">
+                    <mat-chip-list class="assigned-chip-list">
+                      <mat-chip *ngFor="let r of order.chequeoActivoITResponsables"
+                                color="accent"
+                                selected
+                                [matTooltip]="r.nombre"
+                                matTooltipPosition="above">
+                        {{ r.nombre }}
+                      </mat-chip>
+                    </mat-chip-list>
+                  </div>
+                </div>
               </div>
             </mat-card-content>
           </mat-card>
@@ -196,6 +211,8 @@
                       [selected]="true"
                       class="status-chip">
                       {{ getStatusDisplayName(currentStatus) }}
+                      <mat-icon *ngIf="currentStatus === orderStatus.PENDIENTE_ENTREGA && order?.chequeoActivoITResponsables?.length"
+                                class="status-check-icon">check_circle</mat-icon>
                     </mat-chip>
                   </mat-chip-list>
                 </div>

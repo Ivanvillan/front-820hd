@@ -64,6 +64,11 @@ export interface Ticket {
   tiposerv?: number; // Tipo de servicio: 0 = Out (Externo), 1 = In (Interno), null/undefined = No definido
   servicios?: string | number; // ID del servicio específico (referencia a tabla 1reqservicios)
   tipoServicioNombre?: string; // Nombre del servicio específico (ej: "Instalación", "Reparación")
+
+  // Campos de chequeo de activo IT (solo para clientes tipo A, estado "Pendiente de Entrega")
+  activoit?: string | null; // IDs separados por coma "74,76" — raw desde la BD
+  chequeoActivoITIds?: number[] | null; // Array de IDs de técnicos que realizaron el chequeo
+  chequeoActivoITResponsables?: Array<{ id: number; nombre: string }>; // Array parseado con id y nombre
 }
 
 // Enums para los valores permitidos

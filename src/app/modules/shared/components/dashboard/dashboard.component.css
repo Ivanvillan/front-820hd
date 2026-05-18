@@ -514,4 +514,17 @@ mat-table::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.3);
 }
 
+.indicator-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.status-check-icon {
+  font-size: 14px;
+  height: 14px;
+  width: 14px;
+  line-height: 14px;
+}
+
 

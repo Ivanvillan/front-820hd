@@ -159,6 +159,8 @@
                   [selected]="true"
                   class="status-chip">
                   {{ getStatusDisplayName(getOrderStatus(order)) }}
+                  <mat-icon *ngIf="order.estado === 'Pendiente de Entrega' && order.chequeoActivoITResponsables?.length"
+                            class="status-check-icon">check_circle</mat-icon>
                 </mat-chip>
               </mat-chip-list>
             </td>

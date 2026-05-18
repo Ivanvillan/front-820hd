@@ -119,7 +119,10 @@ export class UpdateOrderDialogComponent implements OnInit {
       horafin: [''],
       
       // Observaciones
-      notes: ['']
+      notes: [''],
+
+      // Chequeo de activo IT
+      chequeoActivoITIds: [[]]
     });
   }
 
@@ -145,6 +148,12 @@ export class UpdateOrderDialogComponent implements OnInit {
         this.contactos = [];
         this.updateForm.get('contactId')?.setValue(null);
       }
+      this.updateChequeoActivoITState();
+    });
+
+    // Limpiar chequeo de activo IT si el estado cambia y la condición ya no se cumple
+    this.updateForm.get('estado')?.valueChanges.subscribe(() => {
+      this.updateChequeoActivoITState();
     });
     
     if (this.data) {
@@ -214,7 +223,10 @@ export class UpdateOrderDialogComponent implements OnInit {
       horafin: this.data.horafin || '',
       
       // Observaciones
-      notes: notesText
+      notes: notesText,
+
+      // Chequeo de activo IT — extraer IDs del array de responsables
+      chequeoActivoITIds: this.data.chequeoActivoITResponsables?.map((r: any) => r.id) || []
     });
   }
 
@@ -234,6 +246,27 @@ export class UpdateOrderDialogComponent implements OnInit {
     this.updateForm.get('horafin')?.valueChanges.subscribe(() => {
       this.validateDateRange();
     });
+  }
+
+  /** Devuelve true si el cliente seleccionado es de tipo A */
+  get isClienteTipoA(): boolean {
+    const clientId = this.updateForm.get('clientId')?.value;
+    if (!clientId) return false;
+    const client = this.clientes.find((c: any) => c.id === clientId);
+    return client?.tipocli === 'A';
+  }
+
+  /** Devuelve true cuando el campo chequeo de activo IT debe mostrarse */
+  get showChequeoActivoIT(): boolean {
+    return this.isClienteTipoA &&
+      this.updateForm.get('estado')?.value === OrderStatus.PENDIENTE_ENTREGA;
+  }
+
+  /** Limpia el campo chequeo si la condición deja de cumplirse */
+  private updateChequeoActivoITState(): void {
+    if (!this.showChequeoActivoIT) {
+      this.updateForm.get('chequeoActivoITIds')?.setValue([]);
+    }
   }
 
   /**
@@ -634,6 +667,13 @@ export class UpdateOrderDialogComponent implements OnInit {
       }
       if (formData.prioridad && formData.prioridad.trim()) {
         updateData.prioridad = formData.prioridad;
+      }
+
+      // Chequeo de activo IT — solo enviar si aplica (cliente tipo A + estado correcto)
+      if (this.showChequeoActivoIT) {
+        updateData.chequeoActivoITIds = formData.chequeoActivoITIds || [];
+      } else {
+        updateData.chequeoActivoITIds = null;
       }
       
       // Materiales

@@ -73,6 +73,8 @@
       [selected]="true"
       class="status-chip">
       {{ getStatusText(row) }}
+      <mat-icon *ngIf="row.estado === 'Pendiente de Entrega' && row.chequeoActivoITResponsables?.length"
+                class="status-check-icon">check_circle</mat-icon>
     </mat-chip>
   </mat-chip-list>
 </ng-template>

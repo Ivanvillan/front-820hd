@@ -87,6 +87,15 @@
   white-space: nowrap;
 }
 
+.status-check-icon {
+  font-size: 14px;
+  height: 14px;
+  width: 14px;
+  vertical-align: middle;
+  margin-left: 4px;
+  line-height: 14px;
+}
+
 // Nombre asignado — clases legacy (mantenidas por si se usan en otros contextos)
 .nombre-asignado {
   display: inline-block;

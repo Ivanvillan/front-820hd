@@ -89,7 +89,10 @@ export class CreateOrderDialogComponent implements OnInit {
       fechaini: [''],  // Fecha inicio trabajo
       startTime: [''],
       fechafin: [''],  // Fecha fin trabajo
-      endTime: ['']
+      endTime: [''],
+
+      // Chequeo de activo IT
+      chequeoActivoITIds: [[]]
     });
 
     if (data && data.technicians) {
@@ -184,6 +187,12 @@ export class CreateOrderDialogComponent implements OnInit {
         this.contactos = [];
         this.createForm.get('contactId')?.setValue(null);
       }
+      this.updateChequeoActivoITState();
+    });
+
+    // Limpiar chequeo de activo IT si el estado cambia y la condición ya no se cumple
+    this.createForm.get('status')?.valueChanges.subscribe(() => {
+      this.updateChequeoActivoITState();
     });
 
     // Validación cruzada: fechafin >= fechaini
@@ -214,6 +223,27 @@ export class CreateOrderDialogComponent implements OnInit {
         return OrderSector.HD820;
       default:
         return OrderSector.HD820;
+    }
+  }
+
+  /** Devuelve true si el cliente seleccionado es de tipo A */
+  get isClienteTipoA(): boolean {
+    const clientId = this.createForm.get('clientId')?.value;
+    if (!clientId) return false;
+    const client = this.clientes.find((c: any) => c.id === clientId);
+    return client?.tipocli === 'A';
+  }
+
+  /** Devuelve true cuando el campo chequeo de activo IT debe mostrarse */
+  get showChequeoActivoIT(): boolean {
+    return this.isClienteTipoA &&
+      this.createForm.get('status')?.value === OrderStatus.PENDIENTE_ENTREGA;
+  }
+
+  /** Limpia el campo chequeo si la condición deja de cumplirse */
+  private updateChequeoActivoITState(): void {
+    if (!this.showChequeoActivoIT) {
+      this.createForm.get('chequeoActivoITIds')?.setValue([]);
     }
   }
 
@@ -531,7 +561,10 @@ export class CreateOrderDialogComponent implements OnInit {
         insu: formData.orderType === 'insu' ? 1 : 0,
         mant: formData.orderType === 'mant' ? 1 : 0,
         sopo: formData.orderType === 'sopo' ? 1 : 0,
-        limp: formData.orderType === 'limp' ? 1 : 0
+        limp: formData.orderType === 'limp' ? 1 : 0,
+
+        // Chequeo de activo IT — solo para clientes tipo A en estado "Pendiente de Entrega"
+        chequeoActivoITIds: this.showChequeoActivoIT ? (formData.chequeoActivoITIds || []) : null
       };
       
       // Mapear campos de fecha y hora: fechaini/startTime → fechaini/horaini, fechafin/endTime → fechafin/horafin
