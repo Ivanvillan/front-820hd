@@ -669,11 +669,10 @@ export class UpdateOrderDialogComponent implements OnInit {
         updateData.prioridad = formData.prioridad;
       }
 
-      // Chequeo de activo IT — solo enviar si aplica (cliente tipo A + estado correcto)
+      // Chequeo de activo IT — solo incluir si aplica (cliente tipo A + estado correcto)
+      // Omitir la clave cuando no aplica para compatibilidad con versiones del backend sin este campo
       if (this.showChequeoActivoIT) {
         updateData.chequeoActivoITIds = formData.chequeoActivoITIds || [];
-      } else {
-        updateData.chequeoActivoITIds = null;
       }
       
       // Materiales

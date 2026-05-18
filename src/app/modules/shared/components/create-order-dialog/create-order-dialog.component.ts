@@ -561,11 +561,14 @@ export class CreateOrderDialogComponent implements OnInit {
         insu: formData.orderType === 'insu' ? 1 : 0,
         mant: formData.orderType === 'mant' ? 1 : 0,
         sopo: formData.orderType === 'sopo' ? 1 : 0,
-        limp: formData.orderType === 'limp' ? 1 : 0,
-
-        // Chequeo de activo IT — solo para clientes tipo A en estado "Pendiente de Entrega"
-        chequeoActivoITIds: this.showChequeoActivoIT ? (formData.chequeoActivoITIds || []) : null
+        limp: formData.orderType === 'limp' ? 1 : 0
       };
+
+      // Chequeo de activo IT — solo incluir si aplica (cliente tipo A + estado correcto)
+      // Omitir la clave cuando no aplica para compatibilidad con versiones del backend sin este campo
+      if (this.showChequeoActivoIT && formData.chequeoActivoITIds?.length) {
+        orderData.chequeoActivoITIds = formData.chequeoActivoITIds;
+      }
       
       // Mapear campos de fecha y hora: fechaini/startTime → fechaini/horaini, fechafin/endTime → fechafin/horafin
       if (formData.fechaini) {
