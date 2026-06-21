@@ -248,17 +248,23 @@ export class OrderListComponent implements OnInit, OnDestroy {
       this.orders = allOrders;
     } else if (isLaboratorio) {
       // Laboratorio: órdenes del sector laboratorio + órdenes sin sector ni técnico (disponibles para tomar)
+      // + órdenes asignadas explícitamente al técnico aunque sean de otro sector
       this.orders = allOrders.filter((order: Order) => {
         const orderSector = this.normalizeSector(order.sector || '');
         const hasTechnicians = (order.responsables && order.responsables.length > 0) || order.idresponsable;
-        return orderSector === 'laboratorio' || (!orderSector && !hasTechnicians);
+        return orderSector === 'laboratorio'
+          || (!orderSector && !hasTechnicians)
+          || this.isTechnicianAssigned(order, currentTechnicianId);
       });
     } else if (isCampo) {
       // Campo: órdenes del sector campo + órdenes sin sector ni técnico (disponibles para tomar)
+      // + órdenes asignadas explícitamente al técnico aunque sean de otro sector
       this.orders = allOrders.filter((order: Order) => {
         const orderSector = this.normalizeSector(order.sector || '');
         const hasTechnicians = (order.responsables && order.responsables.length > 0) || order.idresponsable;
-        return orderSector === 'campo' || (!orderSector && !hasTechnicians);
+        return orderSector === 'campo'
+          || (!orderSector && !hasTechnicians)
+          || this.isTechnicianAssigned(order, currentTechnicianId);
       });
     } else {
       // Otras áreas: aplicar reglas de visibilidad legacy
@@ -397,17 +403,23 @@ export class OrderListComponent implements OnInit, OnDestroy {
             this.orders = allOrders;
           } else if (isLaboratorio) {
             // Laboratorio: órdenes del sector laboratorio + órdenes sin sector ni técnico (disponibles para tomar)
+            // + órdenes asignadas explícitamente al técnico aunque sean de otro sector
             this.orders = allOrders.filter((order: Order) => {
               const orderSector = this.normalizeSector(order.sector);
               const hasTechnicians = (order.responsables && order.responsables.length > 0) || order.idresponsable;
-              return orderSector === 'laboratorio' || (!orderSector && !hasTechnicians);
+              return orderSector === 'laboratorio'
+                || (!orderSector && !hasTechnicians)
+                || this.isTechnicianAssigned(order, currentTechnicianId);
             });
           } else if (isCampo) {
             // Campo: órdenes del sector campo + órdenes sin sector ni técnico (disponibles para tomar)
+            // + órdenes asignadas explícitamente al técnico aunque sean de otro sector
             this.orders = allOrders.filter((order: Order) => {
               const orderSector = this.normalizeSector(order.sector);
               const hasTechnicians = (order.responsables && order.responsables.length > 0) || order.idresponsable;
-              return orderSector === 'campo' || (!orderSector && !hasTechnicians);
+              return orderSector === 'campo'
+                || (!orderSector && !hasTechnicians)
+                || this.isTechnicianAssigned(order, currentTechnicianId);
             });
           } else {
             // Para otras áreas: aplicar reglas de visibilidad legacy
@@ -598,8 +610,20 @@ export class OrderListComponent implements OnInit, OnDestroy {
    * Agrega un filtro por técnico asignado preseleccionado con el usuario de la sesión actual.
    */
   private updateFilterConfigForLaboratorio(): void {
-    // Agregar filtro de técnico al inicio del array con el técnico actual como valor por defecto
     this.filterConfig = [
+      {
+        type: 'ng-select',
+        name: 'viewMode',
+        label: 'Vista',
+        options: [
+          { label: 'Todas las órdenes', value: 'all' },
+          { label: 'Solo Laboratorio',  value: 'sector' },
+          { label: 'Solo asignadas a mí', value: 'assigned' }
+        ],
+        optionLabel: 'label',
+        optionValue: 'value',
+        defaultValue: 'all'
+      },
       {
         type: 'ng-select',
         name: 'assignedTo',
@@ -612,6 +636,8 @@ export class OrderListComponent implements OnInit, OnDestroy {
       },
       ...this.filterConfig // Mantener filtros existentes (tipo, estado, prioridad, empresa)
     ];
+
+    this.currentFilters['viewMode'] = 'all';
 
     // Pre-establecer el filtro al técnico de la sesión actual
     if (this.currentTechnicianId) {
@@ -637,6 +663,19 @@ export class OrderListComponent implements OnInit, OnDestroy {
     this.filterConfig = [
       {
         type: 'ng-select',
+        name: 'viewMode',
+        label: 'Vista',
+        options: [
+          { label: 'Todas las órdenes', value: 'all' },
+          { label: 'Solo Campo',        value: 'sector' },
+          { label: 'Solo asignadas a mí', value: 'assigned' }
+        ],
+        optionLabel: 'label',
+        optionValue: 'value',
+        defaultValue: 'all'
+      },
+      {
+        type: 'ng-select',
         name: 'assignedTo',
         label: 'Técnico Asignado',
         placeholder: 'Todos los técnicos',
@@ -646,6 +685,8 @@ export class OrderListComponent implements OnInit, OnDestroy {
       },
       ...this.filterConfig
     ];
+
+    this.currentFilters['viewMode'] = 'all';
   }
 
   /**
@@ -702,10 +743,11 @@ export class OrderListComponent implements OnInit, OnDestroy {
   getOrderType = getOrderType;
 
   /**
-   * Obtiene la empresa del cliente
+   * Obtiene la empresa del cliente con tipo de cliente
    */
   getEmpresaDisplay(order: Order): string {
-    return order.empresa || order.nombre || 'N/A';
+    const empresa = order.empresa || order.nombre || 'N/A';
+    return order.tipocli ? `${empresa} (${order.tipocli})` : empresa;
   }
 
   /**
@@ -882,6 +924,22 @@ export class OrderListComponent implements OnInit, OnDestroy {
         const filterSector = this.normalizeSector(filters['sector']);
         // Mostrar si: coincide con el sector filtrado O no tiene sector asignado
         matches = matches && (orderSector === filterSector || !orderSector);
+      }
+
+      // Filtro por modo de vista (solo campo y laboratorio)
+      if (filters['viewMode'] && filters['viewMode'] !== 'all') {
+        const normalizedArea = this.normalizeSector(this.area);
+        if (normalizedArea === 'campo' || normalizedArea === 'laboratorio') {
+          const techId = this.currentTechnicianId;
+          const orderSector = this.normalizeSector(order.sector);
+          const hasTech = (order.responsables && order.responsables.length > 0) || order.idresponsable;
+
+          if (filters['viewMode'] === 'sector') {
+            matches = matches && (orderSector === normalizedArea || (!orderSector && !hasTech));
+          } else if (filters['viewMode'] === 'assigned' && techId !== null) {
+            matches = matches && this.isTechnicianAssigned(order, techId);
+          }
+        }
       }
 
       // Filtro por tipo
