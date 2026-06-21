@@ -99,6 +99,7 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
   @ViewChild('actionsTemplate', { static: true }) actionsTemplate!: TemplateRef<any>;
   @ViewChild('tipoServicioTemplate', { static: true }) tipoServicioTemplate!: TemplateRef<any>;
   @ViewChild('nombreAsignadoTemplate', { static: true }) nombreAsignadoTemplate!: TemplateRef<any>;
+  @ViewChild('empresaTemplate', { static: true }) empresaTemplate!: TemplateRef<any>;
 
   columnTemplates: { [key: string]: TemplateRef<any> } = {};
 
@@ -128,6 +129,7 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
       'estado': this.statusTemplate,
       'tipoServicio': this.tipoServicioTemplate,
       'nombreAsignado': this.nombreAsignadoTemplate,
+      'empresa': this.empresaTemplate,
       'acciones': this.actionsTemplate
     };
     
@@ -250,7 +252,7 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
         label: 'Empresa',
         placeholder: 'Todas las empresas',
         options: this.customers,
-        optionLabel: 'nombre',
+        optionLabel: 'displayNombre',
         optionValue: 'id7'
       },
       {
@@ -398,7 +400,11 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
   loadCustomers(): void {
     this.ordersService.readAllClients().subscribe({
       next: (data: any) => {
-        this.customers = Array.isArray(data) ? data : [data].flat();
+        const raw = Array.isArray(data) ? data : [data].flat();
+        this.customers = raw.map((c: any) => ({
+          ...c,
+          displayNombre: c.tipocli ? `${c.nombre} (${c.tipocli})` : c.nombre
+        }));
         // Actualizar filterConfig cuando los clientes se carguen
         this.initializeFilterConfig();
       },
@@ -610,6 +616,14 @@ export class OrderManagementComponent implements OnInit, OnDestroy {
       return order.referente;
     }
     return null;
+  }
+
+  /**
+   * Obtiene la empresa del cliente con tipo de cliente
+   */
+  getEmpresaDisplay(order: any): string {
+    const empresa = order.empresa || order.nombre || 'N/A';
+    return order.tipocli ? `${empresa} (${order.tipocli})` : empresa;
   }
 
   /**

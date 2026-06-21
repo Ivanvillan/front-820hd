@@ -12,6 +12,7 @@ export interface Ticket {
   email?: string; // Email del cliente
   nombre?: string; // Nombre de la empresa (opcional)
   empresa?: string; // Alias para nombre
+  tipocli?: string; // Tipo de cliente (ej: 'A', 'B', 'C')
   idcliente?: number; // ID del cliente
   idcontacto?: number; // ID del contacto
   

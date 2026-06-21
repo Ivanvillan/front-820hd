@@ -12,14 +12,14 @@
           <input type="date" [(ngModel)]="secondDate">
         </div>
         <div class="clients-search" *ngIf="userType === 'admin'">
-          <ng-select placeholder="Seleccionar cliente" [items]="clients" bindLabel="nombre"
+          <ng-select placeholder="Seleccionar cliente" [items]="clients" bindLabel="displayNombre"
           [searchFn]="customSearchFn" clearAllText="Clear" dropdownPosition="bottom" [(ngModel)]="client"
           appendTo="body">
           <ng-template ng-label-tmp let-item="item">
-              <span>{{ item.nombre }}</span>
+              <span>{{ item.displayNombre }}</span>
             </ng-template>
             <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
-              <span>{{ item.nombre }}</span>
+              <span>{{ item.displayNombre }}</span>
             </ng-template>
           </ng-select>
         </div>

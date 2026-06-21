@@ -277,7 +277,10 @@ export class UpdateOrderDialogComponent implements OnInit {
     return new Promise((resolve, reject) => {
       this.customersService.find().subscribe({
         next: (clients) => {
-          this.clientes = clients;
+          this.clientes = clients.map(c => ({
+            ...c,
+            displayNombre: c.tipocli ? `${c.nombre} (${c.tipocli})` : c.nombre
+          }));
           resolve();
         },
         error: (error) => {

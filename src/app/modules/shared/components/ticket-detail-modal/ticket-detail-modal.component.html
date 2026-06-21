@@ -52,7 +52,7 @@
         </div>
         <div class="info-item">
           <span class="label">Empresa:</span>
-          <span class="value">{{ticket.nombre || ticket.empresa || '--'}}</span>
+          <span class="value">{{(ticket.nombre || ticket.empresa || '--') + (ticket.tipocli ? ' (' + ticket.tipocli + ')' : '')}}</span>
         </div>
         <div class="info-item">
           <span class="label">Contacto:</span>

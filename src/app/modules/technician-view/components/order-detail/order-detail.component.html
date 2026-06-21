@@ -76,7 +76,7 @@
                 </div>
                 <div class="info-item">
                   <span class="info-label">Empresa:</span>
-                  <span class="info-value">{{ order.empresa || order.nombre || 'N/A' }}</span>
+                  <span class="info-value">{{ (order.empresa || order.nombre || 'N/A') + (order.tipocli ? ' (' + order.tipocli + ')' : '') }}</span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">Email:</span>

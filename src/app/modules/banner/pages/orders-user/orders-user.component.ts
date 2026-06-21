@@ -356,7 +356,10 @@ export class OrdersUserComponent implements OnInit, OnDestroy {
   readAllClients() {
     this.ordersService.readAllClients().subscribe({
       next: (res) => {
-        this.clients = [res].flat();
+        this.clients = ([res].flat() as any[]).map(c => ({
+          ...c,
+          displayNombre: c.tipocli ? `${c.nombre} (${c.tipocli})` : c.nombre
+        }));
       }, 
       error: (err) => {
         console.log(err);

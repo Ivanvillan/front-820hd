@@ -85,8 +85,8 @@
 
       <ng-container matColumnDef="empresa">
         <mat-header-cell *matHeaderCellDef>Empresa</mat-header-cell>
-        <mat-cell *matCellDef="let ticket" [title]="ticket.nombre">
-          {{ticket.nombre.length > 20 ? (ticket.nombre | slice:0:20) + '...' : ticket.nombre}}
+        <mat-cell *matCellDef="let ticket" [title]="getEmpresaDisplay(ticket)">
+          {{getEmpresaDisplay(ticket).length > 20 ? (getEmpresaDisplay(ticket) | slice:0:20) + '...' : getEmpresaDisplay(ticket)}}
         </mat-cell>
       </ng-container>
 

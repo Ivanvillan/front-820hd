@@ -131,6 +131,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  getEmpresaDisplay(ticket: Ticket): string {
+    const empresa = ticket.nombre || ticket.empresa || '';
+    return ticket.tipocli ? `${empresa} (${ticket.tipocli})` : empresa;
+  }
+
   ngOnDestroy() {
     if (this.refreshSubscription) {
       this.refreshSubscription.unsubscribe();

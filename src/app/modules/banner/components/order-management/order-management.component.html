@@ -79,6 +79,10 @@
   </mat-chip-list>
 </ng-template>
 
+<ng-template #empresaTemplate let-row>
+  <span>{{ getEmpresaDisplay(row) }}</span>
+</ng-template>
+
 <ng-template #tipoServicioTemplate let-row>
   <span>{{ getServiceType(row) }}</span>
 </ng-template>

@@ -250,7 +250,10 @@ export class CreateOrderDialogComponent implements OnInit {
   private loadClients(): void {
     this.customersService.find().subscribe({
       next: (clients) => {
-        this.clientes = clients;
+        this.clientes = clients.map(c => ({
+          ...c,
+          displayNombre: c.tipocli ? `${c.nombre} (${c.tipocli})` : c.nombre
+        }));
       },
       error: (error) => {
         console.error('Error loading clients:', error);
